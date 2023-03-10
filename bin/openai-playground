@@ -4,18 +4,19 @@ use v6.d;
 use WWW::OpenAI;
 
 my %*SUB-MAIN-OPTS =
-        :named-anywhere,    # allow named variables at any location
+        :named-anywhere,
+        # allow named variables at any location
         ;
 
 #| Text processing using the OpenAI API.
-sub MAIN(Str $text,                                #= Text to be processed.
-         Str :m(:$model) is copy = 'Whatever',     #= Model.
-         Str :r(:$role) is copy = 'user',          #= Role.
-         Real :t(:$temperature) = 0.7,             #= Temperature.
-         Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
-         UInt :$timeout= 10,                       #= Timeout.
-         Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
-         ) {
+multi sub MAIN(Str $text,                                #= Text to be processed.
+               Str :m(:$model) is copy = 'Whatever',     #= Model.
+               Str :r(:$role) is copy = 'user',          #= Role.
+               Real :t(:$temperature) = 0.7,             #= Temperature.
+               Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
+               UInt :$timeout= 10,                       #= Timeout.
+               Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+               ) {
 
     if $auth-key eq 'Whatever' {
         if %*ENV<OPENAI_API_KEY>:exists {
@@ -41,4 +42,11 @@ sub MAIN(Str $text,                                #= Text to be processed.
     } else {
         say $res;
     }
+}
+
+multi sub MAIN
+#= Command given as a sequence of words.
+(*@words,
+ *%args) {
+    return MAIN(@words.join(' '), |%args)
 }
