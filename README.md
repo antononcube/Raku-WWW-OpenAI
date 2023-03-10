@@ -2,7 +2,7 @@
 
 ## In brief
 
-This Raku package provides access to the language translation service [OpenAI](https://platform.openai.com), [OAI1].
+This Raku package provides access to the machine learning service [OpenAI](https://platform.openai.com), [OAI1].
 For more details of the OpenAI's API usage see [the documentation](https://platform.openai.com/docs/api-reference/making-requests), [OAI2].
 
 **Remark:** To use the OpenAI API one has to register and obtain authorization key.
