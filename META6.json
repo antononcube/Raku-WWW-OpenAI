@@ -1,0 +1,31 @@
+{
+  "name": "WWW::OpenAI",
+  "description": "OpenAI provides access to the OpenAI playground (https://platform.openai.com).",
+  "version": "0.1.0",
+  "perl": "6.*",
+  "authors": [
+    "Anton Antonov"
+  ],
+  "auth": "zef:antononcube",
+  "depends": [
+    "HTTP::UserAgent:ver<1.1.51+>",
+    "URI::Encode:ver<0.9.0+>"
+  ],
+  "build-depends": [],
+  "test-depends": [],
+  "provides": {
+    "WWW::OpenAI": "lib/WWW/OpenAI.rakumod"
+  },
+  "resources": [],
+  "license": "Artistic-2.0",
+  "tags": [
+    "api",
+    "openai",
+    "chatgpt",
+    "ai",
+    "web service",
+    "web"
+  ],
+  "api": "1",
+  "source-url": "https://github.com/antononcube/Raku-WWW-OpenAI"
+}

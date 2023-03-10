@@ -1,0 +1,44 @@
+#!/usr/bin/env raku
+use v6.d;
+
+use WWW::OpenAI;
+
+my %*SUB-MAIN-OPTS =
+        :named-anywhere,    # allow named variables at any location
+        ;
+
+#| Text processing using the OpenAI API.
+sub MAIN(Str $text,                                #= Text to be processed.
+         Str :m(:$model) is copy = 'Whatever',     #= Model.
+         Str :r(:$role) is copy = 'user',          #= Role.
+         Real :t(:$temperature) = 0.7,             #= Temperature.
+         Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
+         UInt :$timeout= 10,                       #= Timeout.
+         Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+         ) {
+
+    if $auth-key eq 'Whatever' {
+        if %*ENV<OPENAI_API_KEY>:exists {
+            $auth-key = %*ENV<OPENAI_API_KEY>;
+        } else {
+            note 'Cannot find OpenAI authorization key. ' ~
+                    'Please provide a valid key to the argument auth-key, or set the ENV variable OPENAI_API_KEY.';
+            $auth-key = ''
+        }
+    }
+
+    my $res =
+            openai-playground($text,
+                    model => $model eq 'Whatever' ?? Whatever !! $model,
+                    role => $role eq 'Whatever' ?? Whatever !! $role,
+                    :$temperature,
+                    :$auth-key,
+                    :$timeout,
+                    :$format);
+
+    if $format.lc ∈ <hash raku> {
+        say $res.raku;
+    } else {
+        say $res;
+    }
+}
