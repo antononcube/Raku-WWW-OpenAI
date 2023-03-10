@@ -5,7 +5,5 @@ use lib '.';
 use lib './lib';
 
 use WWW::OpenAI;
-use Data::Reshapers;
-use Data::Generators;
 
-say openai-playground("how many rabits exist?", format => Whatever);
+say openai-playground("What is the population of Bulgaria?", format => Whatever);

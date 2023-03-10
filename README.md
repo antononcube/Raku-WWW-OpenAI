@@ -10,6 +10,9 @@ For more details of the OpenAI's API usage see [the documentation](https://platf
 **Remark:** This Raku package is much "less ambitious" than the official Python package, [OAIp1], developed by OpenAI's team.
 Gradually, over time, I expect to add features to the Raku package that correspond to features of [OAIp1].
 
+The design and implementation of "WWW::OpenAI" are very similar to those of 
+["Lingua::Translation::DeepL"](https://raku.land/zef:antononcube/Lingua::Translation::DeepL), [AAp1]. 
+
 -----
 
 ## Installation
@@ -42,12 +45,23 @@ Here is a simple call:
 
 ```perl6
 use WWW::OpenAI;
+say openai-playground('Where is Roger Rabbit?');
+```
+```
+# [{finish_reason => stop, index => 0, message => {content => 
+# 
+# As an AI language model, I do not have access to real-time information or location tracking features. Therefore, I cannot provide an accurate answer to the question "Where is Roger Rabbit?" without additional context. However, if you are referring to the fictional character Roger Rabbit, he is a cartoon character created by Disney and is typically found in various media, including films, television shows, and comic books., role => assistant}}]
+```
+
+Another one using Bulgarian:
+
+```perl6
 say openai-playground('Колко групи могат да се намерят в този облак от точки.');
 ```
-``` 
-# {choices => [{finish_reason => stop, index => 0, message => {content => 
+```
+# [{finish_reason => stop, index => 0, message => {content => 
 # 
-# Като AI модел, не мога да визуализирам облак от точки, но мога да кажа, че броят на групите, които могат да се образуват от тези точки, зависи от техния разположение и от критериите за групиране. Например, ако имаме 5 точки, можем да ги разделим в 1 група (ако са близо една до друга), 5 групи (ако са много отдалечени една от друга) или няколко групи, ако имаме различни критерии за групиране, като цвят, форма или размер на точките. Така че, без да имаме повече информация, не можем да определим точен брой на групите в облака от точки., role => assistant}}], created => 1678462673, id => chatcmpl-6sZ6X0YtK8HajxuGyJQsswHWsO3eM, model => gpt-3.5-turbo-0301, object => chat.completion, usage => {completion_tokens => 262, prompt_tokens => 35, total_tokens => 297}}
+# Като асистент на AI, не мога да видя облак от точки, за да мога да дам точен отговор на този въпрос. Моля, предоставете повече информация или конкретен пример, за да мога да ви помогна., role => assistant}}]
 ```
 
 -------
@@ -60,18 +74,17 @@ The package provides a Command Line Interface (CLI) script:
 openai-playground --help
 ```
 ```
-Usage:
-  openai-playground <text> [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] -- Text processing using the OpenAI API.
-  
-    <text>                     Text to be processed.
-    -m|--model=<Str>           Model. [default: 'Whatever']
-    -r|--role=<Str>            Role. [default: 'user']
-    -t|--temperature[=Real]    Temperature. [default: 0.7]
-    -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
-    --timeout[=UInt]           Timeout. [default: 10]
-    --format=<Str>             Format of the result; one of "json" or "hash". [default: 'json']
+# Usage:
+#   openai-playground <text> [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] -- Text processing using the OpenAI API.
+#   
+#     <text>                     Text to be processed.
+#     -m|--model=<Str>           Model. [default: 'Whatever']
+#     -r|--role=<Str>            Role. [default: 'user']
+#     -t|--temperature[=Real]    Temperature. [default: 0.7]
+#     -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
+#     --timeout[=UInt]           Timeout. [default: 10]
+#     --format=<Str>             Format of the result; one of "json" or "hash". [default: 'json']
 ```
-
 
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
 then `openai-playground` attempts to use the env variable `OPENAI_API_KEY`.
@@ -85,14 +98,14 @@ The following flowchart corresponds to the steps in the package function `openai
 ```mermaid
 graph TD
 	UI[/Some natural language text/]
-	TO[/Translation output/]
+	TO[/"OpenAI<br/>Processed output"/]
 	WR[[Web request]]
 	OpenAI{{https://platform.openai.com}}
 	PJ[Parse JSON]
 	Q{Return<br>hash?}
 	MSTC[Compose query]
 	MURL[[Make URL]]
-	TTC[Translate]
+	TTC[Process]
 	QAK{Auth key<br>supplied?}
 	EAK[["Try to find<br>OPENAI_API_KEY<br>in %*ENV"]]
 	QEAF{Auth key<br>found?}
@@ -118,11 +131,15 @@ graph TD
 ## Potential problems
 
 - Tested in macOS only.
-- I have to figure out how to replace the `curl` queries with "direct" URLs...
 
 --------
 
 ## References
+
+[AAp1] Anton Antonov,
+[Lingua::Translation::DeepL Raku package](https://github.com/antononcube/Raku-Lingua-Translation-DeepL),
+(2022),
+[GitHub/antononcube](https://github.com/antononcube).
 
 [OAI1] OpenAI Platform, [OpenAI platform](https://platform.openai.com/).
 

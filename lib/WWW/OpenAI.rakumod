@@ -1,7 +1,6 @@
 use v6.d;
 
-use HTTP::UserAgent;
-use URI::Encode;
+use Cro::HTTP::Client;
 use JSON::Fast;
 
 unit module WWW::OpenAI;
@@ -13,24 +12,24 @@ my $knownModels = Set.new(<gpt-3.5-turbo-0301 gpt-3.5-turbo>);
 my $knownRoles = Set.new(<user assistant>);
 
 #============================================================
-# Get data from a URL
+# Get data by Cro
 #============================================================
 
-# This code is repeated / borrowed from "Data::ExampleDatasets" and "Lingua::Translation::DeepL".
+sub get-cro-post(Str $url, Str $auth-key, Str $body, UInt :$timeout = 10) {
+    my $resp = await Cro::HTTP::Client.post: $url,
+            headers => [
+                Cro::HTTP::Header.new(
+                        name => 'Content-Type',
+                        value => 'application/json'
+                        ),
+                Cro::HTTP::Header.new(
+                        name => 'Authorization',
+                        value => "Bearer $auth-key"
+                        )
+            ],
+            :$body;
 
-#| Gets the data from a specified URL.
-sub get-url-data(Str $url, UInt :$timeout= 10) {
-    my $ua = HTTP::UserAgent.new;
-    $ua.timeout = $timeout;
-
-    my $response = $ua.get($url);
-
-    if not $response.is-success {
-        # say $response.content.WHAT;
-        note $response.status-line;
-        return Nil;
-    }
-    return $response.content;
+    return await $resp.body;
 }
 
 #============================================================
@@ -107,35 +106,25 @@ multi sub  openai-playground($text is copy,
     # Make DeepL URL
     #------------------------------------------------------
     my $textQuery = q:to/END/;
-curl https://api.openai.com/v1/chat/completions \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer $OPENAI_API_KEY' \
-  -d '{
+{
   "model": "$model",
   "messages": [{"role": "user", "content": "$content"}],
   "temperature": $temperature
-}'
+}
 END
 
     $textQuery =
             $textQuery
-            .subst('$OPENAI_API_KEY', $auth-key)
             .subst('$model', $model)
             .subst('$content', $text)
             .subst('$temperature', $temperature);
 
-    # my $url = "https://api.openai.com/v1/chat/completions?$textQuery&auth_key=$auth-key&formality=$formality&target_lang=$to-lang";
+    my $url = 'https://api.openai.com/v1/chat/completions';
 
     #------------------------------------------------------
     # Invoke OpenAI service
     #------------------------------------------------------
-    #my $res = get-url-data($url, :$timeout);
-
-    my $proc = shell $textQuery, :out, :err;
-
-    say $proc.err.slurp(:close);
-
-    my $res = $proc.out.slurp(:close);
+    my $res = get-cro-post($url, $auth-key, $textQuery, :$timeout);
 
     #------------------------------------------------------
     # Result
@@ -144,11 +133,10 @@ END
 
     return do given $format.lc {
         when $_ ∈ <whatever hash raku> {
-            my $t = from-json($res);
-            $t<choices> // $t;
+            $res<choices> // $res;
         }
-        when $_ ∈ <json> { to-json(from-json($res)); }
+        when $_ ∈ <json> { to-json($res); }
         when $_ ∈ <as-is> { $res; }
-        default { from-json($res); }
+        default { $res; }
     }
 }

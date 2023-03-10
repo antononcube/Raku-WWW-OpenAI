@@ -10,6 +10,9 @@ For more details of the OpenAI's API usage see [the documentation](https://platf
 **Remark:** This Raku package is much "less ambitious" than the official Python package, [OAIp1], developed by OpenAI's team.
 Gradually, over time, I expect to add features to the Raku package that correspond to features of [OAIp1].
 
+The design and implementation of "WWW::OpenAI" are very similar to those of 
+["Lingua::Translation::DeepL"](https://raku.land/zef:antononcube/Lingua::Translation::DeepL), [AAp1]. 
+
 -----
 
 ## Installation
@@ -42,6 +45,12 @@ Here is a simple call:
 
 ```perl6
 use WWW::OpenAI;
+say openai-playground('Where is Roger Rabbit?');
+```
+
+Another one using Bulgarian:
+
+```perl6
 say openai-playground('Колко групи могат да се намерят в този облак от точки.');
 ```
 
@@ -55,7 +64,6 @@ The package provides a Command Line Interface (CLI) script:
 openai-playground --help
 ```
 
-
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
 then `openai-playground` attempts to use the env variable `OPENAI_API_KEY`.
 
@@ -68,14 +76,14 @@ The following flowchart corresponds to the steps in the package function `openai
 ```mermaid
 graph TD
 	UI[/Some natural language text/]
-	TO[/Translation output/]
+	TO[/"OpenAI<br/>Processed output"/]
 	WR[[Web request]]
 	OpenAI{{https://platform.openai.com}}
 	PJ[Parse JSON]
 	Q{Return<br>hash?}
 	MSTC[Compose query]
 	MURL[[Make URL]]
-	TTC[Translate]
+	TTC[Process]
 	QAK{Auth key<br>supplied?}
 	EAK[["Try to find<br>OPENAI_API_KEY<br>in %*ENV"]]
 	QEAF{Auth key<br>found?}
@@ -101,11 +109,15 @@ graph TD
 ## Potential problems
 
 - Tested in macOS only.
-- I have to figure out how to replace the `curl` queries with "direct" URLs...
 
 --------
 
 ## References
+
+[AAp1] Anton Antonov,
+[Lingua::Translation::DeepL Raku package](https://github.com/antononcube/Raku-Lingua-Translation-DeepL),
+(2022),
+[GitHub/antononcube](https://github.com/antononcube).
 
 [OAI1] OpenAI Platform, [OpenAI platform](https://platform.openai.com/).
 
