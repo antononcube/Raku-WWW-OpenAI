@@ -57,7 +57,7 @@ openai-playground --help
 
 
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
-then `openai-playground` attempts to use the env variable `DEEPL_AUTH_KEY`.
+then `openai-playground` attempts to use the env variable `OPENAI_API_KEY`.
 
 --------
 
@@ -65,7 +65,36 @@ then `openai-playground` attempts to use the env variable `DEEPL_AUTH_KEY`.
 
 The following flowchart corresponds to the steps in the package function `openai-playground`:
 
-*TBD..*
+```mermaid
+graph TD
+	UI[/Some natural language text/]
+	TO[/Translation output/]
+	WR[[Web request]]
+	OpenAI{{https://platform.openai.com}}
+	PJ[Parse JSON]
+	Q{Return<br>hash?}
+	MSTC[Compose query]
+	MURL[[Make URL]]
+	TTC[Translate]
+	QAK{Auth key<br>supplied?}
+	EAK[["Try to find<br>OPENAI_API_KEY<br>in %*ENV"]]
+	QEAF{Auth key<br>found?}
+	NAK[/Cannot find auth key/]
+	UI --> QAK
+	QAK --> |yes|MSTC
+	QAK --> |no|EAK
+	EAK --> QEAF
+	MSTC --> TTC
+	QEAF --> |no|NAK
+	QEAF --> |yes|TTC
+	TTC -.-> MURL -.-> WR -.-> TTC
+	WR -.-> |URL|OpenAI 
+	OpenAI -.-> |JSON|WR
+	TTC --> Q 
+	Q --> |yes|PJ
+	Q --> |no|TO
+	PJ --> TO
+```
 
 --------
 
