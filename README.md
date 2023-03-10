@@ -44,6 +44,11 @@ Here is a simple call:
 use WWW::OpenAI;
 say openai-playground('Колко групи могат да се намерят в този облак от точки.');
 ```
+``` 
+# {choices => [{finish_reason => stop, index => 0, message => {content => 
+# 
+# Като AI модел, не мога да визуализирам облак от точки, но мога да кажа, че броят на групите, които могат да се образуват от тези точки, зависи от техния разположение и от критериите за групиране. Например, ако имаме 5 точки, можем да ги разделим в 1 група (ако са близо една до друга), 5 групи (ако са много отдалечени една от друга) или няколко групи, ако имаме различни критерии за групиране, като цвят, форма или размер на точките. Така че, без да имаме повече информация, не можем да определим точен брой на групите в облака от точки., role => assistant}}], created => 1678462673, id => chatcmpl-6sZ6X0YtK8HajxuGyJQsswHWsO3eM, model => gpt-3.5-turbo-0301, object => chat.completion, usage => {completion_tokens => 262, prompt_tokens => 35, total_tokens => 297}}
+```
 
 -------
 
@@ -53,6 +58,18 @@ The package provides a Command Line Interface (CLI) script:
 
 ```shell
 openai-playground --help
+```
+```
+Usage:
+  openai-playground <text> [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] -- Text processing using the OpenAI API.
+  
+    <text>                     Text to be processed.
+    -m|--model=<Str>           Model. [default: 'Whatever']
+    -r|--role=<Str>            Role. [default: 'user']
+    -t|--temperature[=Real]    Temperature. [default: 0.7]
+    -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
+    --timeout[=UInt]           Timeout. [default: 10]
+    --format=<Str>             Format of the result; one of "json" or "hash". [default: 'json']
 ```
 
 
@@ -77,7 +94,7 @@ The following flowchart corresponds to the steps in the package function `openai
 
 ## References
 
-[OAI1] OpenAI Platform, [DeepL Translator](https://platform.openai.com/).
+[OAI1] OpenAI Platform, [OpenAI platform](https://platform.openai.com/).
 
 [OAI1] OpenAI Platform, [OpenAI documentation](https://platform.openai.com/docs).
 

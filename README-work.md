@@ -77,7 +77,7 @@ The following flowchart corresponds to the steps in the package function `openai
 
 ## References
 
-[OAI1] OpenAI Platform, [DeepL Translator](https://platform.openai.com/).
+[OAI1] OpenAI Platform, [OpenAI platform](https://platform.openai.com/).
 
 [OAI1] OpenAI Platform, [OpenAI documentation](https://platform.openai.com/docs).
 
