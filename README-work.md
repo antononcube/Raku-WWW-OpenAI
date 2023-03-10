@@ -100,7 +100,8 @@ graph TD
 
 ## Potential problems
 
-*TBD..*
+- Tested in macOS only.
+- I have to figure out how to replace the `curl` queries with "direct" URLs...
 
 --------
 
