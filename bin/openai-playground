@@ -9,14 +9,14 @@ my %*SUB-MAIN-OPTS =
         ;
 
 #| Text processing using the OpenAI API.
-multi sub MAIN(Str $text,                                #= Text to be processed.
-               Str :m(:$model) is copy = 'Whatever',     #= Model.
-               Str :r(:$role) is copy = 'user',          #= Role.
-               Real :t(:$temperature) = 0.7,             #= Temperature.
-               Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
-               UInt :$timeout= 10,                       #= Timeout.
-               Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
-               ) {
+multi sub openai-front(Str $text,                                #= Text to be processed.
+                       Str :m(:$model) is copy = 'Whatever',     #= Model.
+                       Str :r(:$role) is copy = 'user',          #= Role.
+                       Real :t(:$temperature) = 0.7,             #= Temperature.
+                       Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
+                       UInt :$timeout= 10,                       #= Timeout.
+                       Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+                       ) {
 
     if $text.chars == 0 { return 'Nothing.'; }
 
@@ -46,6 +46,18 @@ multi sub MAIN(Str $text,                                #= Text to be processed
     }
 }
 
+#| Text processing using the OpenAI API.
+multi sub MAIN(Str $text,                                #= Text to be processed.
+               Str :m(:$model) is copy = 'Whatever',     #= Model.
+               Str :r(:$role) is copy = 'user',          #= Role.
+               Real :t(:$temperature) = 0.7,             #= Temperature.
+               Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
+               UInt :$timeout= 10,                       #= Timeout.
+               Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+               ) {
+    return openai-front($text, :$model, :$role, :$temperature, :$auth-key, :$timeout, :$format);
+}
+
 multi sub MAIN
 #= Command given as a sequence of words.
 (*@words,
@@ -56,5 +68,5 @@ multi sub MAIN
  UInt :$timeout= 10,                       #= Timeout.
  Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash"
  ) {
-    return MAIN(@words.join(' '), :$model, $role, :$temperature, :$auth-key, :$timeout, :$format);
+    return openai-front(@words.join(' ').Str, :$model, :$role, :$temperature, :$auth-key, :$timeout, :$format);
 }
