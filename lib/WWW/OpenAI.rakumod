@@ -5,17 +5,76 @@ use JSON::Fast;
 
 unit module WWW::OpenAI;
 
-# Open AI playground documentation
-constant $maxTextsPerQuery = 50;
+#============================================================
+# Known roles
+#============================================================
 
-my $knownModels = Set.new(<gpt-3.5-turbo-0301 gpt-3.5-turbo>);
 my $knownRoles = Set.new(<user assistant>);
 
 #============================================================
-# Get data by Cro
+# Known models
+#============================================================
+# https://platform.openai.com/docs/api-reference/models/list
+
+my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
+                            "ada-code-search-text", "ada-search-document", "ada-search-query",
+                            "ada-similarity", "babbage", "babbage:2020-05-03",
+                            "babbage-code-search-code", "babbage-code-search-text",
+                            "babbage-search-document", "babbage-search-query",
+                            "babbage-similarity", "code-cushman-001", "code-davinci-002",
+                            "code-davinci-edit-001", "code-search-ada-code-001",
+                            "code-search-ada-text-001", "code-search-babbage-code-001",
+                            "code-search-babbage-text-001", "curie", "curie:2020-05-03",
+                            "curie-instruct-beta", "curie-search-document", "curie-search-query",
+                            "curie-similarity", "cushman:2020-05-03", "davinci",
+                            "davinci:2020-05-03", "davinci-if:3.0.0", "davinci-instruct-beta",
+                            "davinci-instruct-beta:2.0.0", "davinci-search-document",
+                            "davinci-search-query", "davinci-similarity", "gpt-3.5-turbo",
+                            "gpt-3.5-turbo-0301", "if-curie-v2", "if-davinci:3.0.0",
+                            "if-davinci-v2", "text-ada-001", "text-ada:001", "text-babbage-001",
+                            "text-babbage:001", "text-curie-001", "text-curie:001",
+                            "text-davinci-001", "text-davinci:001", "text-davinci-002",
+                            "text-davinci-003", "text-davinci-edit-001",
+                            "text-davinci-insert-001", "text-davinci-insert-002",
+                            "text-embedding-ada-002", "text-search-ada-doc-001",
+                            "text-search-ada-query-001", "text-search-babbage-doc-001",
+                            "text-search-babbage-query-001", "text-search-curie-doc-001",
+                            "text-search-curie-query-001", "text-search-davinci-doc-001",
+                            "text-search-davinci-query-001", "text-similarity-ada-001",
+                            "text-similarity-babbage-001", "text-similarity-curie-001",
+                            "text-similarity-davinci-001", "whisper-1"]);
+
+
+#============================================================
+# GET Cro call
 #============================================================
 
-sub get-cro-post(Str $url, Str $auth-key, Str $body, UInt :$timeout = 10) {
+sub get-cro-get(Str :$url, Str :$auth-key, UInt :$timeout = 10) {
+    my $resp = await Cro::HTTP::Client.get: $url,
+            headers => [
+                Cro::HTTP::Header.new(
+                        name => 'Content-Type',
+                        value => 'application/json'
+                        ),
+                Cro::HTTP::Header.new(
+                        name => 'Authorization',
+                        value => "Bearer $auth-key"
+                        )
+            ];
+
+    CATCH {
+        when X::Cro::HTTP::Error {
+            say "Problem fetching " ~ .request.target;
+        }
+    }
+    return $resp.body;
+}
+
+#============================================================
+# POST Cro call
+#============================================================
+
+sub get-cro-post(Str $body, Str :$url, Str :$auth-key, UInt :$timeout = 10) {
     my $resp = await Cro::HTTP::Client.post: $url,
             headers => [
                 Cro::HTTP::Header.new(
@@ -33,7 +92,18 @@ sub get-cro-post(Str $url, Str $auth-key, Str $body, UInt :$timeout = 10) {
 }
 
 #============================================================
-# Get data from a URL
+# Models
+#============================================================
+
+our sub openai-get-models(
+        :$auth-key is copy = Whatever,
+                          ) is export {
+    my Str $url = 'https://api.openai.com/v1/models';
+
+}
+
+#============================================================
+# Playground
 #============================================================
 
 #| OpenAI playground access.
@@ -124,7 +194,7 @@ END
     #------------------------------------------------------
     # Invoke OpenAI service
     #------------------------------------------------------
-    my $res = get-cro-post($url, $auth-key, $textQuery, :$timeout);
+    my $res = get-cro-post($textQuery, :$url, :$auth-key, :$timeout);
 
     #------------------------------------------------------
     # Result
