@@ -10,12 +10,15 @@ my %*SUB-MAIN-OPTS =
 
 #| Text processing using the OpenAI API.
 multi sub openai-front(Str $text,                                #= Text to be processed.
+                       Str :$path = 'chat/completions',          #= Path, one of 'images/generations' or 'chat/completions'.
+                       UInt :$n = 1,                             #= Number of completions or generations.
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
                        Str :r(:$role) is copy = 'user',          #= Role.
                        Real :t(:$temperature) = 0.7,             #= Temperature.
                        Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
                        UInt :$timeout= 10,                       #= Timeout.
                        Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+                       Str :$method is copy = 'cro',             #= Method for the HTTP POST query; one of "cro" or "curl".
                        ) {
 
     if $text.chars == 0 { return 'Nothing.'; }
@@ -32,12 +35,15 @@ multi sub openai-front(Str $text,                                #= Text to be p
 
     my $res =
             openai-playground($text,
+                    :$path,
                     model => $model eq 'Whatever' ?? Whatever !! $model,
                     role => $role eq 'Whatever' ?? Whatever !! $role,
+                    :$n,
                     :$temperature,
                     :$auth-key,
                     :$timeout,
-                    :$format);
+                    :$format,
+                    :$method);
 
     if $format.lc ∈ <hash raku> {
         say $res.raku;
@@ -48,25 +54,31 @@ multi sub openai-front(Str $text,                                #= Text to be p
 
 #| Text processing using the OpenAI API.
 multi sub MAIN(Str $text,                                #= Text to be processed.
+               Str :$path = 'chat/completions',          #= Path, one of 'images/generations' or 'chat/completions'.
+               UInt :$n = 1,                             #= Number of completions or generations.
                Str :m(:$model) is copy = 'Whatever',     #= Model.
                Str :r(:$role) is copy = 'user',          #= Role.
                Real :t(:$temperature) = 0.7,             #= Temperature.
                Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
                UInt :$timeout= 10,                       #= Timeout.
                Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+               Str :$method is copy = 'cro',             #= Method for the HTTP POST query; one of "cro" or "curl".
                ) {
-    return openai-front($text, :$model, :$role, :$temperature, :$auth-key, :$timeout, :$format);
+    return openai-front($text, :$model, :$path, :$n, :$role, :$temperature, :$auth-key, :$timeout, :$format, :$method);
 }
 
 multi sub MAIN
 #= Command given as a sequence of words.
 (*@words,
  Str :m(:$model) is copy = 'Whatever',     #= Model.
+ Str :$path = 'chat/completions',          #= Path, one of 'images/generations' or 'chat/completions'.
+ UInt :$n = 1,                             #= Number of completions or generations.
  Str :r(:$role) is copy = 'user',          #= Role.
  Real :t(:$temperature) = 0.7,             #= Temperature.
  Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
  UInt :$timeout= 10,                       #= Timeout.
  Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash"
+ Str :$method is copy = 'cro',             #= Method for the HTTP POST query; one of "cro" or "curl".
  ) {
-    return openai-front(@words.join(' ').Str, :$model, :$role, :$temperature, :$auth-key, :$timeout, :$format);
+    return openai-front(@words.join(' ').Str, :$model, :$path, :$n, :$role, :$temperature, :$auth-key, :$timeout, :$format, :$method);
 }
