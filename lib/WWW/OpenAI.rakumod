@@ -201,6 +201,7 @@ multi sub  openai-request(Str :$url!,
     without $res { return Nil; }
 
     if $format.lc eq <asis as-is as_is> { return $res; }
+
     if $method eq 'curl' {
         $res = from-json($res);
     }
@@ -210,10 +211,10 @@ multi sub  openai-request(Str :$url!,
             if $res<choices>:exists {
                 $res<choices>.map({ $_<message><content>.trim })
             } else {
-                $res<data>.map({ $_<url> })
+                $res<data>.map({ $_<url> // $_<b64_json> })
             }
         }
-        when $_ ∈ <whatever hash raku values> {
+        when $_ ∈ <whatever hash raku> {
             if $res<choices>:exists {}
             $res<choices> // $res<data> // $res;
         }
