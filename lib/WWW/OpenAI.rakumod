@@ -156,6 +156,12 @@ multi sub  openai-request(Str :$url!,
     unless $format ~~ Str;
 
     #------------------------------------------------------
+    # Process $method
+    #------------------------------------------------------
+    die "The argument \$method is expected to be a one of 'cro' or 'curl'."
+    unless $method ∈ <cro curl>;
+
+    #------------------------------------------------------
     # Process $auth-key
     #------------------------------------------------------
     if $auth-key.isa(Whatever) {
@@ -377,7 +383,6 @@ multi sub openai-create-image($prompt,
     die "The argument \$size is expected to be Whatever or one of '{%sizeMap.keys.join(', ')}', '{%sizeMap.values.join(', ')}'."
     unless %sizeMap{$size}:exists;
 
-
     #------------------------------------------------------
     # Process $response_format
     #------------------------------------------------------
@@ -441,11 +446,11 @@ multi sub  openai-playground($text is copy,
     given $path.lc {
         when $_ ∈ <completions chat/completions> {
             my $url = 'https://api.openai.com/v1/chat/completions';
-            return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash, :$auth-key, :$timeout, :$format);
+            return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash, :$auth-key, :$timeout, :$format, :$method);
         }
         when $_ ∈ <create-image images/generations> {
             my $url = 'https://api.openai.com/v1/images/generations';
-            return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key, :$timeout, :$format);
+            return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key, :$timeout, :$format, :$method);
         }
         default {
             die 'Do not know how to process the given path.';
