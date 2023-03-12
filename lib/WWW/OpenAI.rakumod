@@ -45,6 +45,10 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "text-similarity-davinci-001", "whisper-1"]);
 
 
+multi sub openai-known-models(Bool :$retrieve = False) is export {
+    return $knownModels;
+}
+
 #============================================================
 # GET Cro call
 #============================================================
@@ -196,25 +200,25 @@ multi sub  openai-request(Str :$url!,
     #------------------------------------------------------
     without $res { return Nil; }
 
-    if $method eq 'cro' {
-        return do given $format.lc {
-            when $_ ∈ <whatever hash raku> {
-                $res<choices> // $res<data> // $res;
+    if $format.lc eq <asis as-is as_is> { return $res; }
+    if $method eq 'curl' {
+        $res = from-json($res);
+    }
+
+    return do given $format.lc {
+        when $_ eq 'values' {
+            if $res<choices>:exists {
+                $res<choices>.map({ $_<message><content>.trim })
+            } else {
+                $res<data>.map({ $_<url> })
             }
-            when $_ ∈ <json> { to-json($res); }
-            when $_ ∈ <as-is> { $res; }
-            default { $res; }
         }
-    } else {
-        return do given $format.lc {
-            when $_ ∈ <whatever hash raku> {
-                my $t = from-json($res);
-                $t<choices> // $t<data> // $t;
-            }
-            when $_ ∈ <json> { to-json(from-json($res)); }
-            when $_ ∈ <as-is> { $res; }
-            default { from-json($res); }
+        when $_ ∈ <whatever hash raku values> {
+            if $res<choices>:exists {}
+            $res<choices> // $res<data> // $res;
         }
+        when $_ ∈ <json> { to-json($res); }
+        default { $res; }
     }
 }
 
@@ -380,8 +384,9 @@ multi sub openai-create-image($prompt,
     my %sizeMap = small => '256x256', medium => '512x512', 'large' => '1024x1024';
     %sizeMap = %sizeMap , %sizeMap.values.map({ $_ => $_ }).Hash;
 
-    die "The argument \$size is expected to be Whatever or one of '{%sizeMap.keys.join(', ')}', '{%sizeMap.values.join(', ')}'."
+    die "The argument \$size is expected to be Whatever or one of '{%sizeMap.keys.sort.join(', ')}'."
     unless %sizeMap{$size}:exists;
+    $size = %sizeMap{$size};
 
     #------------------------------------------------------
     # Process $response_format
