@@ -339,7 +339,7 @@ END
 our proto openai-create-image($prompt,
                               UInt :$n = 1,
                               :$size is copy = Whatever,
-                              :$response_format is copy = Whatever,
+                              :$response-format is copy = Whatever,
                               :$auth-key is copy = Whatever,
                               UInt :$timeout= 10,
                               :$format is copy = Whatever,
@@ -441,11 +441,11 @@ multi sub  openai-playground($text is copy,
     given $path.lc {
         when $_ ∈ <completions chat/completions> {
             my $url = 'https://api.openai.com/v1/chat/completions';
-            return openai-completion($text, |%args, :$auth-key, :$timeout, :$format);
+            return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash, :$auth-key, :$timeout, :$format);
         }
         when $_ ∈ <create-image images/generations> {
             my $url = 'https://api.openai.com/v1/images/generations';
-            return openai-create-image($text, |%args, :$auth-key, :$timeout, :$format);
+            return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key, :$timeout, :$format);
         }
         default {
             die 'Do not know how to process the given path.';
