@@ -190,13 +190,25 @@ multi sub  openai-request(Str :$url!,
     #------------------------------------------------------
     without $res { return Nil; }
 
-    return do given $format.lc {
-        when $_ ∈ <whatever hash raku> {
-            $res<choices> // $res;
+    if $method eq 'cro' {
+        return do given $format.lc {
+            when $_ ∈ <whatever hash raku> {
+                $res<choices> // $res<data> // $res;
+            }
+            when $_ ∈ <json> { to-json($res); }
+            when $_ ∈ <as-is> { $res; }
+            default { $res; }
         }
-        when $_ ∈ <json> { to-json($res); }
-        when $_ ∈ <as-is> { $res; }
-        default { $res; }
+    } else {
+        return do given $format.lc {
+            when $_ ∈ <whatever hash raku> {
+                my $t = from-json($res);
+                $t<choices> // $t<data> // $t;
+            }
+            when $_ ∈ <json> { to-json(from-json($res)); }
+            when $_ ∈ <as-is> { $res; }
+            default { from-json($res); }
+        }
     }
 }
 
