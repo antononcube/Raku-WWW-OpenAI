@@ -100,6 +100,21 @@ my @imgRes = |openai-create-image(
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
 
+### Moderation
+
+Here is an example of using 
+[OpenAI's moderation](https://platform.openai.com/docs/api-reference/moderations):
+
+```perl6
+my @modRes = |openai-moderation(
+"I want to kill them!",
+format => "values",
+method => 'cro');
+
+for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
+```
+
+
 -------
 
 ## Command Line Interface

@@ -53,7 +53,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, message => {content => 
 # 
-# As an AI language model, I cannot accurately determine the location of a fictional character. However, Roger Rabbit is a fictional character from the movie "Who Framed Roger Rabbit," created by Robert Zemeckis and released in 1988., role => assistant}}]
+# As an AI language model, I do not have the capability to determine the current whereabouts of fictional characters. However, Roger Rabbit is a character created for the 1988 film "Who Framed Roger Rabbit" and is still popular among fans of the movie., role => assistant}}]
 ```
 
 Another one using Bulgarian:
@@ -64,7 +64,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, message => {content => 
 # 
-# За да отговорим на този въпрос, ни трябва повече информация за облака от точки. Ако знаем броя точки в облака и какви са техните ко, role => assistant}}]
+# Като AI модел, не мога да видя облак от точки, който споменавате. Моля, посочете повече информация или предоставете изображение, за да мога да отгов, role => assistant}}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -109,6 +109,30 @@ my @imgRes = |openai-create-image(
 
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
+
+### Moderation
+
+Here is an example of using 
+[OpenAI's moderation](https://platform.openai.com/docs/api-reference/moderations):
+
+```perl6
+my @modRes = |openai-moderation(
+"I want to kill them!",
+format => "values",
+method => 'curl');
+
+for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
+```
+``` 
+# violence => 0.9640626311302185
+# hate => 0.27332669496536255
+# hate/threatening => 0.00637523178011179
+# sexual => 8.585161026530841e-07
+# violence/graphic => 2.8522084249971158e-08
+# self-harm => 1.678687522321809e-09
+# sexual/minors => 1.3898265871503668e-09
+```
+
 
 -------
 
