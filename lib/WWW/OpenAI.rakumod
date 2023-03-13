@@ -209,9 +209,16 @@ multi sub  openai-request(Str :$url!,
     return do given $format.lc {
         when $_ eq 'values' {
             if $res<choices>:exists {
+                # Assuming chat completion
                 $res<choices>.map({ $_<message><content>.trim })
-            } else {
+            } elsif $res<data> {
+                # Assuming image generation
                 $res<data>.map({ $_<url> // $_<b64_json> })
+            } elsif $res<results> {
+                # Assuming moderation
+                $res<results>.map({ $_<category_scores> // $_<categories> })
+            } else {
+                $res
             }
         }
         when $_ ∈ <whatever hash raku> {
@@ -248,7 +255,7 @@ END
 #}
 #END
 
-#| OpenAI playground access.
+#| OpenAI completion access.
 our proto openai-completion($prompt is copy,
                             :$role is copy = Whatever,
                             :$model is copy = Whatever,
@@ -260,12 +267,12 @@ our proto openai-completion($prompt is copy,
                             :$format is copy = Whatever,
                             Str :$method = 'cro') is export {*}
 
-#| OpenAI playground access.
+#| OpenAI completion access.
 multi sub openai-completion(@prompts, *%args) {
     return @prompts.map({ openai-completion($_, |%args) });
 }
 
-#| OpenAI playground access.
+#| OpenAI completion access.
 multi sub  openai-completion($prompt is copy,
                              :$role is copy = Whatever,
                              :$model is copy = Whatever,
@@ -346,7 +353,7 @@ my $imageGenerationStencil = q:to/END/;
 }
 END
 
-#| OpenAI playground access.
+#| OpenAI image generation access.
 our proto openai-create-image($prompt,
                               UInt :$n = 1,
                               :$size is copy = Whatever,
@@ -357,12 +364,12 @@ our proto openai-create-image($prompt,
                               Str :$method = 'cro'
                               ) is export {*}
 
-#| OpenAI playground access.
+#| OpenAI image generation access.
 multi sub openai-create-image(@prompts, *%args) {
-    return @prompts.map({ openai-completion($_, |%args) });
+    return @prompts.map({ openai-create-image($_, |%args) });
 }
 
-#| OpenAI playground access.
+#| OpenAI image generation access.
 multi sub openai-create-image($prompt,
                               UInt :$n = 1,
                               :$size is copy = Whatever,
@@ -383,9 +390,9 @@ multi sub openai-create-image($prompt,
     #------------------------------------------------------
     if $size.isa(Whatever) { $size = '256x256'; }
     my %sizeMap = small => '256x256', medium => '512x512', 'large' => '1024x1024';
-    %sizeMap = %sizeMap , %sizeMap.values.map({ $_ => $_ }).Hash;
+    %sizeMap = %sizeMap, %sizeMap.values.map({ $_ => $_ }).Hash;
 
-    die "The argument \$size is expected to be Whatever or one of '{%sizeMap.keys.sort.join(', ')}'."
+    die "The argument \$size is expected to be Whatever or one of '{ %sizeMap.keys.sort.join(', ') }'."
     unless %sizeMap{$size}:exists;
     $size = %sizeMap{$size};
 
@@ -407,6 +414,53 @@ multi sub openai-create-image($prompt,
             .subst('$n', $n);
 
     my $url = 'https://api.openai.com/v1/images/generations';
+
+    #------------------------------------------------------
+    # Delegate
+    #------------------------------------------------------
+
+    return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
+}
+
+
+#============================================================
+# Moderation
+#============================================================
+
+my $moderationStencil = q:to/END/;
+{
+  "input": "$prompt"
+}
+END
+
+#| OpenAI image generation access.
+our proto openai-moderation($prompt,
+                            :$auth-key is copy = Whatever,
+                            UInt :$timeout= 10,
+                            :$format is copy = Whatever,
+                            Str :$method = 'cro'
+                            ) is export {*}
+
+#| OpenAI image generation access.
+multi sub openai-moderation(@prompts, *%args) {
+    return @prompts.map({ openai-moderation($_, |%args) });
+}
+
+#| OpenAI image generation access.
+multi sub openai-moderation($prompt,
+                            :$auth-key is copy = Whatever,
+                            UInt :$timeout= 10,
+                            :$format is copy = Whatever,
+                            Str :$method = 'cro') {
+
+    #------------------------------------------------------
+    # Make OpenAI URL
+    #------------------------------------------------------
+
+    my $body = $moderationStencil
+            .subst('$prompt', $prompt);
+
+    my $url = 'https://api.openai.com/v1/moderations';
 
     #------------------------------------------------------
     # Delegate
@@ -452,11 +506,13 @@ multi sub  openai-playground($text is copy,
     given $path.lc {
         when $_ ∈ <completions chat/completions> {
             my $url = 'https://api.openai.com/v1/chat/completions';
-            return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash, :$auth-key, :$timeout, :$format, :$method);
+            return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
+                    :$auth-key, :$timeout, :$format, :$method);
         }
         when $_ ∈ <create-image images/generations> {
             my $url = 'https://api.openai.com/v1/images/generations';
-            return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key, :$timeout, :$format, :$method);
+            return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
+                    :$timeout, :$format, :$method);
         }
         default {
             die 'Do not know how to process the given path.';
