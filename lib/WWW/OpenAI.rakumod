@@ -288,14 +288,14 @@ multi sub  openai-completion($prompt is copy,
     # Process $role
     #------------------------------------------------------
     if $role.isa(Whatever) { $role = "user"; }
-    die "The argument \$role is expected to be Whatever or one of the strings: { $knownRoles.keys.sort.join(' ') }."
+    die "The argument \$role is expected to be Whatever or one of the strings: { '"' ~ $knownRoles.keys.sort.join('", "') ~ '"'  }."
     unless $role ∈ $knownRoles;
 
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
     if $model.isa(Whatever) { $model = "gpt-3.5-turbo"; }
-    die "The argument \$model is expected to be Whatever or one of the strings: { $knownModels.keys.sort.join(' ') }."
+    die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ $knownModels.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ $knownModels;
 
     #------------------------------------------------------
@@ -504,15 +504,19 @@ multi sub  openai-playground($text is copy,
     #------------------------------------------------------
 
     given $path.lc {
-        when $_ ∈ <completions chat/completions> {
+        when $_ ∈ <completion completions chat/completions> {
             my $url = 'https://api.openai.com/v1/chat/completions';
             return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
         }
-        when $_ ∈ <create-image images/generations> {
+        when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
             my $url = 'https://api.openai.com/v1/images/generations';
             return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
                     :$timeout, :$format, :$method);
+        }
+        when $_ ∈ <moderations moderation censorship> {
+            my $url = 'https://api.openai.com/v1/moderations';
+            return openai-moderation($text, :$auth-key, :$timeout, :$format, :$method);
         }
         default {
             die 'Do not know how to process the given path.';

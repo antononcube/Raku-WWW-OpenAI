@@ -10,7 +10,7 @@ my %*SUB-MAIN-OPTS =
 
 #| Text processing using the OpenAI API.
 multi sub openai-front(Str $text,                                #= Text to be processed.
-                       Str :$path = 'chat/completions',          #= Path, one of 'images/generations' or 'chat/completions'.
+                       Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', or 'moderations'.
                        UInt :$n = 1,                             #= Number of completions or generations.
                        UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
@@ -23,7 +23,10 @@ multi sub openai-front(Str $text,                                #= Text to be p
                        Str :$method is copy = 'cro',             #= Method for the HTTP POST query; one of "cro" or "curl".
                        ) {
 
-    if $text.chars == 0 { return 'Nothing.'; }
+    if $text.chars == 0 {
+        note 'Nothing.';
+        return;
+    }
 
     if $auth-key eq 'Whatever' {
         if %*ENV<OPENAI_API_KEY>:exists {
@@ -58,7 +61,7 @@ multi sub openai-front(Str $text,                                #= Text to be p
 
 #| Text processing using the OpenAI API.
 multi sub MAIN(Str $text,                                #= Text to be processed.
-               Str :$path = 'chat/completions',          #= Path, one of 'images/generations' or 'chat/completions'.
+               Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', or 'moderations'.
                UInt :$n = 1,                             #= Number of completions or generations.
                UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
                Str :m(:$model) is copy = 'Whatever',     #= Model.
@@ -77,7 +80,7 @@ multi sub MAIN
 #= Command given as a sequence of words.
 (*@words,
  Str :m(:$model) is copy = 'Whatever',     #= Model.
- Str :$path = 'chat/completions',          #= Path, one of 'images/generations' or 'chat/completions'.
+ Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', or 'moderations'.
  UInt :$n = 1,                             #= Number of completions or generations.
  UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
  Str :r(:$role) is copy = 'user',          #= Role.
