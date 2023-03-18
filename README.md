@@ -221,7 +221,7 @@ graph TD
   
 - Interestingly: 
   - I did not get these messages while implementing the changes of ver<1.1> of this package
-  - I do not get these message when using Raku in a Markdown or Mathematica notebooks, [AA1],
+  - I do not get these messages when using Raku in Markdown or Mathematica notebooks, [AA1],
     via the package ["Text::CodeProcessing"](https://raku.land/zef:antononcube/Text::CodeProcessing)
   
 - Because of those SSL problems I implemented the method option that takes the values 'cro' and 'curl'.
