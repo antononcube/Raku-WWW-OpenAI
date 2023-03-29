@@ -640,7 +640,7 @@ multi sub openai-audio($file,
                         body-blob => slurp($file, :bin)
                         )
         );
-        .say for @body;
+
         return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
     }
 }
