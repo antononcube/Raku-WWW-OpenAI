@@ -95,18 +95,12 @@ multi sub get-cro-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout 
     return await $resp.body;
 }
 
-
 multi sub get-cro-post(Str :$url!,
                        :$body! where * ~~ Positional,
                        Str :$auth-key!,
                        UInt :$timeout = 10) {
     my $resp = await Cro::HTTP::Client.post: $url,
-            headers => [
-                Cro::HTTP::Header.new(
-                        name => 'Authorization',
-                        value => "Bearer $auth-key"
-                        )
-            ],
+            headers => [ Authorization => "Bearer $auth-key" ],
             content-type => 'multipart/form-data',
             :$body;
 
@@ -627,15 +621,26 @@ multi sub openai-audio($file,
         my %body = %(:$file, :$model, :$prompt, :$language, :$temperature, response_format => $format);
 
         return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method); }
-    else {
-        my @body = [:$model, :$prompt, :$language, :$temperature, response_format => $format];
-        @body.append(
-                (file => {
-                    MIMEType => 'audio/' ~ $file.split('.')[*- 1],
-                    Name => $file.split('/')[*- 1],
-                    Content => slurp($file, :bin)
-                }));
 
+    else {
+        my @body = [:$model, :$temperature, response_format => $format];
+
+        if $prompt { @body.append($prompt); }
+
+        if $language { @body.append($language); }
+
+        @body.append(
+                Cro::HTTP::Body::MultiPartFormData::Part.new(
+                        headers => [Cro::HTTP::Header.new(
+                                name => 'Content-type',
+                                value => 'audio/' ~ $file.split('.')[*- 1],
+                                )],
+                        name => $file.split('/')[*- 1].split('.')[0..(*-2)].join('.'),
+                        filename => $file.split('/')[*- 1],
+                        body-blob => slurp($file, :bin)
+                        )
+        );
+        .say for @body;
         return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
     }
 }
