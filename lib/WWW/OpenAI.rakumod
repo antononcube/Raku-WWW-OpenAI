@@ -78,7 +78,7 @@ sub get-cro-get(Str :$url, Str :$auth-key, UInt :$timeout = 10) {
 # POST Cro call
 #============================================================
 
-sub get-cro-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) {
+multi sub get-cro-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) {
     my $resp = await Cro::HTTP::Client.post: $url,
             headers => [
                 Cro::HTTP::Header.new(
@@ -95,6 +95,24 @@ sub get-cro-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) 
     return await $resp.body;
 }
 
+
+multi sub get-cro-post(Str :$url!,
+                       :$body! where * ~~ Positional,
+                       Str :$auth-key!,
+                       UInt :$timeout = 10) {
+    my $resp = await Cro::HTTP::Client.post: $url,
+            headers => [
+                Cro::HTTP::Header.new(
+                        name => 'Authorization',
+                        value => "Bearer $auth-key"
+                        )
+            ],
+            content-type => 'multipart/form-data',
+            :$body;
+
+    return await $resp.body;
+}
+
 #============================================================
 # POST Curl call
 #============================================================
@@ -105,12 +123,40 @@ curl $URL \
   -d '$BODY'
 END
 
-sub get-curl-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) {
+multi sub get-curl-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) {
 
     my $textQuery = $curlQuery
             .subst('$URL', $url)
             .subst('$OPENAI_API_KEY', $auth-key)
             .subst('$BODY', $body);
+
+    my $proc = shell $textQuery, :out, :err;
+
+    say $proc.err.slurp(:close);
+
+    return $proc.out.slurp(:close);
+}
+
+my $curlFormQuery = q:to/END/;
+curl $URL \
+  --header 'Authorization: Bearer $OPENAI_API_KEY' \
+  --header 'Content-Type: multipart/form-data'
+END
+
+multi sub get-curl-post(Str :$url!,
+                        :$body! where * ~~ Map,
+                        Str :$auth-key!,
+                        UInt :$timeout = 10) {
+
+    my $textQuery = $curlFormQuery
+            .subst('$URL', $url)
+            .subst('$OPENAI_API_KEY', $auth-key)
+            .trim-trailing;
+
+    for $body.kv -> $k, $v {
+        my $sep=$k eq 'file' ?? '@' !! '';
+        $textQuery ~= " \\\n  --form $k=$sep$v";
+    }
 
     my $proc = shell $textQuery, :out, :err;
 
@@ -136,21 +182,23 @@ our sub openai-get-models(
 
 #| OpenAI request access.
 our proto openai-request(Str :$url!,
-                         Str :$body!,
+                         :$body!,
+                         Str :$audio-file = '',
+                         :$auth-key is copy = Whatever,
+                         UInt :$timeout= 10,
+                         :$format is copy = Whatever,
+                         Str :$method = 'cro',
+                         ) is export {*}
+
+#| OpenAI request access.
+multi sub openai-request(Str :$url!,
+                         :$body!,
+                         Str :$audio-file = '',
                          :$auth-key is copy = Whatever,
                          UInt :$timeout= 10,
                          :$format is copy = Whatever,
                          Str :$method = 'cro'
-                         ) is export {*}
-
-#| OpenAI request access.
-multi sub  openai-request(Str :$url!,
-                          Str :$body!,
-                          :$auth-key is copy = Whatever,
-                          UInt :$timeout= 10,
-                          :$format is copy = Whatever,
-                          Str :$method = 'cro'
-                          ) {
+                         ) {
 
     #------------------------------------------------------
     # Process $format
@@ -273,22 +321,22 @@ multi sub openai-completion(@prompts, *%args) {
 }
 
 #| OpenAI completion access.
-multi sub  openai-completion($prompt is copy,
-                             :$role is copy = Whatever,
-                             :$model is copy = Whatever,
-                             :$temperature is copy = Whatever,
-                             :$max-tokens is copy = Whatever,
-                             UInt :$n = 1,
-                             :$auth-key is copy = Whatever,
-                             UInt :$timeout= 10,
-                             :$format is copy = Whatever,
-                             Str :$method = 'cro') {
+multi sub openai-completion($prompt is copy,
+                            :$role is copy = Whatever,
+                            :$model is copy = Whatever,
+                            :$temperature is copy = Whatever,
+                            :$max-tokens is copy = Whatever,
+                            UInt :$n = 1,
+                            :$auth-key is copy = Whatever,
+                            UInt :$timeout= 10,
+                            :$format is copy = Whatever,
+                            Str :$method = 'cro') {
 
     #------------------------------------------------------
     # Process $role
     #------------------------------------------------------
     if $role.isa(Whatever) { $role = "user"; }
-    die "The argument \$role is expected to be Whatever or one of the strings: { '"' ~ $knownRoles.keys.sort.join('", "') ~ '"'  }."
+    die "The argument \$role is expected to be Whatever or one of the strings: { '"' ~ $knownRoles.keys.sort.join('", "') ~ '"' }."
     unless $role ∈ $knownRoles;
 
     #------------------------------------------------------
@@ -471,6 +519,129 @@ multi sub openai-moderation($prompt,
 
 
 #============================================================
+# Audio
+#============================================================
+
+my $audioStencil = q:to/END/;
+{
+  "file": "$file",
+  "model": "$model",
+  "prompt": "$prompt",
+  "language": "$language",
+  "temperature": $temperature,
+  "response_format": "$response-format"
+}
+END
+
+#| OpenAI image generation access.
+our proto openai-audio($fileName,
+                       :$type = 'transcriptions',
+                       :$temperature is copy = Whatever,
+                       :$language is copy = Whatever,
+                       :$model is copy = Whatever,
+                       Str :$prompt = '',
+                       :$auth-key is copy = Whatever,
+                       UInt :$timeout= 10,
+                       :$format is copy = Whatever,
+                       Str :$method = 'cro'
+                       ) is export {*}
+
+#| OpenAI image generation access.
+multi sub openai-audio(@fileNames, *%args) {
+    return @fileNames.map({ openai-audio($_, |%args) });
+}
+
+#| OpenAI image generation access.
+multi sub openai-audio($file,
+                       :$type is copy = 'transcriptions',
+                       :$temperature is copy = Whatever,
+                       :$language is copy = Whatever,
+                       :$model is copy = Whatever,
+                       Str :$prompt = '',
+                       :$auth-key is copy = Whatever,
+                       UInt :$timeout= 10,
+                       :$format is copy = Whatever,
+                       Str :$method = 'cro') {
+
+    #------------------------------------------------------
+    # Process file name
+    #------------------------------------------------------
+
+    # Verify file exists
+    die "The file '$file' does not exists"
+    unless $file.IO.e;
+
+    #------------------------------------------------------
+    # Process type
+    #------------------------------------------------------
+    if $type.isa(Whatever) { $type = 'transcriptions'; }
+    my @expectedTypes = <transcriptions translations>;
+    die "The value of the argument \$type is expected to be one of {@expectedTypes.join(', ')}."
+    unless $type ~~ Str && $type.lc ∈ @expectedTypes;
+
+    #------------------------------------------------------
+    # Process format
+    #------------------------------------------------------
+    my @expectedFormats = <json text srt verbose_json vtt>;
+    die "The value of the argument \$format is expected to be one of {@expectedFormats.join(', ')}."
+    unless $format ~~ Str && $format.lc ∈ @expectedFormats;
+
+    #------------------------------------------------------
+    # Process $temperature
+    #------------------------------------------------------
+    if $temperature.isa(Whatever) { $temperature = 0; }
+    die "The argument \$temperature is expected to be Whatever or number between 0 and 1."
+    unless $temperature ~~ Numeric && 0 ≤ $temperature ≤ 1;
+
+    #------------------------------------------------------
+    # Process $language
+    #------------------------------------------------------
+    if $language.isa(Whatever) { $language = ''; }
+
+    #------------------------------------------------------
+    # Process $model
+    #------------------------------------------------------
+    # The API documentation states that only 'whisper-1' is available. (2023-03-29)
+    if $model.isa(Whatever) { $model = 'whisper-1'; }
+
+    #------------------------------------------------------
+    # Make OpenAI URL
+    #------------------------------------------------------
+
+    my $body = $audioStencil
+            .subst('$file', $file)
+            .subst('$model', $model)
+            .subst('$prompt', $prompt)
+            .subst('$language', $language)
+            .subst('$temperature', $temperature)
+            .subst('$response-format', $format);
+
+    my $url = 'https://api.openai.com/v1/audio/' ~ $type;
+
+    #------------------------------------------------------
+    # Delegate
+    #------------------------------------------------------
+
+    if $method eq 'curl' {
+        # Some sort of no-good shortcut -- see get-curl-post
+        my %body = %(:$file, :$model, :$prompt, :$language, :$temperature, response_format => $format);
+
+        return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method); }
+    else {
+        my @body = [:$model, :$prompt, :$language, :$temperature, response_format => $format];
+        @body.append(
+                (file => {
+                    MIMEType => 'audio/' ~ $file.split('.')[*- 1],
+                    Name => $file.split('/')[*- 1],
+                    Content => slurp($file, :bin)
+                }));
+
+        return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
+    }
+}
+
+
+#============================================================
 # Playground
 #============================================================
 
@@ -490,14 +661,14 @@ multi sub openai-playground(@texts, *%args) {
 }
 
 #| OpenAI playground access.
-multi sub  openai-playground($text is copy,
-                             Str :$path = 'completions',
-                             :$auth-key is copy = Whatever,
-                             UInt :$timeout= 10,
-                             :$format is copy = Whatever,
-                             Str :$method = 'cro',
-                             *%args
-                             ) {
+multi sub openai-playground($text is copy,
+                            Str :$path = 'completions',
+                            :$auth-key is copy = Whatever,
+                            UInt :$timeout= 10,
+                            :$format is copy = Whatever,
+                            Str :$method = 'cro',
+                            *%args
+                            ) {
 
     #------------------------------------------------------
     # Dispatch
@@ -505,18 +676,32 @@ multi sub  openai-playground($text is copy,
 
     given $path.lc {
         when $_ ∈ <completion completions chat/completions> {
-            my $url = 'https://api.openai.com/v1/chat/completions';
+            # my $url = 'https://api.openai.com/v1/chat/completions';
             return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
         }
         when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
-            my $url = 'https://api.openai.com/v1/images/generations';
+            # my $url = 'https://api.openai.com/v1/images/generations';
             return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
                     :$timeout, :$format, :$method);
         }
         when $_ ∈ <moderations moderation censorship> {
-            my $url = 'https://api.openai.com/v1/moderations';
+            # my $url = 'https://api.openai.com/v1/moderations';
             return openai-moderation($text, :$auth-key, :$timeout, :$format, :$method);
+        }
+        when $_ ∈ <transcriptions transcription transcribe audio/transcriptions> {
+            # my $url = 'https://api.openai.com/v1/audio';
+            # Here $text is a file name
+            return openai-audio($text,
+                    |%args.grep({ $_.key ∈ <prompt model temperature language> }).Hash,
+                    type => 'transcriptions', :$auth-key, :$timeout, :$format, :$method);
+        }
+        when $_ ∈ <translations translation translate audio/translations> {
+            # my $url = 'https://api.openai.com/v1/audio';
+            # Here $text is a file name
+            return openai-audio($text,
+                    |%args.grep({ $_.key ∈ <prompt model temperature language> }).Hash,
+                    type => 'translations', :$auth-key, :$timeout, :$format, :$method);
         }
         default {
             die 'Do not know how to process the given path.';
