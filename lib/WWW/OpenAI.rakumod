@@ -68,7 +68,7 @@ sub get-cro-get(Str :$url, Str :$auth-key, UInt :$timeout = 10) {
 
     CATCH {
         when X::Cro::HTTP::Error {
-            say "Problem fetching " ~ .request.target;
+            note "Problem fetching " ~ .request.target;
         }
     }
     return $resp.body;
