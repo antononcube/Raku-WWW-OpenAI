@@ -641,6 +641,15 @@ multi sub openai-audio($file,
                         )
         );
 
+        # A possible alternative following:
+        #   https://github.com/sw1sh/OpenAILink/blob/master/Kernel/Audio.wl
+        # @body.append(
+        #         (file => %(
+        #             MIMEType => 'audio/' ~ $file.split('.')[*- 1],
+        #             Name => $file.split('/')[*- 1],
+        #             Content => slurp($file, :bin)))
+        #         );
+
         return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
     }
 }
