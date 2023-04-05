@@ -2,6 +2,7 @@ use v6.d;
 
 use Cro::HTTP::Client;
 use JSON::Fast;
+use HTTP::Tiny;
 
 unit module WWW::OpenAI;
 
@@ -108,6 +109,21 @@ multi sub get-cro-post(Str :$url!,
 }
 
 #============================================================
+# POST Tiny call
+#============================================================
+
+multi sub get-tiny-post(Str :$url!,
+                       :%body!,
+                       Str :$auth-key!,
+                       UInt :$timeout = 10) {
+    my $resp = .<content>.decode given HTTP::Tiny.post: $url,
+            headers => { authorization => "Bearer $auth-key" },
+            content => %body;
+
+    return $resp;
+}
+
+#============================================================
 # POST Curl call
 #============================================================
 my $curlQuery = q:to/END/;
@@ -177,7 +193,6 @@ our sub openai-get-models(
 #| OpenAI request access.
 our proto openai-request(Str :$url!,
                          :$body!,
-                         Str :$audio-file = '',
                          :$auth-key is copy = Whatever,
                          UInt :$timeout= 10,
                          :$format is copy = Whatever,
@@ -187,7 +202,6 @@ our proto openai-request(Str :$url!,
 #| OpenAI request access.
 multi sub openai-request(Str :$url!,
                          :$body!,
-                         Str :$audio-file = '',
                          :$auth-key is copy = Whatever,
                          UInt :$timeout= 10,
                          :$format is copy = Whatever,
@@ -204,8 +218,8 @@ multi sub openai-request(Str :$url!,
     #------------------------------------------------------
     # Process $method
     #------------------------------------------------------
-    die "The argument \$method is expected to be a one of 'cro' or 'curl'."
-    unless $method ∈ <cro curl>;
+    die "The argument \$method is expected to be a one of 'curl', 'cro', or 'tiny'."
+    unless $method ∈ <curl cro tiny>;
 
     #------------------------------------------------------
     # Process $auth-key
@@ -231,6 +245,9 @@ multi sub openai-request(Str :$url!,
         }
         when 'curl' {
             get-curl-post(:$url, :$body, :$auth-key, :$timeout);
+        }
+        when 'tiny' {
+            get-tiny-post(:$url, :$body, :$auth-key, :$timeout);
         }
         default {
             die 'Unknown method.'
@@ -555,7 +572,7 @@ multi sub openai-audio($file,
                        :$auth-key is copy = Whatever,
                        UInt :$timeout= 10,
                        :$format is copy = Whatever,
-                       Str :$method = 'cro') {
+                       Str :$method = 'tiny') {
 
     #------------------------------------------------------
     # Process file name
@@ -570,14 +587,14 @@ multi sub openai-audio($file,
     #------------------------------------------------------
     if $type.isa(Whatever) { $type = 'transcriptions'; }
     my @expectedTypes = <transcriptions translations>;
-    die "The value of the argument \$type is expected to be one of {@expectedTypes.join(', ')}."
+    die "The value of the argument \$type is expected to be one of { @expectedTypes.join(', ') }."
     unless $type ~~ Str && $type.lc ∈ @expectedTypes;
 
     #------------------------------------------------------
     # Process format
     #------------------------------------------------------
     my @expectedFormats = <json text srt verbose_json vtt>;
-    die "The value of the argument \$format is expected to be one of {@expectedFormats.join(', ')}."
+    die "The value of the argument \$format is expected to be one of { @expectedFormats.join(', ') }."
     unless $format ~~ Str && $format.lc ∈ @expectedFormats;
 
     #------------------------------------------------------
@@ -620,9 +637,21 @@ multi sub openai-audio($file,
         # Some sort of no-good shortcut -- see get-curl-post
         my %body = %(:$file, :$model, :$prompt, :$language, :$temperature, response_format => $format);
 
-        return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method); }
+        return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method);
 
-    else {
+    } elsif $method eq 'tiny' {
+
+        my %body = :$model, :$temperature, response_format => $format;
+
+        if $prompt { %body<prompt> = $prompt; }
+
+        if $language { %body<language> = $language; }
+
+        %body<file> = $file.IO;
+
+        return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method);
+
+    } else {
         my @body = [:$model, :$temperature, response_format => $format];
 
         if $prompt { @body.append($prompt); }
@@ -639,7 +668,7 @@ multi sub openai-audio($file,
                         filename => $file.split('/')[*- 1],
                         body-blob => slurp($file, :bin)
                         )
-        );
+                );
 
         # A possible alternative following:
         #   https://github.com/sw1sh/OpenAILink/blob/master/Kernel/Audio.wl
@@ -650,7 +679,7 @@ multi sub openai-audio($file,
         #             Content => slurp($file, :bin)))
         #         );
 
-        return openai-request(:$url, :@body, :$auth-key, :$timeout, :$format, :$method);
+        return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
     }
 }
 
