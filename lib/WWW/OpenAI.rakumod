@@ -679,7 +679,7 @@ multi sub openai-audio($file,
         #             Content => slurp($file, :bin)))
         #         );
 
-        return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
+        return openai-request(:$url, :@body, :$auth-key, :$timeout, :$format, :$method);
     }
 }
 
