@@ -51,9 +51,7 @@ use WWW::OpenAI;
 openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 ```
-# [{finish_reason => stop, index => 0, message => {content => 
-# 
-# As an AI language model, I do not have the capability to determine the current whereabouts of fictional characters. However, Roger Rabbit is a character created for the 1988 film "Who Framed Roger Rabbit" and is still popular among fans of the movie., role => assistant}}]
+# [{finish_reason => stop, index => 0, message => {content => As an AI language model, I cannot provide a real-time location of fictional characters. However, Roger Rabbit is a character from the 1988 film "Who Framed Roger Rabbit" and is a cartoon character living in the fictional Toontown., role => assistant}}]
 ```
 
 Another one using Bulgarian:
@@ -62,9 +60,7 @@ Another one using Bulgarian:
 openai-playground('Колко групи могат да се намерят в този облак от точки.', max-tokens => 64);
 ```
 ```
-# [{finish_reason => length, index => 0, message => {content => 
-# 
-# Като AI модел, не мога да видя облак от точки, който споменавате. Моля, посочете повече информация или предоставете изображение, за да мога да отгов, role => assistant}}]
+# [{finish_reason => stop, index => 0, message => {content => Не е посочено колко точки има в облака, така че не можем да отговорим на този въпрос., role => assistant}}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -119,20 +115,43 @@ Here is an example of using
 my @modRes = |openai-moderation(
 "I want to kill them!",
 format => "values",
-method => 'curl');
+method => 'cro');
 
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
-``` 
-# violence => 0.9640626311302185
-# hate => 0.27332669496536255
-# hate/threatening => 0.00637523178011179
-# sexual => 8.585161026530841e-07
-# violence/graphic => 2.8522084249971158e-08
-# self-harm => 1.678687522321809e-09
-# sexual/minors => 1.3898265871503668e-09
+```
+# violence => 0.9635829329490662
+# hate => 0.2717878818511963
+# hate/threatening => 0.006235524546355009
+# sexual => 8.503619142175012e-07
+# violence/graphic => 2.7227645915672838e-08
+# self-harm => 1.6152158499593838e-09
+# sexual/minors => 1.3727728953583096e-09
 ```
 
+### Audio transcription and translation
+
+Here is an example of using
+[OpenAI's audio transcription](https://platform.openai.com/docs/api-reference/audio):
+
+```
+my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+say openai-audio(
+        $fileName,
+        format => 'json',
+        method => 'tiny');
+```
+
+To do translations use the named argument `type`:
+
+```
+my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+say openai-audio(
+        $fileName,
+        type => 'translations',
+        format => 'text',
+        method => 'tiny');
+```
 
 -------
 
@@ -145,16 +164,17 @@ openai-playground --help
 ```
 ```
 # Usage:
-#   openai-playground <text> [--path=<Str>] [-n[=UInt]] [--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Text processing using the OpenAI API.
-#   openai-playground [<words> ...] [-m|--model=<Str>] [--path=<Str>] [-n[=UInt]] [--max-tokens[=UInt]] [-r|--role=<Str>] [-t|--temperature[=Real]] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
+#   openai-playground <text> [--path=<Str>] [-n[=UInt]] [--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Text processing using the OpenAI API.
+#   openai-playground [<words> ...] [-m|--model=<Str>] [--path=<Str>] [-n[=UInt]] [--max-tokens[=UInt]] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
 #   
-#     <text>                     Text to be processed.
-#     --path=<Str>               Path, one of 'images/generations' or 'chat/completions'. [default: 'chat/completions']
+#     <text>                     Text to be processed or audio file name.
+#     --path=<Str>               Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', or 'audio/translations'. [default: 'chat/completions']
 #     -n[=UInt]                  Number of completions or generations. [default: 1]
 #     --max-tokens[=UInt]        The maximum number of tokens to generate in the completion. [default: 16]
 #     -m|--model=<Str>           Model. [default: 'Whatever']
 #     -r|--role=<Str>            Role. [default: 'user']
 #     -t|--temperature[=Real]    Temperature. [default: 0.7]
+#     -l|--language=<Str>        Language. [default: '']
 #     --response-format=<Str>    The format in which the generated images are returned; one of 'url' or 'b64_json'. [default: 'url']
 #     -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
 #     --timeout[=UInt]           Timeout. [default: 10]

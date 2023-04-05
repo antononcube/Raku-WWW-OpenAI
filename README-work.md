@@ -114,6 +114,29 @@ method => 'cro');
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
 
+### Audio transcription and translation
+
+Here is an example of using
+[OpenAI's audio transcription](https://platform.openai.com/docs/api-reference/audio):
+
+```
+my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+say openai-audio(
+        $fileName,
+        format => 'json',
+        method => 'tiny');
+```
+
+To do translations use the named argument `type`:
+
+```
+my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+say openai-audio(
+        $fileName,
+        type => 'translations',
+        format => 'text',
+        method => 'tiny');
+```
 
 -------
 
