@@ -8,7 +8,8 @@
   ],
   "auth": "zef:antononcube",
   "depends": [
-    "Cro::HTTP::Client:ver<0.8.7+>"
+    "Cro::HTTP::Client:ver<0.8.7+>",
+    "HTTP::Tiny:ver<0.2.5>"
   ],
   "build-depends": [],
   "test-depends": [],
