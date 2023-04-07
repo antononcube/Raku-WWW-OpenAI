@@ -754,7 +754,7 @@ multi sub openai-playground($text is copy,
         }
         when $_ ∈ <completion completions text/completions> {
             # my $url = 'https://api.openai.com/v1/completions';
-            return openai-completion($text, type => 'text',
+            return openai-completion($text, type => Whatever,
                     |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
         }
