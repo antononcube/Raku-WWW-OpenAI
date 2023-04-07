@@ -62,6 +62,35 @@ See the section
 ["Create chat completion"](https://platform.openai.com/docs/api-reference/chat/create) of [OAI2]
 for more details.
 
+### Code generation
+
+There are two types of completions : text and chat. Let us illustrate the differences
+of their usage by Raku code generation. Here is a text completion:
+
+```perl6
+openai-completion(
+        'generate Raku code for making a loop over a list',
+        type => 'text',
+        max-tokens => 120,
+        format => 'values');
+```
+
+Here is a chat completion:
+
+```perl6
+openai-completion(
+        'generate Raku code for making a loop over a list',
+        type => 'chat',
+        max-tokens => 120,
+        format => 'values');
+```
+
+**Remark:** When the argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
+For example: 
+- `model => 'text-davinci-003` implies `type => 'text'`
+- `model => 'gpt-3.5-turbo` implies `type => 'chat'`
+
+
 ### Image generation
 
 **Remark:** See the files ["Image-generation*"](./docs/Image-generation.md) for more details.

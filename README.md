@@ -51,7 +51,9 @@ use WWW::OpenAI;
 openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 ```
-# [{finish_reason => stop, index => 0, message => {content => As an AI language model, I cannot provide a real-time location of fictional characters. However, Roger Rabbit is a character from the 1988 film "Who Framed Roger Rabbit" and is a cartoon character living in the fictional Toontown., role => assistant}}]
+# [{finish_reason => stop, index => 0, logprobs => (Any), text => 
+# 
+# Roger Rabbit is a fictional character created by Gary K. Wolf for the novel Who Censored Roger Rabbit? He does not exist in real life.}]
 ```
 
 Another one using Bulgarian:
@@ -60,13 +62,64 @@ Another one using Bulgarian:
 openai-playground('Колко групи могат да се намерят в този облак от точки.', max-tokens => 64);
 ```
 ```
-# [{finish_reason => stop, index => 0, message => {content => Не е посочено колко точки има в облака, така че не можем да отговорим на този въпрос., role => assistant}}]
+# [{finish_reason => length, index => 0, logprobs => (Any), text => 
+# 
+# В зависимост от размера на облака от точки и наличието на}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
 See the section 
 ["Create chat completion"](https://platform.openai.com/docs/api-reference/chat/create) of [OAI2]
 for more details.
+
+### Code generation
+
+There are two types of completions : text and chat. Let us illustrate the differences
+of their usage by Raku code generation. Here is a text completion:
+
+```perl6
+openai-completion(
+        'generate Raku code for making a loop over a list',
+        type => 'text',
+        max-tokens => 120,
+        format => 'values');
+```
+```
+# #loop over a list
+# my @list = <A B C D E F G>;
+# 
+# for @list -> $item {
+#     say $item;
+# }
+```
+
+Here is a chat completion:
+
+```perl6
+openai-completion(
+        'generate Raku code for making a loop over a list',
+        type => 'chat',
+        max-tokens => 120,
+        format => 'values');
+```
+```
+# Here is an example of Raku code for making a loop over a list:
+# 
+# ```
+# my @list = (1, 2, 3, 4, 5);
+# 
+# for @list -> $item {
+#     say $item;
+# }
+# ```
+# 
+# This code creates an array called `@list` that contains the values `1, 2, 3, 4, 5`. It then loops over each item in the list using the `for` loop construct. The `-> $item` syntax is used to declare a variable `$item` that will hold the current item
+```
+
+**Remark:** When the argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
+For example:
+- `model => 'text-davinci-003` implies `type => 'text'`
+- `model => 'gpt-3.5-turbo` implies `type => 'chat'`
 
 ### Image generation
 
