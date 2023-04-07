@@ -53,7 +53,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character created by Gary K. Wolf for the novel Who Censored Roger Rabbit? He does not exist in real life.}]
+# The character Roger Rabbit does not exist in real life. He was created for the 1988 film Who Framed Roger Rabbit and subsequent related works.}]
 ```
 
 Another one using Bulgarian:
@@ -64,7 +64,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост от размера на облака от точки и наличието на}]
+# В зависимост от това кое нещо се отнася до облака от точки}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -85,11 +85,10 @@ openai-completion(
         format => 'values');
 ```
 ```
-# #loop over a list
-# my @list = <A B C D E F G>;
-# 
+# # loop over list
+# my @list = (1,2,3,4,5);
 # for @list -> $item {
-#     say $item;
+#   say $item;
 # }
 ```
 
@@ -106,20 +105,21 @@ openai-completion(
 # Here is an example of Raku code for making a loop over a list:
 # 
 # ```
-# my @list = (1, 2, 3, 4, 5);
+# my @list = 1, 2, 3, 4, 5;
 # 
 # for @list -> $item {
 #     say $item;
 # }
 # ```
 # 
-# This code creates an array called `@list` that contains the values `1, 2, 3, 4, 5`. It then loops over each item in the list using the `for` loop construct. The `-> $item` syntax is used to declare a variable `$item` that will hold the current item
+# This code creates an array `@list` with five elements, and then loops over each element of the array using a `for` loop. The arrow `->` is used to declare a parameter that represents each item in the list, and the code block inside the loop simply prints out each item to the console using the `say`
 ```
 
 **Remark:** When the argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
-For example:
+For example: 
 - `model => 'text-davinci-003` implies `type => 'text'`
 - `model => 'gpt-3.5-turbo` implies `type => 'chat'`
+
 
 ### Image generation
 
