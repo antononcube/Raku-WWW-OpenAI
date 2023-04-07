@@ -245,7 +245,33 @@ graph TD
   - Requires [`curl`](https://curl.se) to be installed
   - Invokes the procedure [`shell`](https://docs.raku.org/routine/shell)
   - Again, this is tested on macOS only.  
-  
+
+--------
+
+## TODO
+
+- [ ] TODO Comprehensive unit tests
+    - Note that this requires OpenAI auth token and costs money. (Ideally, not much.)
+    - [X] TODO Audio transcription
+    - [X] TODO Audio translation
+    - [X] DONE Basic usage
+    - [X] TODO Completions - chat
+    - [X] TODO Completions - text
+    - [X] TODO Moderation
+    - [ ] TODO Image generation
+    - [ ] TODO Embeddings
+
+- [ ] TODO HTTP(S) retrieval methods
+
+    - [X] DONE `curl` 
+    - [X] TODO "Cro"
+    - [ ] TODO "HTTP::Tiny"
+    
+- [ ] TODO Embeddings implementation
+
+- [ ] TODO Refactor the code, so each functionality (audio, completion, moderation, etc) 
+     has a separate file.
+
 --------
 
 ## References
