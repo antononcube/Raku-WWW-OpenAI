@@ -361,6 +361,7 @@ multi sub openai-completion($prompt is copy,
     #------------------------------------------------------
     if $type.isa(Whatever) {
         $type = do given $model {
+            when Whatever { 'text' }
             when $_.starts-with('text-')  { 'text' };
             when $_ ∈ <gpt-3.5-turbo gpt-3.5-turbo-0301> { 'chat' };
             default { 'text' }
@@ -379,7 +380,7 @@ multi sub openai-completion($prompt is copy,
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
-    if $model.isa(Whatever) { $model = "gpt-3.5-turbo"; }
+    if $model.isa(Whatever) { $model = $type eq 'text' ?? 'text-davinci-003' !! 'gpt-3.5-turbo'; }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ $knownModels.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ $knownModels;
 
