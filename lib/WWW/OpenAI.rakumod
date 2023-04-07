@@ -268,8 +268,8 @@ multi sub openai-request(Str :$url!,
     return do given $format.lc {
         when $_ eq 'values' {
             if $res<choices>:exists {
-                # Assuming chat completion
-                $res<choices>.map({ $_<message><content>.trim })
+                # Assuming text of chat completion
+                $res<choices>.map({ $_<text> // $_<message><content> })
             } elsif $res<data> {
                 # Assuming image generation
                 $res<data>.map({ $_<url> // $_<b64_json> })
@@ -294,7 +294,17 @@ multi sub openai-request(Str :$url!,
 # Completions
 #============================================================
 
-my $completitionStencil = q:to/END/;
+my $textCompletitionStencil = q:to/END/;
+{
+  "model": "$model",
+  "prompt": "$prompt",
+  "temperature": $temperature,
+  "max_tokens": $max-tokens,
+  "n": $n
+}
+END
+
+my $chatCompletitionStencil = q:to/END/;
 {
   "model": "$model",
   "messages": [{"role": "user", "content": "$content"}],
@@ -316,6 +326,7 @@ END
 
 #| OpenAI completion access.
 our proto openai-completion($prompt is copy,
+                            :$type is copy = Whatever,
                             :$role is copy = Whatever,
                             :$model is copy = Whatever,
                             :$temperature is copy = Whatever,
@@ -333,6 +344,7 @@ multi sub openai-completion(@prompts, *%args) {
 
 #| OpenAI completion access.
 multi sub openai-completion($prompt is copy,
+                            :$type is copy = Whatever,
                             :$role is copy = Whatever,
                             :$model is copy = Whatever,
                             :$temperature is copy = Whatever,
@@ -342,6 +354,19 @@ multi sub openai-completion($prompt is copy,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
                             Str :$method = 'cro') {
+
+    #------------------------------------------------------
+    # Process $type
+    #------------------------------------------------------
+    if $type.isa(Whatever) {
+        $type = do given $model {
+            when $_.starts-with('text-')  { 'text' };
+            when $_ ∈ <gpt-3.5-turbo gpt-3.5-turbo-0301> { 'chat' };
+            default { 'text' }
+        }
+    }
+    die "The argument \$type is expected to be one of 'chat', 'text', or Whatever."
+    unless $type ∈ <chat text>;
 
     #------------------------------------------------------
     # Process $role
@@ -381,15 +406,16 @@ multi sub openai-completion($prompt is copy,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my $body = $completitionStencil
+    my $body = ($type eq 'chat' ?? $chatCompletitionStencil !! $textCompletitionStencil)
             .subst('$model', $model)
             .subst('$content', $prompt)
+            .subst('$prompt', $prompt)
             .subst('$role', $role)
             .subst('$temperature', $temperature)
             .subst('$max-tokens', $max-tokens)
             .subst('$n', $n);
 
-    my $url = 'https://api.openai.com/v1/chat/completions';
+    my $url = $type eq 'chat' ?? 'https://api.openai.com/v1/chat/completions' !! 'https://api.openai.com/v1/completions';
 
     #------------------------------------------------------
     # Delegate
@@ -718,9 +744,16 @@ multi sub openai-playground($text is copy,
     #------------------------------------------------------
 
     given $path.lc {
-        when $_ ∈ <completion completions chat/completions> {
+        when $_ ∈ <chat chat/completions> {
             # my $url = 'https://api.openai.com/v1/chat/completions';
-            return openai-completion($text, |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
+            return openai-completion($text, type => 'chat',
+                    |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
+                    :$auth-key, :$timeout, :$format, :$method);
+        }
+        when $_ ∈ <completion completions text/completions> {
+            # my $url = 'https://api.openai.com/v1/completions';
+            return openai-completion($text, type => 'text',
+                    |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
         }
         when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
