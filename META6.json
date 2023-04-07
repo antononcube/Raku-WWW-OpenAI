@@ -1,7 +1,7 @@
 {
   "name": "WWW::OpenAI",
   "description": "WWW::OpenAI provides access to the OpenAI playground (https://platform.openai.com).",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "perl": "6.*",
   "authors": [
     "Anton Antonov"
@@ -17,7 +17,10 @@
   "provides": {
     "WWW::OpenAI": "lib/WWW/OpenAI.rakumod"
   },
-  "resources": [],
+  "resources": [
+    "HowAreYouRU.mp3",
+    "HelloRaccoonsEN.mp3"
+  ],
   "license": "Artistic-2.0",
   "tags": [
     "ai",
