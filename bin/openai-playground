@@ -12,7 +12,7 @@ my %*SUB-MAIN-OPTS =
 multi sub openai-front(Str $text,                                #= Text to be processed or audio file name.
                        Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
                        UInt :$n = 1,                             #= Number of completions or generations.
-                       UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
+                       UInt :$max-tokens = 100,                  #= The maximum number of tokens to generate in the completion.
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
                        Str :r(:$role) is copy = 'user',          #= Role.
                        Real :t(:$temperature) = 0.7,             #= Temperature.
@@ -65,7 +65,7 @@ multi sub openai-front(Str $text,                                #= Text to be p
 multi sub MAIN(Str $text,                                #= Text to be processed or audio file name.
                Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
                UInt :$n = 1,                             #= Number of completions or generations.
-               UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
+               UInt :$max-tokens = 100,                  #= The maximum number of tokens to generate in the completion.
                Str :m(:$model) is copy = 'Whatever',     #= Model.
                Str :r(:$role) is copy = 'user',          #= Role.
                Real :t(:$temperature) = 0.7,             #= Temperature.
@@ -85,7 +85,7 @@ multi sub MAIN
  Str :m(:$model) is copy = 'Whatever',     #= Model.
  Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
  UInt :$n = 1,                             #= Number of completions or generations.
- UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
+ UInt :$max-tokens = 100,                  #= The maximum number of tokens to generate in the completion.
  Str :r(:$role) is copy = 'user',          #= Role.
  Real :t(:$temperature) = 0.7,             #= Temperature.
  Str :l(:$language) = '',                  #= Language.
