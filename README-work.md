@@ -62,6 +62,14 @@ See the section
 ["Create chat completion"](https://platform.openai.com/docs/api-reference/chat/create) of [OAI2]
 for more details.
 
+### Models
+
+The current OpenAI models can be found with the function `openai-models`:
+
+```perl6
+openai-models
+```
+
 ### Code generation
 
 There are two types of completions : text and chat. Let us illustrate the differences
@@ -85,10 +93,10 @@ openai-completion(
         format => 'values');
 ```
 
-**Remark:** When the argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
+**Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
 For example: 
-- `model => 'text-davinci-003` implies `type => 'text'`
-- `model => 'gpt-3.5-turbo` implies `type => 'chat'`
+- `model => 'text-davinci-003'` implies `type => 'text'`
+- `model => 'gpt-3.5-turbo'` implies `type => 'chat'`
 
 
 ### Image generation
@@ -148,8 +156,8 @@ for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 Here is an example of using
 [OpenAI's audio transcription](https://platform.openai.com/docs/api-reference/audio):
 
-```
-my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+```perl6
+my $fileName = $*CWD ~ '/resources/HelloRaccoonsEN.mp3';
 say openai-audio(
         $fileName,
         format => 'json',
@@ -158,14 +166,58 @@ say openai-audio(
 
 To do translations use the named argument `type`:
 
-```
-my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+```perl6
+my $fileName = $*CWD ~ '/resources/HowAreYouRU.mp3';
 say openai-audio(
         $fileName,
         type => 'translations',
-        format => 'text',
+        format => 'json',
         method => 'tiny');
 ```
+
+### Embeddings
+
+[Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
+can be obtained with the function `openai-embeddings`. Here is an example of finding the embedding vectors
+for each of the elements of an array of strings:
+
+```perl6
+my @queries = [
+    'make a classifier with the method RandomForeset over the data dfTitanic',
+    'show precision and accuracy',
+    'plot True Positive Rate vs Positive Predictive Value',
+    'what is a good meat and potatoes recipe'
+];
+
+my $embs = openai-embeddings(@queries, format => 'values', method => 'tiny');
+$embs.elems;
+```
+
+Here we show:
+- That the result is an array of three vectors each with length 1536
+- The distributions of the values of each vector
+
+```perl6
+use Data::Reshapers;
+use Data::Summarizers;
+
+say "\$embs.elems : { $embs.elems }";
+say "\$embs>>.elems : { $embs>>.elems }";
+records-summary($embs.kv.Hash.&transpose);
+```
+
+Here we find the corresponding dot products and (cross-)tabulate them:
+
+```perl6
+use Data::Reshapers;
+use Data::Summarizers;
+my @ct = (^$embs.elems X ^$embs.elems).map({ %( i => $_[0], j => $_[1], dot => sum($embs[$_[0]] >>*<< $embs[$_[1]])) }).Array;
+
+say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs.elems)>>.Str);
+````
+
+**Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
+(Judging by the table with dot products.)
 
 -------
 

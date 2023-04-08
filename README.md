@@ -53,7 +53,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# The character Roger Rabbit does not exist in real life. He was created for the 1988 film Who Framed Roger Rabbit and subsequent related works.}]
+# Roger Rabbit is a fictional character created by Disney and Amblin Entertainment. He first appeared in the 1988 film Who Framed Roger Rabbit. He is typically depicted as a cartoon rabbit who lives in the real world, and is known for his catchphrase "P-p-p-please!"}]
 ```
 
 Another one using Bulgarian:
@@ -64,13 +64,24 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост от това кое нещо се отнася до облака от точки}]
+# Във всеки облак от точки може да се намерят неограничен б}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
 See the section 
 ["Create chat completion"](https://platform.openai.com/docs/api-reference/chat/create) of [OAI2]
 for more details.
+
+### Models
+
+The current OpenAI models can be found with the function `openai-models`:
+
+```perl6
+openai-models
+```
+```
+# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity ada:2020-05-03 babbage babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity babbage:2020-05-03 code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity curie:2020-05-03 cushman:2020-05-03 davinci davinci-if:3.0.0 davinci-instruct-beta davinci-instruct-beta:2.0.0 davinci-search-document davinci-search-query davinci-similarity davinci:2020-05-03 gpt-3.5-turbo gpt-3.5-turbo-0301 if-curie-v2 if-davinci-v2 if-davinci:3.0.0 text-ada-001 text-ada:001 text-babbage-001 text-babbage:001 text-curie-001 text-curie:001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-davinci:001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 whisper-1)
+```
 
 ### Code generation
 
@@ -85,10 +96,11 @@ openai-completion(
         format => 'values');
 ```
 ```
-# # loop over list
-# my @list = (1,2,3,4,5);
+# # loop over a list
+# my @list = <a b c d e f>;
+# 
 # for @list -> $item {
-#   say $item;
+#     say $item;
 # }
 ```
 
@@ -102,23 +114,23 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Here is an example of Raku code for making a loop over a list:
+# Here is an example of how to make a loop over a list in Raku:
 # 
 # ```
-# my @list = 1, 2, 3, 4, 5;
+# my @list = (1, 2, 3, 4, 5);
 # 
-# for @list -> $item {
-#     say $item;
+# for @list -> $value {
+#     say $value;
 # }
 # ```
 # 
-# This code creates an array `@list` with five elements, and then loops over each element of the array using a `for` loop. The arrow `->` is used to declare a parameter that represents each item in the list, and the code block inside the loop simply prints out each item to the console using the `say`
+# This code creates an array called `@list` with five elements. The `for` loop iterates over each element in the list, assigning the value to the variable `$value` on each iteration. The `say` statement then prints out the value of `$value` to the console. In this case, the output would be
 ```
 
-**Remark:** When the argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
+**Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
 For example: 
-- `model => 'text-davinci-003` implies `type => 'text'`
-- `model => 'gpt-3.5-turbo` implies `type => 'chat'`
+- `model => 'text-davinci-003'` implies `type => 'text'`
+- `model => 'gpt-3.5-turbo'` implies `type => 'chat'`
 
 
 ### Image generation
@@ -187,24 +199,105 @@ for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 Here is an example of using
 [OpenAI's audio transcription](https://platform.openai.com/docs/api-reference/audio):
 
-```
-my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+```perl6
+my $fileName = $*CWD ~ '/resources/HelloRaccoonsEN.mp3';
 say openai-audio(
         $fileName,
         format => 'json',
         method => 'tiny');
 ```
+```
+# {
+#   "text": "Raku practitioners around the world, eat more onions!"
+# }
+```
 
 To do translations use the named argument `type`:
 
-```
-my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
+```perl6
+my $fileName = $*CWD ~ '/resources/HowAreYouRU.mp3';
 say openai-audio(
         $fileName,
         type => 'translations',
-        format => 'text',
+        format => 'json',
         method => 'tiny');
 ```
+```
+# {
+#   "text": "How are you, bandits, hooligans? I've lost my mind because of you. I've been working as a guard for my whole life."
+# }
+```
+
+### Embeddings
+
+[Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
+can be obtained with the function `openai-embeddings`. Here is an example of finding the embedding vectors
+for each of the elements of an array of strings:
+
+```perl6
+my @queries = [
+    'make a classifier with the method RandomForeset over the data dfTitanic',
+    'show precision and accuracy',
+    'plot True Positive Rate vs Positive Predictive Value',
+    'what is a good meat and potatoes recipe'
+];
+
+my $embs = openai-embeddings(@queries, format => 'values', method => 'tiny');
+$embs.elems;
+```
+```
+# 4
+```
+
+Here we show:
+- That the result is an array of three vectors each with length 1536
+- The distributions of the values of each vector
+
+```perl6
+use Data::Reshapers;
+use Data::Summarizers;
+
+say "\$embs.elems : { $embs.elems }";
+say "\$embs>>.elems : { $embs>>.elems }";
+records-summary($embs.kv.Hash.&transpose);
+```
+```
+# $embs.elems : 4
+# $embs>>.elems : 1536 1536 1536 1536
+# +-------------------------------+-------------------------------+-------------------------------+------------------------------+
+# | 0                             | 2                             | 1                             | 3                            |
+# +-------------------------------+-------------------------------+-------------------------------+------------------------------+
+# | Min    => -0.590541           | Min    => -0.6319088          | Min    => -0.66787094         | Min    => -0.604582          |
+# | 1st-Qu => -0.013253814        | 1st-Qu => -0.0125411955       | 1st-Qu => -0.0122630695       | 1st-Qu => -0.01291059        |
+# | Mean   => -0.0007620548729349 | Mean   => -0.0007294898405221 | Mean   => -0.0007619727928789 | Mean   => -0.000753978386686 |
+# | Median => -0.00099546775      | Median => -0.0005957828       | Median => -0.00033191686      | Median => -0.00073154968     |
+# | 3rd-Qu => 0.012380486         | 3rd-Qu => 0.0118658495        | 3rd-Qu => 0.011165141         | 3rd-Qu => 0.0121792655       |
+# | Max    => 0.2120038           | Max    => 0.21254525          | Max    => 0.22820392          | Max    => 0.22215208         |
+# +-------------------------------+-------------------------------+-------------------------------+------------------------------+
+```
+
+Here we find the corresponding dot products and (cross-)tabulate them:
+
+```perl6
+use Data::Reshapers;
+use Data::Summarizers;
+my @ct = (^$embs.elems X ^$embs.elems).map({ %( i => $_[0], j => $_[1], dot => sum($embs[$_[0]] >>*<< $embs[$_[1]])) }).Array;
+
+say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs.elems)>>.Str);
+```
+```
+# +---+----------+----------+----------+----------+
+# |   |    0     |    1     |    2     |    3     |
+# +---+----------+----------+----------+----------+
+# | 0 | 1.000000 | 0.724754 | 0.756875 | 0.665380 |
+# | 1 | 0.724754 | 1.000000 | 0.811251 | 0.715327 |
+# | 2 | 0.756875 | 0.811251 | 1.000000 | 0.698792 |
+# | 3 | 0.665380 | 0.715327 | 0.698792 | 1.000000 |
+# +---+----------+----------+----------+----------+
+````
+
+**Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
+(Judging by the table with dot products.)
 
 -------
 
@@ -221,7 +314,7 @@ openai-playground --help
 #   openai-playground [<words> ...] [-m|--model=<Str>] [--path=<Str>] [-n[=UInt]] [--max-tokens[=UInt]] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
 #   
 #     <text>                     Text to be processed or audio file name.
-#     --path=<Str>               Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', or 'audio/translations'. [default: 'chat/completions']
+#     --path=<Str>               Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
 #     -n[=UInt]                  Number of completions or generations. [default: 1]
 #     --max-tokens[=UInt]        The maximum number of tokens to generate in the completion. [default: 16]
 #     -m|--model=<Str>           Model. [default: 'Whatever']
@@ -331,7 +424,7 @@ graph TD
 
 - [ ] TODO Refactor the code, so each functionality (audio, completion, moderation, etc)
   has a separate file.
-  
+
 --------
 
 ## References
