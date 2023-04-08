@@ -10,7 +10,7 @@ my %*SUB-MAIN-OPTS =
 
 #| Text processing using the OpenAI API.
 multi sub openai-front(Str $text,                                #= Text to be processed or audio file name.
-                       Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', or 'audio/translations'.
+                       Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
                        UInt :$n = 1,                             #= Number of completions or generations.
                        UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
@@ -63,13 +63,13 @@ multi sub openai-front(Str $text,                                #= Text to be p
 
 #| Text processing using the OpenAI API.
 multi sub MAIN(Str $text,                                #= Text to be processed or audio file name.
-               Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', or 'audio/translations'.
+               Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
                UInt :$n = 1,                             #= Number of completions or generations.
                UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
                Str :m(:$model) is copy = 'Whatever',     #= Model.
                Str :r(:$role) is copy = 'user',          #= Role.
                Real :t(:$temperature) = 0.7,             #= Temperature.
-               Str :l(:$language) = '',                 #= Language.
+               Str :l(:$language) = '',                  #= Language.
                Str :$response-format = 'url',            #= The format in which the generated images are returned; one of 'url' or 'b64_json'.             
                Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
                UInt :$timeout= 10,                       #= Timeout.
@@ -83,12 +83,12 @@ multi sub MAIN
 #= Command given as a sequence of words.
 (*@words,
  Str :m(:$model) is copy = 'Whatever',     #= Model.
- Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', or 'audio/translations'.
+ Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
  UInt :$n = 1,                             #= Number of completions or generations.
  UInt :$max-tokens = 16,                   #= The maximum number of tokens to generate in the completion.
  Str :r(:$role) is copy = 'user',          #= Role.
  Real :t(:$temperature) = 0.7,             #= Temperature.
- Str :l(:$language) = '',                 #= Language.
+ Str :l(:$language) = '',                  #= Language.
  Str :$response-format = 'url',            #= The format in which the generated images are returned; one of 'url' or 'b64_json'.
  Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
  UInt :$timeout= 10,                       #= Timeout.
