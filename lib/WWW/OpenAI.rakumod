@@ -46,7 +46,7 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "text-similarity-davinci-001", "whisper-1"]);
 
 
-multi sub openai-known-models(Bool :$retrieve = False) is export {
+multi sub openai-known-models() is export {
     return $knownModels;
 }
 
@@ -112,16 +112,34 @@ multi sub get-cro-post(Str :$url!,
 # POST Tiny call
 #============================================================
 
-multi sub get-tiny-post(Str :$url!,
-                       :%body!,
-                       Str :$auth-key!,
-                       UInt :$timeout = 10) {
-    my $resp = .<content>.decode given HTTP::Tiny.post: $url,
-            headers => { authorization => "Bearer $auth-key" },
-            content => %body;
+proto sub get-tiny-post(Str :$url!, |) is export {*}
 
-    return $resp;
+multi sub get-tiny-post(Str :$url!,
+                        Str :$body!,
+                        Str :$auth-key!,
+                        UInt :$timeout = 10) {
+    my $resp = HTTP::Tiny.post: $url,
+            headers => { authorization => "Bearer $auth-key",
+                         Content-Type => "application/json" },
+            content => $body;
+
+    return from-json($resp<content>.decode);
 }
+
+multi sub get-tiny-post(Str :$url!,
+                        :$body! where * ~~ Map,
+                        Str :$auth-key!,
+                        Bool :$json = False,
+                        UInt :$timeout = 10) {
+    if $json {
+        return get-tiny-post( :$url, body => to-json($body), :$auth-key, :$timeout);
+    }
+    my $resp = HTTP::Tiny.post: $url,
+            headers => { authorization => "Bearer $auth-key" },
+            content => $body;
+    return $resp<content>.decode;
+}
+
 
 #============================================================
 # POST Curl call
@@ -180,11 +198,37 @@ multi sub get-curl-post(Str :$url!,
 # Models
 #============================================================
 
-our sub openai-get-models(
-        :$auth-key is copy = Whatever,
-                          ) is export {
+#| OpenAI models.
+our sub openai-models(:$auth-key is copy = Whatever, UInt :$timeout = 10) is export {
+    #------------------------------------------------------
+    # Process $auth-key
+    #------------------------------------------------------
+    # This code is repeated below.
+    if $auth-key.isa(Whatever) {
+        if %*ENV<OPENAI_API_KEY>:exists {
+            $auth-key = %*ENV<OPENAI_API_KEY>;
+        } else {
+            note 'Cannot find OpenAI authorization key. ' ~
+                    'Please provide a valid key to the argument auth-key, or set the ENV variable OPENAI_API_KEY.';
+            $auth-key = ''
+        }
+    }
+    die "The argument auth-key is expected to be a string or Whatever."
+    unless $auth-key ~~ Str;
+
+    #------------------------------------------------------
+    # Retrieve
+    #------------------------------------------------------
     my Str $url = 'https://api.openai.com/v1/models';
+
+    my $resp = HTTP::Tiny.get: $url,
+            headers => { authorization => "Bearer $auth-key" };
+
+    my $res = from-json($resp<content>.decode);
+
+    return $res<data>.map(*<id>).sort;
 }
+
 
 #============================================================
 # Request
@@ -261,7 +305,7 @@ multi sub openai-request(Str :$url!,
 
     if $format.lc eq <asis as-is as_is> { return $res; }
 
-    if $method eq 'curl' {
+    if $method ∈ <curl tiny> && $res ~~ Str {
         $res = from-json($res);
     }
 
@@ -273,7 +317,7 @@ multi sub openai-request(Str :$url!,
                 @res2.elems == 1 ?? @res2[0] !! @res2;
             } elsif $res<data> {
                 # Assuming image generation
-                $res<data>.map({ $_<url> // $_<b64_json> })
+                $res<data>.map({ $_<url> // $_<b64_json> // $_<embedding> })
             } elsif $res<results> {
                 # Assuming moderation
                 $res<results>.map({ $_<category_scores> // $_<categories> })
@@ -713,11 +757,74 @@ multi sub openai-audio($file,
 
 
 #============================================================
+# Embeddings
+#============================================================
+
+my $embeddingsStencil = q:to/END/;
+{
+  "input": "$input",
+  "model": "$model"
+}
+END
+
+#| OpenAI embeddings.
+our proto openai-embeddings($prompt,
+                            :$model = Whatever,
+                            :$auth-key is copy = Whatever,
+                            UInt :$timeout= 10,
+                            :$format is copy = Whatever,
+                            Str :$method = 'cro'
+                            ) is export {*}
+
+
+#| OpenAI embeddings.
+multi sub openai-embeddings($prompt,
+                            :$model is copy = Whatever,
+                            :$auth-key is copy = Whatever,
+                            UInt :$timeout= 10,
+                            :$format is copy = Whatever,
+                            Str :$method = 'cro') {
+
+
+    #------------------------------------------------------
+    # Process $model
+    #------------------------------------------------------
+    if $model.isa(Whatever) { $model = 'text-embedding-ada-002'; }
+    die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ $knownModels.keys.sort.join('", "') ~ '"' }."
+    unless $model ∈ $knownModels;
+
+    #------------------------------------------------------
+    # OpenAI URL
+    #------------------------------------------------------
+
+    my $url = 'https://api.openai.com/v1/embeddings';
+
+    #------------------------------------------------------
+    # Delegate
+    #------------------------------------------------------
+    if ($prompt ~~ Positional || $prompt ~~ Seq) && $method ∈ <cro tiny> {
+
+        return openai-request(:$url,
+                body => to-json({ input => $prompt.Array, :$model}),
+                :$auth-key, :$timeout, :$format, :$method);
+
+    } else {
+
+        my $body = $embeddingsStencil
+                .subst('$input', $prompt)
+                .subst('$model', $model);
+
+        return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
+    }
+}
+
+
+#============================================================
 # Playground
 #============================================================
 
 #| OpenAI playground access.
-our proto openai-playground($text is copy,
+our proto openai-playground($text is copy = '',
                             Str :$path = 'completions',
                             :$auth-key is copy = Whatever,
                             UInt :$timeout= 10,
@@ -725,6 +832,11 @@ our proto openai-playground($text is copy,
                             Str :$method = 'cro',
                             *%args
                             ) is export {*}
+
+#| OpenAI playground access.
+multi sub openai-playground(*%args) {
+    return openai-playground('', |%args);
+}
 
 #| OpenAI playground access.
 multi sub openai-playground(@texts, *%args) {
@@ -746,6 +858,10 @@ multi sub openai-playground($text is copy,
     #------------------------------------------------------
 
     given $path.lc {
+        when $_ eq 'models' {
+            # my $url = 'https://api.openai.com/v1/models';
+            return openai-models(:$auth-key, :$timeout);
+        }
         when $_ ∈ <chat chat/completions> {
             # my $url = 'https://api.openai.com/v1/chat/completions';
             return openai-completion($text, type => 'chat',
@@ -780,6 +896,12 @@ multi sub openai-playground($text is copy,
             return openai-audio($text,
                     |%args.grep({ $_.key ∈ <prompt model temperature language> }).Hash,
                     type => 'translations', :$auth-key, :$timeout, :$format, :$method);
+        }
+        when $_ ∈ <embedding embeddings> {
+            # my $url = 'https://api.openai.com/v1/embeddings';
+            return openai-embeddings($text,
+                    |%args.grep({ $_.key ∈ <model> }).Hash,
+                    :$auth-key, :$timeout, :$format, :$method);
         }
         default {
             die 'Do not know how to process the given path.';
