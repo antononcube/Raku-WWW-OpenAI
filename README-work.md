@@ -265,9 +265,11 @@ graph TD
 
   - [X] DONE `curl`
   - [X] DONE "Cro"
-  - [ ] TODO "HTTP::Tiny"
+  - [X] TODO "HTTP::Tiny"
 
-- [ ] TODO Embeddings implementation
+- [X] TODO Models implementation
+
+- [X] TODO Embeddings implementation
 
 - [ ] TODO Refactor the code, so each functionality (audio, completion, moderation, etc)
   has a separate file.
