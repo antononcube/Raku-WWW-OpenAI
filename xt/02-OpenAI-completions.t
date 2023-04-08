@@ -6,7 +6,7 @@ use lib './lib';
 use WWW::OpenAI;
 use Test;
 
-my $method = 'curl';
+my $method = 'tiny';
 
 plan *;
 
