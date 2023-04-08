@@ -319,11 +319,11 @@ graph TD
   - [X] DONE "Cro"
   - [X] DONE "HTTP::Tiny"
 
-- [X] TODO Models implementation
+- [X] DONE Models implementation
 
-- [X] TODO Embeddings implementation
+- [X] DONE Embeddings implementation
 
-- [ ] TODO Refactor the code, so each functionality (audio, completion, moderation, etc)
+- [X] DONE Refactor the code, so each functionality (audio, completion, moderation, etc)
   has a separate file.
 
 - [ ] TODO Refactor HTTP(S) retrieval functions to be simpler and more "uniform."

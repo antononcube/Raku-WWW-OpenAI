@@ -51,9 +51,9 @@ use WWW::OpenAI;
 openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 ```
-# [{finish_reason => stop, index => 0, logprobs => (Any), text => 
+# [{finish_reason => (Any), index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character created by Disney and Amblin Entertainment. He first appeared in the 1988 film Who Framed Roger Rabbit. He is typically depicted as a cartoon rabbit who lives in the real world, and is known for his catchphrase "P-p-p-please!"}]
+# Roger Rabbit is a fictional character created by author Gary K. Wolf in his 1981 novel Who Censored Roger Rabbit? The character has since been adapted into a feature-length film, Who Framed Roger Rabbit, and various other media.}]
 ```
 
 Another one using Bulgarian:
@@ -64,7 +64,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# Във всеки облак от точки може да се намерят неограничен б}]
+# В зависимост от структурата на облака от точки, в него мож}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -80,7 +80,8 @@ The current OpenAI models can be found with the function `openai-models`:
 openai-models
 ```
 ```
-# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity ada:2020-05-03 babbage babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity babbage:2020-05-03 code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity curie:2020-05-03 cushman:2020-05-03 davinci davinci-if:3.0.0 davinci-instruct-beta davinci-instruct-beta:2.0.0 davinci-search-document davinci-search-query davinci-similarity davinci:2020-05-03 gpt-3.5-turbo gpt-3.5-turbo-0301 if-curie-v2 if-davinci-v2 if-davinci:3.0.0 text-ada-001 text-ada:001 text-babbage-001 text-babbage:001 text-curie-001 text-curie:001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-davinci:001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 whisper-1)
+#ERROR: Could not find symbol '&Tiny' in 'GLOBAL::HTTP'
+# Nil
 ```
 
 ### Code generation
@@ -96,8 +97,7 @@ openai-completion(
         format => 'values');
 ```
 ```
-# # loop over a list
-# my @list = <a b c d e f>;
+# my @list = <foo bar baz qux>;
 # 
 # for @list -> $item {
 #     say $item;
@@ -114,17 +114,17 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Here is an example of how to make a loop over a list in Raku:
+# Here's an example of how to create a loop over a list in Raku:
 # 
 # ```
 # my @list = (1, 2, 3, 4, 5);
 # 
-# for @list -> $value {
-#     say $value;
+# for @list -> $item {
+#     say $item;
 # }
 # ```
 # 
-# This code creates an array called `@list` with five elements. The `for` loop iterates over each element in the list, assigning the value to the variable `$value` on each iteration. The `say` statement then prints out the value of `$value` to the console. In this case, the output would be
+# In this code, we define a list `@list` containing the values 1 through 5. We then use the `for` loop to iterate over each item in the list, assigning each item to the variable `$item` in turn. Inside the loop, we simply print out the value of `$item` using the `
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -264,16 +264,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +-------------------------------+-------------------------------+-------------------------------+------------------------------+
-# | 0                             | 2                             | 1                             | 3                            |
-# +-------------------------------+-------------------------------+-------------------------------+------------------------------+
-# | Min    => -0.590541           | Min    => -0.6319088          | Min    => -0.66787094         | Min    => -0.604582          |
-# | 1st-Qu => -0.013253814        | 1st-Qu => -0.0125411955       | 1st-Qu => -0.0122630695       | 1st-Qu => -0.01291059        |
-# | Mean   => -0.0007620548729349 | Mean   => -0.0007294898405221 | Mean   => -0.0007619727928789 | Mean   => -0.000753978386686 |
-# | Median => -0.00099546775      | Median => -0.0005957828       | Median => -0.00033191686      | Median => -0.00073154968     |
-# | 3rd-Qu => 0.012380486         | 3rd-Qu => 0.0118658495        | 3rd-Qu => 0.011165141         | 3rd-Qu => 0.0121792655       |
-# | Max    => 0.2120038           | Max    => 0.21254525          | Max    => 0.22820392          | Max    => 0.22215208         |
-# +-------------------------------+-------------------------------+-------------------------------+------------------------------+
+# +--------------------------------+-------------------------------+------------------------------+-------------------------------+
+# | 2                              | 0                             | 1                            | 3                             |
+# +--------------------------------+-------------------------------+------------------------------+-------------------------------+
+# | Min    => -0.6316531           | Min    => -0.58950233         | Min    => -0.66777724        | Min    => -0.6049923          |
+# | 1st-Qu => -0.012527813         | 1st-Qu => -0.013168254        | 1st-Qu => -0.012265999       | 1st-Qu => -0.0129131605       |
+# | Mean   => -0.00072959246806706 | Mean   => -0.0007618211378867 | Mean   => -0.000762514686426 | Mean   => -0.0007543544948138 |
+# | Median => -0.0005818053        | Median => -0.0009763381       | Median => -0.00032089773     | Median => -0.000717447385     |
+# | 3rd-Qu => 0.0118590325         | 3rd-Qu => 0.012348148         | 3rd-Qu => 0.011157169        | 3rd-Qu => 0.01218189075       |
+# | Max    => 0.21271273           | Max    => 0.21178077          | Max    => 0.22788173         | Max    => 0.2221349           |
+# +--------------------------------+-------------------------------+------------------------------+-------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -289,10 +289,10 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.724754 | 0.756875 | 0.665380 |
-# | 1 | 0.724754 | 1.000000 | 0.811251 | 0.715327 |
-# | 2 | 0.756875 | 0.811251 | 1.000000 | 0.698792 |
-# | 3 | 0.665380 | 0.715327 | 0.698792 | 1.000000 |
+# | 0 | 1.000000 | 0.724207 | 0.756615 | 0.665059 |
+# | 1 | 0.724207 | 1.000000 | 0.811324 | 0.715589 |
+# | 2 | 0.756615 | 0.811324 | 1.000000 | 0.699119 |
+# | 3 | 0.665059 | 0.715589 | 0.699119 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
@@ -316,7 +316,7 @@ openai-playground --help
 #     <text>                     Text to be processed or audio file name.
 #     --path=<Str>               Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
 #     -n[=UInt]                  Number of completions or generations. [default: 1]
-#     --max-tokens[=UInt]        The maximum number of tokens to generate in the completion. [default: 16]
+#     --max-tokens[=UInt]        The maximum number of tokens to generate in the completion. [default: 100]
 #     -m|--model=<Str>           Model. [default: 'Whatever']
 #     -r|--role=<Str>            Role. [default: 'user']
 #     -t|--temperature[=Real]    Temperature. [default: 0.7]
@@ -418,11 +418,11 @@ graph TD
   - [X] DONE "Cro"
   - [X] DONE "HTTP::Tiny"
 
-- [X] TODO Models implementation
+- [X] DONE Models implementation
 
-- [X] TODO Embeddings implementation
+- [X] DONE Embeddings implementation
 
-- [ ] TODO Refactor the code, so each functionality (audio, completion, moderation, etc)
+- [X] DONE Refactor the code, so each functionality (audio, completion, moderation, etc)
   has a separate file.
 
 - [ ] TODO Refactor HTTP(S) retrieval functions to be simpler and more "uniform."
