@@ -328,6 +328,12 @@ graph TD
 
 - [ ] TODO Refactor HTTP(S) retrieval functions to be simpler and more "uniform."
 
+- [ ] MAYBE De-Cro the request code.
+
+  - Given the problems of using "Cro::HTTP::Client" and the implementations with `curl` and 
+    ["HTTP::Tiny"](https://gitlab.com/jjatria/http-tiny/-/blob/master/examples/cookbook.md),
+    it seems it is better to make the implementation of "WWW::OpenAI" more lightweight.
+
 --------
 
 ## References
