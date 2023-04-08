@@ -2,6 +2,7 @@ use v6.d;
 
 use WWW::OpenAI::Models;
 use WWW::OpenAI::Request;
+use JSON::Fast;
 
 unit module WWW::OpenAI::Embeddings;
 
