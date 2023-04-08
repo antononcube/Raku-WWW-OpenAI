@@ -1,7 +1,7 @@
 {
   "name": "WWW::OpenAI",
   "description": "WWW::OpenAI provides access to the OpenAI playground (https://platform.openai.com).",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "perl": "6.*",
   "authors": [
     "Anton Antonov"
@@ -15,7 +15,14 @@
   "build-depends": [],
   "test-depends": [],
   "provides": {
-    "WWW::OpenAI": "lib/WWW/OpenAI.rakumod"
+    "WWW::OpenAI": "lib/WWW/OpenAI.rakumod",
+    "WWW::OpenAI::Audio": "lib/WWW/OpenAI/Audio.rakumod",
+    "WWW::OpenAI::Completions": "lib/WWW/OpenAI/Completions.rakumod",
+    "WWW::OpenAI::Embeddings": "lib/WWW/OpenAI/Embeddings.rakumod",
+    "WWW::OpenAI::ImageGenerations": "lib/WWW/OpenAI/ImageGenerations.rakumod",
+    "WWW::OpenAI::Models": "lib/WWW/OpenAI/Models.rakumod",
+    "WWW::OpenAI::Moderations": "lib/WWW/OpenAI/Moderations.rakumod",
+    "WWW::OpenAI::Request": "lib/WWW/OpenAI/Request.rakumod"
   },
   "resources": [
     "HowAreYouRU.mp3",
