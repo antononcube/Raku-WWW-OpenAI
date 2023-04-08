@@ -403,20 +403,20 @@ graph TD
 
 - [ ] TODO Comprehensive unit tests
   - Note that this requires OpenAI auth token and costs money. (Ideally, not much.)
-  - [X] DONE Audio transcription
-  - [X] DONE Audio translation
   - [X] DONE Basic usage
   - [X] DONE Completions - chat
   - [X] DONE Completions - text
   - [X] DONE Moderation
+  - [X] DONE Audio transcription
+  - [X] DONE Audio translation
   - [ ] TODO Image generation
   - [ ] TODO Embeddings
 
-- [ ] TODO HTTP(S) retrieval methods
+- [X] DONE HTTP(S) retrieval methods
 
   - [X] DONE `curl`
   - [X] DONE "Cro"
-  - [X] TODO "HTTP::Tiny"
+  - [X] DONE "HTTP::Tiny"
 
 - [X] TODO Models implementation
 
@@ -424,6 +424,8 @@ graph TD
 
 - [ ] TODO Refactor the code, so each functionality (audio, completion, moderation, etc)
   has a separate file.
+
+- [ ] TODO Refactor HTTP(S) retrieval functions to be simpler and more "uniform."
 
 --------
 
