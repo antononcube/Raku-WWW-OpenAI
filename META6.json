@@ -22,7 +22,8 @@
     "WWW::OpenAI::ImageGenerations": "lib/WWW/OpenAI/ImageGenerations.rakumod",
     "WWW::OpenAI::Models": "lib/WWW/OpenAI/Models.rakumod",
     "WWW::OpenAI::Moderations": "lib/WWW/OpenAI/Moderations.rakumod",
-    "WWW::OpenAI::Request": "lib/WWW/OpenAI/Request.rakumod"
+    "WWW::OpenAI::Request": "lib/WWW/OpenAI/Request.rakumod",
+    "WWW::OpenAI::TextCompletions": "lib/WWW/OpenAI/TextCompletions.rakumod"
   },
   "resources": [
     "HowAreYouRU.mp3",
