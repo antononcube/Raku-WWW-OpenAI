@@ -10,13 +10,6 @@ unit module WWW::OpenAI::Embeddings;
 # Embeddings
 #============================================================
 
-my $embeddingsStencil = q:to/END/;
-{
-  "input": "$input",
-  "model": "$model"
-}
-END
-
 #| OpenAI embeddings.
 our proto OpenAIEmbeddings($prompt,
                            :$model = Whatever,
@@ -51,7 +44,7 @@ multi sub OpenAIEmbeddings($prompt,
     #------------------------------------------------------
     # Delegate
     #------------------------------------------------------
-    if ($prompt ~~ Positional || $prompt ~~ Seq) && $method ∈ <cro tiny> {
+    if ($prompt ~~ Positional || $prompt ~~ Seq) && $method ∈ <tiny> {
 
         return openai-request(:$url,
                 body => to-json({ input => $prompt.Array, :$model }),
@@ -59,10 +52,8 @@ multi sub OpenAIEmbeddings($prompt,
 
     } else {
 
-        my $body = $embeddingsStencil
-                .subst('$input', $prompt)
-                .subst('$model', $model);
-
-        return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
+        return openai-request(:$url,
+                body => to-json({ input => $prompt.Array, :$model }),
+                :$auth-key, :$timeout, :$format, :$method);
     }
 }
