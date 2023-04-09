@@ -8,17 +8,6 @@ unit module WWW::OpenAI::Aidio;
 # Audio
 #============================================================
 
-my $audioStencil = q:to/END/;
-{
-  "file": "$file",
-  "model": "$model",
-  "prompt": "$prompt",
-  "language": "$language",
-  "temperature": $temperature,
-  "response_format": "$response-format"
-}
-END
-
 #| OpenAI image generation access.
 our proto OpenAIAudio($fileName,
                       :$type = 'transcriptions',
@@ -94,14 +83,6 @@ multi sub OpenAIAudio($file,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my $body = $audioStencil
-            .subst('$file', $file)
-            .subst('$model', $model)
-            .subst('$prompt', $prompt)
-            .subst('$language', $language)
-            .subst('$temperature', $temperature)
-            .subst('$response-format', $format);
-
     my $url = 'https://api.openai.com/v1/audio/' ~ $type;
 
     #------------------------------------------------------
@@ -126,34 +107,5 @@ multi sub OpenAIAudio($file,
 
         return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method);
 
-    } else {
-        my @body = [:$model, :$temperature, response_format => $format];
-
-        if $prompt { @body.append($prompt); }
-
-        if $language { @body.append($language); }
-
-        @body.append(
-                Cro::HTTP::Body::MultiPartFormData::Part.new(
-                        headers => [Cro::HTTP::Header.new(
-                                name => 'Content-type',
-                                value => 'audio/' ~ $file.split('.')[*- 1],
-                                )],
-                        name => $file.split('/')[*- 1].split('.')[0 .. (*- 2)].join('.'),
-                        filename => $file.split('/')[*- 1],
-                        body-blob => slurp($file, :bin)
-                        )
-                );
-
-        # A possible alternative following:
-        #   https://github.com/sw1sh/OpenAILink/blob/master/Kernel/Audio.wl
-        # @body.append(
-        #         (file => %(
-        #             MIMEType => 'audio/' ~ $file.split('.')[*- 1],
-        #             Name => $file.split('/')[*- 1],
-        #             Content => slurp($file, :bin)))
-        #         );
-
-        return openai-request(:$url, :@body, :$auth-key, :$timeout, :$format, :$method);
     }
 }
