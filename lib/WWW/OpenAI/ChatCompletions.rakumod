@@ -24,7 +24,12 @@ our proto OpenAIChatCompletion($prompt is copy,
                                :$model is copy = Whatever,
                                :$temperature is copy = Whatever,
                                :$max-tokens is copy = Whatever,
-                               :$n = 1,
+                               Numeric :$top-p = 1,
+                               UInt :$n = 1,
+                               Bool :$stream = False,
+                               :$stop = Whatever,
+                               Numeric :$presence-penalty = 0,
+                               Numeric :$frequency-penalty = 0,
                                :$auth-key is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
@@ -41,7 +46,12 @@ multi sub OpenAIChatCompletion($prompt is copy,
                                :$model is copy = Whatever,
                                :$temperature is copy = Whatever,
                                :$max-tokens is copy = Whatever,
+                               Numeric :$top-p = 1,
                                UInt :$n = 1,
+                               Bool :$stream = False,
+                               :$stop = Whatever,
+                               Numeric :$presence-penalty = 0,
+                               Numeric :$frequency-penalty = 0,
                                :$auth-key is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
@@ -76,16 +86,54 @@ multi sub OpenAIChatCompletion($prompt is copy,
     unless $max-tokens ~~ Int && 0 < $max-tokens;
 
     #------------------------------------------------------
+    # Process $top-p
+    #------------------------------------------------------
+    if $top-p.isa(Whatever) { $top-p = 1.0; }
+    die "The argument \$temperature is expected to be Whatever or number between 0 and 1."
+    unless $top-p ~~ Numeric && 0 ≤ $top-p ≤ 1;
+
+    #------------------------------------------------------
     # Process $n
     #------------------------------------------------------
     die "The argument \$n is expected to be a positive integer."
     unless 0 < $n;
 
     #------------------------------------------------------
+    # Process $stream
+    #------------------------------------------------------
+    die "The argument \$stream is expected to be Boolean."
+    unless $stream ~~ Bool;
+
+    #------------------------------------------------------
+    # Process $stop
+    #------------------------------------------------------
+    if !$stop.isa(Whatever) {
+        die "The argument \$stop is expected to be a string, a list strings, or Whatever."
+        unless $stop ~~ Str || $stop ~~ Positional && $stop.all ~~ Str;
+    }
+
+    #------------------------------------------------------
+    # Process $presence-penalty
+    #------------------------------------------------------
+    die "The argument \$presence-penalty is expected to be Boolean."
+    unless $presence-penalty ~~ Numeric && -2 ≤ $presence-penalty ≤ 2;
+
+    #------------------------------------------------------
+    # Process $frequency-penalty
+    #------------------------------------------------------
+    die "The argument \$frequency-penalty is expected to be Boolean."
+    unless $frequency-penalty ~~ Numeric && -2 ≤ $frequency-penalty ≤ 2;
+
+    #------------------------------------------------------
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my %body = :$model, messages => [%(:$role, content => $prompt),], :$temperature, max_tokens => $max-tokens, :$n;
+    my %body = :$model, :$temperature, :$stream, :$n,
+               top_p => $top-p,
+               messages => [%(:$role, content => $prompt),],
+               max_tokens => $max-tokens,
+               presence_penalty => $presence-penalty,
+               frequency_penalty => $frequency-penalty;
 
     my $url = 'https://api.openai.com/v1/chat/completions';
 
