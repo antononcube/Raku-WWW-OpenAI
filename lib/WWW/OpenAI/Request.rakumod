@@ -182,8 +182,8 @@ multi sub openai-request(Str :$url!,
     #------------------------------------------------------
     # Process $method
     #------------------------------------------------------
-    die "The argument \$method is expected to be a one of 'curl', 'cro', or 'tiny'."
-    unless $method ∈ <curl cro tiny>;
+    die "The argument \$method is expected to be a one of 'curl' or 'tiny'."
+    unless $method ∈ <curl tiny>;
 
     #------------------------------------------------------
     # Process $auth-key
