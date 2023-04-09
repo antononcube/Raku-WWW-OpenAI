@@ -1,79 +1,20 @@
 use v6.d;
 
-use Cro::HTTP::Client;
 use JSON::Fast;
 use HTTP::Tiny;
 
 unit module WWW::OpenAI::Request;
 
 #============================================================
-# GET Cro call
-#============================================================
-
-sub get-cro-get(Str :$url, Str :$auth-key, UInt :$timeout = 10) {
-    my $resp = await Cro::HTTP::Client.get: $url,
-            headers => [
-                Cro::HTTP::Header.new(
-                        name => 'Content-Type',
-                        value => 'application/json'
-                        ),
-                Cro::HTTP::Header.new(
-                        name => 'Authorization',
-                        value => "Bearer $auth-key"
-                        )
-            ];
-
-    CATCH {
-        when X::Cro::HTTP::Error {
-            note "Problem fetching " ~ .request.target;
-        }
-    }
-    return $resp.body;
-}
-
-#============================================================
-# POST Cro call
-#============================================================
-
-multi sub get-cro-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) {
-    my $resp = await Cro::HTTP::Client.post: $url,
-            headers => [
-                Cro::HTTP::Header.new(
-                        name => 'Content-Type',
-                        value => 'application/json'
-                        ),
-                Cro::HTTP::Header.new(
-                        name => 'Authorization',
-                        value => "Bearer $auth-key"
-                        )
-            ],
-            :$body;
-
-    return await $resp.body;
-}
-
-multi sub get-cro-post(Str :$url!,
-                       :$body! where * ~~ Positional,
-                       Str :$auth-key!,
-                       UInt :$timeout = 10) {
-    my $resp = await Cro::HTTP::Client.post: $url,
-            headers => [ Authorization => "Bearer $auth-key" ],
-            content-type => 'multipart/form-data',
-            :$body;
-
-    return await $resp.body;
-}
-
-#============================================================
 # POST Tiny call
 #============================================================
 
-proto sub get-tiny-post(Str :$url!, |) is export {*}
+proto sub tiny-post(Str :$url!, |) is export {*}
 
-multi sub get-tiny-post(Str :$url!,
-                        Str :$body!,
-                        Str :$auth-key!,
-                        UInt :$timeout = 10) {
+multi sub tiny-post(Str :$url!,
+                    Str :$body!,
+                    Str :$auth-key!,
+                    UInt :$timeout = 10) {
     my $resp = HTTP::Tiny.post: $url,
             headers => { authorization => "Bearer $auth-key",
                          Content-Type => "application/json" },
@@ -82,13 +23,13 @@ multi sub get-tiny-post(Str :$url!,
     return $resp<content>.decode;
 }
 
-multi sub get-tiny-post(Str :$url!,
-                        :$body! where * ~~ Map,
-                        Str :$auth-key!,
-                        Bool :$json = False,
-                        UInt :$timeout = 10) {
+multi sub tiny-post(Str :$url!,
+                    :$body! where *~~ Map,
+                    Str :$auth-key!,
+                    Bool :$json = False,
+                    UInt :$timeout = 10) {
     if $json {
-        return get-tiny-post( :$url, body => to-json($body), :$auth-key, :$timeout);
+        return tiny-post(:$url, body => to-json($body), :$auth-key, :$timeout);
     }
     my $resp = HTTP::Tiny.post: $url,
             headers => { authorization => "Bearer $auth-key" },
@@ -107,7 +48,7 @@ curl $URL \
   -d '$BODY'
 END
 
-multi sub get-curl-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) {
+multi sub curl-post(Str :$url!, Str :$body!, Str :$auth-key!, UInt :$timeout = 10) {
 
     my $textQuery = $curlQuery
             .subst('$URL', $url)
@@ -127,10 +68,10 @@ curl $URL \
   --header 'Content-Type: multipart/form-data'
 END
 
-multi sub get-curl-post(Str :$url!,
-                        :$body! where * ~~ Map,
-                        Str :$auth-key!,
-                        UInt :$timeout = 10) {
+multi sub curl-post(Str :$url!,
+                    :$body! where *~~ Map,
+                    Str :$auth-key!,
+                    UInt :$timeout = 10) {
 
     my $textQuery = $curlFormQuery
             .subst('$URL', $url)
@@ -138,7 +79,7 @@ multi sub get-curl-post(Str :$url!,
             .trim-trailing;
 
     for $body.kv -> $k, $v {
-        my $sep=$k eq 'file' ?? '@' !! '';
+        my $sep = $k eq 'file' ?? '@' !! '';
         $textQuery ~= " \\\n  --form $k=$sep$v";
     }
 
@@ -204,14 +145,11 @@ multi sub openai-request(Str :$url!,
     # Invoke OpenAI service
     #------------------------------------------------------
     my $res = do given $method.lc {
-        when 'cro' {
-            get-cro-post(:$url, :$body, :$auth-key, :$timeout);
-        }
         when 'curl' {
-            get-curl-post(:$url, :$body, :$auth-key, :$timeout);
+            curl-post(:$url, :$body, :$auth-key, :$timeout);
         }
         when 'tiny' {
-            get-tiny-post(:$url, :$body, :$auth-key, :$timeout);
+            tiny-post(:$url, :$body, :$auth-key, :$timeout);
         }
         default {
             die 'Unknown method.'
