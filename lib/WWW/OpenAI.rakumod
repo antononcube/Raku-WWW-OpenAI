@@ -82,7 +82,7 @@ our proto openai-playground($text is copy = '',
                             :$auth-key is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
-                            Str :$method = 'cro',
+                            Str :$method = 'tiny',
                             *%args
                             ) is export {*}
 
@@ -102,7 +102,7 @@ multi sub openai-playground($text is copy,
                             :$auth-key is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
-                            Str :$method = 'cro',
+                            Str :$method = 'tiny',
                             *%args
                             ) {
 

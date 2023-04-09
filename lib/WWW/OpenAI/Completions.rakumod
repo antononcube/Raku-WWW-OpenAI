@@ -57,7 +57,7 @@ our proto OpenAICompletion($prompt is copy,
                            :$auth-key is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
-                           Str :$method = 'cro') is export {*}
+                           Str :$method = 'tiny') is export {*}
 
 #| OpenAI completion access.
 multi sub OpenAICompletion(@prompts, *%args) {
@@ -75,7 +75,7 @@ multi sub OpenAICompletion($prompt is copy,
                            :$auth-key is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
-                           Str :$method = 'cro') {
+                           Str :$method = 'tiny') {
 
     #------------------------------------------------------
     # Process $type

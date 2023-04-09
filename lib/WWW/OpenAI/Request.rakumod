@@ -101,7 +101,7 @@ our proto openai-request(Str :$url!,
                          :$auth-key is copy = Whatever,
                          UInt :$timeout= 10,
                          :$format is copy = Whatever,
-                         Str :$method = 'cro',
+                         Str :$method = 'tiny',
                          ) is export {*}
 
 #| OpenAI request access.
@@ -110,7 +110,7 @@ multi sub openai-request(Str :$url!,
                          :$auth-key is copy = Whatever,
                          UInt :$timeout= 10,
                          :$format is copy = Whatever,
-                         Str :$method = 'cro'
+                         Str :$method = 'tiny'
                          ) {
 
     #------------------------------------------------------

@@ -18,7 +18,7 @@ our proto OpenAIAudio($fileName,
                       :$auth-key is copy = Whatever,
                       UInt :$timeout= 10,
                       :$format is copy = Whatever,
-                      Str :$method = 'cro'
+                      Str :$method = 'tiny'
                       ) is export {*}
 
 #| OpenAI image generation access.

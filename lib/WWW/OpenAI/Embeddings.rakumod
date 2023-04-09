@@ -16,7 +16,7 @@ our proto OpenAIEmbeddings($prompt,
                            :$auth-key is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
-                           Str :$method = 'cro'
+                           Str :$method = 'tiny'
                            ) is export {*}
 
 
@@ -26,7 +26,7 @@ multi sub OpenAIEmbeddings($prompt,
                            :$auth-key is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
-                           Str :$method = 'cro') {
+                           Str :$method = 'tiny') {
 
     #------------------------------------------------------
     # Process $model
