@@ -20,7 +20,7 @@ use WWW::OpenAI::TextCompletions;
 our proto openai-audio(|) is export {*}
 
 multi sub openai-audio(**@args, *%args) {
-    return WWW::OpenAI::Aidio::OpenAIAudio(|@args, |%args);
+    return WWW::OpenAI::Audio::OpenAIAudio(|@args, |%args);
 }
 
 #===========================================================

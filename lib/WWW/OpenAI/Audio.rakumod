@@ -2,7 +2,7 @@ use v6.d;
 
 use WWW::OpenAI::Request;
 
-unit module WWW::OpenAI::Aidio;
+unit module WWW::OpenAI::Audio;
 
 #============================================================
 # Audio
