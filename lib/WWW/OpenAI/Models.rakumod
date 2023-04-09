@@ -1,6 +1,8 @@
 use v6.d;
 
 use WWW::OpenAI::Request;
+use HTTP::Tiny;
+use JSON::Fast;
 
 unit module WWW::OpenAI::Models;
 
