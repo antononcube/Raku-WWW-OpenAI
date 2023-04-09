@@ -223,7 +223,7 @@ multi sub openai-request(Str :$url!,
     #------------------------------------------------------
     without $res { return Nil; }
 
-    if $format.lc eq <asis as-is as_is> { return $res; }
+    if $format.lc ∈ <asis as-is as_is> { return $res; }
 
     if $method ∈ <curl tiny> && $res ~~ Str {
         $res = from-json($res);
