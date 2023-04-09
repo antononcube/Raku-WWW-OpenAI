@@ -40,7 +40,7 @@ Here are the descriptions of the named arguments (options):
 - `n` takes a positive integer, for the number of images to be generated
 - `size` takes the values '1024x1024', '512x512', '256x256', 'large', 'medium', 'small'.
 - `response-format` takes the values "url" and "b64_json"
-- `method` takes the values "cro" and "curl"
+- `method` takes the values "tiny" and "curl"
 
 
 Here we generate a few images, get their URLs, and place (embed) the image links using a table:
