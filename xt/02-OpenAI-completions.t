@@ -27,8 +27,9 @@ ok openai-completion('Generate Raku code for a loop over a list',
         type => 'chat', model => Whatever, :$method);
 
 ## 5
-nok openai-completion('Generate Raku code for a loop over a list',
-        type => Whatever, model => 'gtp-blah-blah', :$method);
+dies-ok {
+    openai-completion('Generate Raku code for a loop over a list', type => Whatever, model => 'gtp-blah-blah', :$method)
+};
 
 ## 6
 ok openai-completion('Generate Raku code for a loop over a list',
