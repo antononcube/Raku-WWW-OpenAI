@@ -7,7 +7,7 @@ use HTTP::Tiny;
 unit module WWW::OpenAI;
 
 use WWW::OpenAI::Audio;
-use WWW::OpenAI::Completions;
+use WWW::OpenAI::ChatCompletions;
 use WWW::OpenAI::Embeddings;
 use WWW::OpenAI::ImageGenerations;
 use WWW::OpenAI::Models;
@@ -25,11 +25,48 @@ multi sub openai-audio(**@args, *%args) {
 }
 
 #===========================================================
-#| OpenAI completions access.
+#| OpenAI chat and text completions access.
 our proto openai-completion(|) is export {*}
 
-multi sub openai-completion(**@args, *%args) {
-    return WWW::OpenAI::Completions::OpenAICompletion(|@args, |%args);
+multi sub openai-completion($prompt,
+                            :$type is copy = Whatever,
+                            :$model is copy = Whatever,
+                            *%args) {
+
+    #------------------------------------------------------
+    # Process $type
+    #------------------------------------------------------
+    if $type.isa(Whatever) {
+        $type = do given $model {
+            when Whatever { 'text' }
+            when $_.starts-with('text-') { 'text' };
+            when $_ ∈ <gpt-3.5-turbo gpt-3.5-turbo-0301> { 'chat' };
+            default { 'text' }
+        }
+    }
+    die "The argument \$type is expected to be one of 'chat', 'text', or Whatever."
+    unless $type ∈ <chat text>;
+
+    #------------------------------------------------------
+    # Process $model
+    #------------------------------------------------------
+    if $model.isa(Whatever) { $model = $type eq 'text' ?? 'text-davinci-003' !! 'gpt-3.5-turbo'; }
+    die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-known-models.keys.sort.join('", "') ~ '"' }."
+    unless $model ∈ openai-known-models;
+
+    if $type eq 'chat' {
+        return WWW::OpenAI::ChatCompletions::OpenAIChatCompletion($prompt, :$model, |%args);
+    } else {
+        return WWW::OpenAI::TextCompletions::OpenAITextCompletion($prompt, :$model, |%args);
+    }
+}
+
+#===========================================================
+#| OpenAI chat completions access.
+our proto openai-chat-completion(|) is export {*}
+
+multi sub openai-chat-completion(**@args, *%args) {
+    return WWW::OpenAI::ChatCompletions::OpenAIChatCompletion(|@args, |%args);
 }
 
 #===========================================================
