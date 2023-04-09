@@ -16,7 +16,7 @@ multi sub openai-front(Str $text,                                #= Text to be p
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
                        Str :r(:$role) is copy = 'user',          #= Role.
                        Real :t(:$temperature) = 0.7,             #= Temperature.
-                       Str :l(:$language) = '',                 #= Language.
+                       Str :l(:$language) = '',                  #= Language.
                        Str :$response-format = 'url',            #= The format in which the generated images are returned; one of 'url' or 'b64_json'.
                        Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
                        UInt :$timeout= 10,                       #= Timeout.
