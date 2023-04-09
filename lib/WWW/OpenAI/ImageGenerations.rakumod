@@ -1,6 +1,7 @@
 use v6.d;
 
 use WWW::OpenAI::Request;
+use JSON::Fast;
 
 unit module WWW::OpenAI::ImageGenerations;
 
@@ -25,7 +26,7 @@ our proto OpenAICreateImage($prompt,
                             :$auth-key is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
-                            Str :$method = 'cro'
+                            Str :$method = 'tiny'
                             ) is export {*}
 
 #| OpenAI image generation access.
@@ -41,7 +42,7 @@ multi sub OpenAICreateImage($prompt,
                             :$auth-key is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
-                            Str :$method = 'cro') {
+                            Str :$method = 'tiny') {
 
     #------------------------------------------------------
     # Process $n
@@ -71,11 +72,7 @@ multi sub OpenAICreateImage($prompt,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my $body = $imageGenerationStencil
-            .subst('$prompt', $prompt)
-            .subst('$size', $size)
-            .subst('$response-format', $response-format)
-            .subst('$n', $n);
+    my %body = :$prompt, :$size, response_format => $response-format, :$n;
 
     my $url = 'https://api.openai.com/v1/images/generations';
 
@@ -83,5 +80,5 @@ multi sub OpenAICreateImage($prompt,
     # Delegate
     #------------------------------------------------------
 
-    return openai-request(:$url, :$body, :$auth-key, :$timeout, :$format, :$method);
+    return openai-request(:$url, body => to-json(%body), :$auth-key, :$timeout, :$format, :$method);
 }
