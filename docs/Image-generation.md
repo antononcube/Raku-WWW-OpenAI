@@ -25,7 +25,7 @@ my @imgResB64 = |openai-create-image(
         size => 'small',
         response-format => 'b64_json',
         format => 'values',
-        method => 'cro');
+        method => 'tiny');
 
 @imgResB64.map({ '![](data:image/png;base64,' ~ $_ ~ ')' }).join("\n\n")        
 ```
@@ -52,11 +52,9 @@ my @imgRes = |openai-create-image(
         n => 2,
         size => 'small',
         format => 'values',
-        method => 'cro');
+        method => 'tiny');
 
-'| ' ~ (^@imgRes.elems).map({ $_.Str }).join(' | ') ~ "|\n" ~
-'|' ~ (^@imgRes.elems).map({ '-----' }).join('|') ~ "|\n" ~ 
-'| ' ~ @imgRes.map({ '![](' ~ $_ ~ ')' }).join(' | ') ~ "|\n"
+@imgRes.map({ '![](' ~ $_ ~ ')' }).join("\n\n")       
 ```
 
 --------
