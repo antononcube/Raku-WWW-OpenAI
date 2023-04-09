@@ -13,6 +13,7 @@ use WWW::OpenAI::ImageGenerations;
 use WWW::OpenAI::Models;
 use WWW::OpenAI::Moderations;
 use WWW::OpenAI::Request;
+use WWW::OpenAI::TextCompletions;
 
 
 #===========================================================
@@ -48,7 +49,7 @@ multi sub openai-create-image(**@args, *%args) {
 }
 
 #===========================================================
-#| OpenAI models accesss.
+#| OpenAI models access.
 our proto openai-models(|) is export {*}
 
 multi sub openai-models(*%args) {
@@ -61,6 +62,14 @@ our proto openai-moderation(|) is export {*}
 
 multi sub openai-moderation(**@args, *%args) {
     return WWW::OpenAI::Moderations::OpenAIModeration(|@args, |%args);
+}
+
+#===========================================================
+#| OpenAI text completions access.
+our proto openai-text-completion(|) is export {*}
+
+multi sub openai-text-completion(**@args, *%args) {
+    return WWW::OpenAI::TextCompletions::OpenAITextCompletion(|@args, |%args);
 }
 
 #============================================================
@@ -114,8 +123,9 @@ multi sub openai-playground($text is copy,
         }
         when $_ ∈ <completion completions text/completions> {
             # my $url = 'https://api.openai.com/v1/completions';
-            return openai-completion($text, type => Whatever,
-                    |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
+            my $expectedKeys = <model prompt suffix max-tokens$ temperature top-n n stream echo presence-penalty frequency-penalty best-of>;
+            return openai-text-completion($text,
+                    |%args.grep({ $_.key ∈ $expectedKeys }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
         }
         when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
