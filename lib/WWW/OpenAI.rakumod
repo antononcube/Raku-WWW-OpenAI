@@ -45,7 +45,7 @@ multi sub openai-embeddings(**@args, *%args) {
 our proto openai-create-image(|) is export {*}
 
 multi sub openai-create-image(**@args, *%args) {
-    return WWW::OpenAI::Completions::OpenAICreateImage(|@args, |%args);
+    return WWW::OpenAI::ImageGenerations::OpenAICreateImage(|@args, |%args);
 }
 
 #===========================================================
