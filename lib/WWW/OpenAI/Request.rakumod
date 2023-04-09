@@ -79,7 +79,7 @@ multi sub get-tiny-post(Str :$url!,
                          Content-Type => "application/json" },
             content => $body;
 
-    return from-json($resp<content>.decode);
+    return $resp<content>.decode;
 }
 
 multi sub get-tiny-post(Str :$url!,
@@ -226,7 +226,13 @@ multi sub openai-request(Str :$url!,
     if $format.lc ∈ <asis as-is as_is> { return $res; }
 
     if $method ∈ <curl tiny> && $res ~~ Str {
-        $res = from-json($res);
+        try {
+            $res = from-json($res);
+        }
+        if $! {
+            note 'Cannot convert from JSON, returning "asis".';
+            return $res;
+        }
     }
 
     return do given $format.lc {
