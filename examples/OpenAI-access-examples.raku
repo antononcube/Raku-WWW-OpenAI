@@ -16,7 +16,7 @@ say openai-playground("how many rabits exist?", format => Whatever);
 #        n => 1,
 #        size => 'large',
 #        format => Whatever,
-#        method => 'cro');
+#        method => 'tiny');
 
 #my $fileName = $*CWD ~ '/resources/New-Recording-32.mp3';
 #my @modRes = |openai-audio(
