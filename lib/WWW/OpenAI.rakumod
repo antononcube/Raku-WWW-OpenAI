@@ -1,6 +1,5 @@
 use v6.d;
 
-use Cro::HTTP::Client;
 use JSON::Fast;
 use HTTP::Tiny;
 
