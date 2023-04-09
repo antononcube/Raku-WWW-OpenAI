@@ -51,9 +51,9 @@ use WWW::OpenAI;
 openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 ```
-# [{finish_reason => length, index => 0, logprobs => (Any), text => 
+# [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character, so he does not exist in the}]
+# Roger Rabbit is a fictional character created by the Walt Disney Company. He does not exist in real life.}]
 ```
 
 Another one using Bulgarian:
@@ -64,7 +64,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост}]
+# В зависимост от това, какъв е този облак от точки, може да}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -96,9 +96,10 @@ openai-completion(
         format => 'values');
 ```
 ```
-# # Loop over a list of integers
-# my @list = 1, 2, 3, 4, 5;
+# # Create a list
+# my @list = (1, 2, 3, 4, 5);
 # 
+# # Iterate over list
 # for @list -> $item {
 #     say $item;
 # }
@@ -120,11 +121,11 @@ openai-completion(
 # my @list = (1, 2, 3, 4, 5);
 # 
 # for @list -> $item {
-#     say $item;
+#     say "Item: $item";
 # }
 # ```
 # 
-# This code defines an array `@list` with five elements, and then uses a `for` loop to iterate over each element in the list. Inside the loop, the current item is assigned to the `$item` variable, and then printed to the console using the `say` function. The output of this code would be:
+# In this code, we create a list `@list` with five numbers. We then use a `for` loop to iterate over each item in the list, assigning the current item to the variable `$item`. Inside the loop, we simply print out the value of `$item` using the `say` function.
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -264,16 +265,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +-------------------------------+------------------------------+-------------------------------+--------------------------------+
-# | 0                             | 1                            | 2                             | 3                              |
-# +-------------------------------+------------------------------+-------------------------------+--------------------------------+
-# | Min    => -0.5897995          | Min    => -0.6674932         | Min    => -0.6316293          | Min    => -0.6049936           |
-# | 1st-Qu => -0.013175397        | 1st-Qu => -0.012275769       | 1st-Qu => -0.0125476065       | 1st-Qu => -0.0128846505        |
-# | Mean   => -0.0007618981246602 | Mean   => -0.000762535416627 | Mean   => -0.0007296895499115 | Mean   => -0.00075456833016081 |
-# | Median => -0.00100605615      | Median => -0.0003188204      | Median => -0.00056341792      | Median => -0.00069939          |
-# | 3rd-Qu => 0.012387738         | 3rd-Qu => 0.011146013        | 3rd-Qu => 0.011868718         | 3rd-Qu => 0.012142678          |
-# | Max    => 0.21172291          | Max    => 0.22815572         | Max    => 0.21270473          | Max    => 0.22202122           |
-# +-------------------------------+------------------------------+-------------------------------+--------------------------------+
+# +-------------------------------+--------------------------------+---------------------------------+---------------------------------+
+# | 0                             | 2                              | 1                               | 3                               |
+# +-------------------------------+--------------------------------+---------------------------------+---------------------------------+
+# | Min    => -0.590541           | Min    => -0.6317091           | Min    => -0.6682107            | Min    => -0.6042805            |
+# | 1st-Qu => -0.013253814        | 1st-Qu => -0.012545814         | 1st-Qu => -0.012124679          | 1st-Qu => -0.0129210345         |
+# | Mean   => -0.0007620548729349 | Mean   => -0.00072974665905879 | Mean   => -0.000762886858567253 | Mean   => -0.000754102343022331 |
+# | Median => -0.00099546775      | Median => -0.0005900907        | Median => -0.000282800135       | Median => -0.0007270535         |
+# | 3rd-Qu => 0.012380486         | 3rd-Qu => 0.011856706          | 3rd-Qu => 0.011022749           | 3rd-Qu => 0.012135995           |
+# | Max    => 0.2120038           | Max    => 0.2126235            | Max    => 0.22743845            | Max    => 0.22198059            |
+# +-------------------------------+--------------------------------+---------------------------------+---------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -289,10 +290,10 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.724412 | 0.756557 | 0.665149 |
-# | 1 | 0.724412 | 1.000000 | 0.811169 | 0.715543 |
-# | 2 | 0.756557 | 0.811169 | 1.000000 | 0.698977 |
-# | 3 | 0.665149 | 0.715543 | 0.698977 | 1.000000 |
+# | 0 | 1.000000 | 0.723637 | 0.756871 | 0.665119 |
+# | 1 | 0.723637 | 1.000000 | 0.812411 | 0.714687 |
+# | 2 | 0.756871 | 0.812411 | 1.000000 | 0.698599 |
+# | 3 | 0.665119 | 0.714687 | 0.698599 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
