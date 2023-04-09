@@ -90,7 +90,7 @@ multi sub OpenAIAudio($file,
     #------------------------------------------------------
 
     if $method eq 'curl' {
-        # Some sort of no-good shortcut -- see get-curl-post
+        # Some sort of no-good shortcut -- see curl-post
         my %body = %(:$file, :$model, :$prompt, :$language, :$temperature, response_format => $format);
 
         return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method);
