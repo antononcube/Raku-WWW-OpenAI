@@ -115,7 +115,7 @@ my $imgB64 = openai-create-image(
         n => 1,
         size => 'small',
         format => 'values',
-        method => 'cro');
+        method => 'tiny');
 ```
 
 Here are the options descriptions:
@@ -132,7 +132,7 @@ my @imgRes = |openai-create-image(
         response-format => 'url',
         n => 1,
         size => 'small',
-        method => 'cro');
+        method => 'tiny');
 
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
@@ -146,7 +146,7 @@ Here is an example of using
 my @modRes = |openai-moderation(
 "I want to kill them!",
 format => "values",
-method => 'cro');
+method => 'tiny');
 
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
@@ -298,6 +298,9 @@ graph TD
   - Invokes the procedure [`shell`](https://docs.raku.org/routine/shell)
   - Again, this is tested on macOS only.  
 
+- After "discovering" "HTTP::Tiny" and given the problems with "Cro::HTTP::Client", I removed the 'cro' method.
+  (I.e. the methods are 'tiny' and 'curl' in ver<0.2.0+>.)
+  
 --------
 
 ## TODO
@@ -310,13 +313,14 @@ graph TD
   - [X] DONE Moderation
   - [X] DONE Audio transcription
   - [X] DONE Audio translation
-  - [ ] TODO Image generation
-  - [ ] TODO Embeddings
+  - [X] DONE Image generation
+  - [X] DONE Embeddings
 
 - [X] DONE HTTP(S) retrieval methods
 
   - [X] DONE `curl`
   - [X] DONE "Cro"
+     - Not used in ver<0.2.0+>.
   - [X] DONE "HTTP::Tiny"
 
 - [X] DONE Models implementation
@@ -326,9 +330,9 @@ graph TD
 - [X] DONE Refactor the code, so each functionality (audio, completion, moderation, etc)
   has a separate file.
 
-- [ ] TODO Refactor HTTP(S) retrieval functions to be simpler and more "uniform."
+- [X] DONE Refactor HTTP(S) retrieval functions to be simpler and more "uniform."
 
-- [ ] MAYBE De-Cro the request code.
+- [X] DONE De-Cro the request code.
 
   - Given the problems of using "Cro::HTTP::Client" and the implementations with `curl` and 
     ["HTTP::Tiny"](https://gitlab.com/jjatria/http-tiny/-/blob/master/examples/cookbook.md),

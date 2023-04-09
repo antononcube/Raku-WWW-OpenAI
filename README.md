@@ -51,9 +51,9 @@ use WWW::OpenAI;
 openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 ```
-# [{finish_reason => (Any), index => 0, logprobs => (Any), text => 
+# [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character created by author Gary K. Wolf in his 1981 novel Who Censored Roger Rabbit? The character has since been adapted into a feature-length film, Who Framed Roger Rabbit, and various other media.}]
+# Roger Rabbit is a fictional character, so he does not exist in the}]
 ```
 
 Another one using Bulgarian:
@@ -64,7 +64,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост от структурата на облака от точки, в него мож}]
+# В зависимост}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -80,8 +80,7 @@ The current OpenAI models can be found with the function `openai-models`:
 openai-models
 ```
 ```
-#ERROR: Could not find symbol '&Tiny' in 'GLOBAL::HTTP'
-# Nil
+# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity ada:2020-05-03 babbage babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity babbage:2020-05-03 code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity curie:2020-05-03 cushman:2020-05-03 davinci davinci-if:3.0.0 davinci-instruct-beta davinci-instruct-beta:2.0.0 davinci-search-document davinci-search-query davinci-similarity davinci:2020-05-03 gpt-3.5-turbo gpt-3.5-turbo-0301 if-curie-v2 if-davinci-v2 if-davinci:3.0.0 text-ada-001 text-ada:001 text-babbage-001 text-babbage:001 text-curie-001 text-curie:001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-davinci:001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 whisper-1)
 ```
 
 ### Code generation
@@ -97,7 +96,8 @@ openai-completion(
         format => 'values');
 ```
 ```
-# my @list = <foo bar baz qux>;
+# # Loop over a list of integers
+# my @list = 1, 2, 3, 4, 5;
 # 
 # for @list -> $item {
 #     say $item;
@@ -114,7 +114,7 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Here's an example of how to create a loop over a list in Raku:
+# Here's an example of how to make a loop over a list in Raku:
 # 
 # ```
 # my @list = (1, 2, 3, 4, 5);
@@ -124,7 +124,7 @@ openai-completion(
 # }
 # ```
 # 
-# In this code, we define a list `@list` containing the values 1 through 5. We then use the `for` loop to iterate over each item in the list, assigning each item to the variable `$item` in turn. Inside the loop, we simply print out the value of `$item` using the `
+# This code defines an array `@list` with five elements, and then uses a `for` loop to iterate over each element in the list. Inside the loop, the current item is assigned to the `$item` variable, and then printed to the console using the `say` function. The output of this code would be:
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -149,7 +149,7 @@ my $imgB64 = openai-create-image(
         n => 1,
         size => 'small',
         format => 'values',
-        method => 'cro');
+        method => 'tiny');
 ```
 
 Here are the options descriptions:
@@ -166,7 +166,7 @@ my @imgRes = |openai-create-image(
         response-format => 'url',
         n => 1,
         size => 'small',
-        method => 'cro');
+        method => 'tiny');
 
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
@@ -180,7 +180,7 @@ Here is an example of using
 my @modRes = |openai-moderation(
 "I want to kill them!",
 format => "values",
-method => 'cro');
+method => 'tiny');
 
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
@@ -264,16 +264,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +--------------------------------+-------------------------------+------------------------------+-------------------------------+
-# | 2                              | 0                             | 1                            | 3                             |
-# +--------------------------------+-------------------------------+------------------------------+-------------------------------+
-# | Min    => -0.6316531           | Min    => -0.58950233         | Min    => -0.66777724        | Min    => -0.6049923          |
-# | 1st-Qu => -0.012527813         | 1st-Qu => -0.013168254        | 1st-Qu => -0.012265999       | 1st-Qu => -0.0129131605       |
-# | Mean   => -0.00072959246806706 | Mean   => -0.0007618211378867 | Mean   => -0.000762514686426 | Mean   => -0.0007543544948138 |
-# | Median => -0.0005818053        | Median => -0.0009763381       | Median => -0.00032089773     | Median => -0.000717447385     |
-# | 3rd-Qu => 0.0118590325         | 3rd-Qu => 0.012348148         | 3rd-Qu => 0.011157169        | 3rd-Qu => 0.01218189075       |
-# | Max    => 0.21271273           | Max    => 0.21178077          | Max    => 0.22788173         | Max    => 0.2221349           |
-# +--------------------------------+-------------------------------+------------------------------+-------------------------------+
+# +-------------------------------+------------------------------+-------------------------------+--------------------------------+
+# | 0                             | 1                            | 2                             | 3                              |
+# +-------------------------------+------------------------------+-------------------------------+--------------------------------+
+# | Min    => -0.5897995          | Min    => -0.6674932         | Min    => -0.6316293          | Min    => -0.6049936           |
+# | 1st-Qu => -0.013175397        | 1st-Qu => -0.012275769       | 1st-Qu => -0.0125476065       | 1st-Qu => -0.0128846505        |
+# | Mean   => -0.0007618981246602 | Mean   => -0.000762535416627 | Mean   => -0.0007296895499115 | Mean   => -0.00075456833016081 |
+# | Median => -0.00100605615      | Median => -0.0003188204      | Median => -0.00056341792      | Median => -0.00069939          |
+# | 3rd-Qu => 0.012387738         | 3rd-Qu => 0.011146013        | 3rd-Qu => 0.011868718         | 3rd-Qu => 0.012142678          |
+# | Max    => 0.21172291          | Max    => 0.22815572         | Max    => 0.21270473          | Max    => 0.22202122           |
+# +-------------------------------+------------------------------+-------------------------------+--------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -289,10 +289,10 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.724207 | 0.756615 | 0.665059 |
-# | 1 | 0.724207 | 1.000000 | 0.811324 | 0.715589 |
-# | 2 | 0.756615 | 0.811324 | 1.000000 | 0.699119 |
-# | 3 | 0.665059 | 0.715589 | 0.699119 | 1.000000 |
+# | 0 | 1.000000 | 0.724412 | 0.756557 | 0.665149 |
+# | 1 | 0.724412 | 1.000000 | 0.811169 | 0.715543 |
+# | 2 | 0.756557 | 0.811169 | 1.000000 | 0.698977 |
+# | 3 | 0.665149 | 0.715543 | 0.698977 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
@@ -325,7 +325,7 @@ openai-playground --help
 #     -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
 #     --timeout[=UInt]           Timeout. [default: 10]
 #     --format=<Str>             Format of the result; one of "json" or "hash". [default: 'json']
-#     --method=<Str>             Method for the HTTP POST query; one of "cro" or "curl". [default: 'cro']
+#     --method=<Str>             Method for the HTTP POST query; one of "tiny" or "curl". [default: 'tiny']
 ```
 
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
@@ -397,6 +397,9 @@ graph TD
   - Invokes the procedure [`shell`](https://docs.raku.org/routine/shell)
   - Again, this is tested on macOS only.  
 
+- After "discovering" "HTTP::Tiny" and given the problems with "Cro::HTTP::Client", I removed the 'cro' method.
+  (I.e. the methods are 'tiny' and 'curl' in ver<0.2.0+>.)
+  
 --------
 
 ## TODO
@@ -409,13 +412,14 @@ graph TD
   - [X] DONE Moderation
   - [X] DONE Audio transcription
   - [X] DONE Audio translation
-  - [ ] TODO Image generation
-  - [ ] TODO Embeddings
+  - [X] DONE Image generation
+  - [X] DONE Embeddings
 
 - [X] DONE HTTP(S) retrieval methods
 
   - [X] DONE `curl`
   - [X] DONE "Cro"
+     - Not used in ver<0.2.0+>.
   - [X] DONE "HTTP::Tiny"
 
 - [X] DONE Models implementation
@@ -425,11 +429,11 @@ graph TD
 - [X] DONE Refactor the code, so each functionality (audio, completion, moderation, etc)
   has a separate file.
 
-- [ ] TODO Refactor HTTP(S) retrieval functions to be simpler and more "uniform."
+- [X] DONE Refactor HTTP(S) retrieval functions to be simpler and more "uniform."
 
-- [ ] MAYBE De-Cro the request code.
+- [X] DONE De-Cro the request code.
 
-  - Given the problems of using "Cro::HTTP::Client" and the implementations with `curl` and
+  - Given the problems of using "Cro::HTTP::Client" and the implementations with `curl` and 
     ["HTTP::Tiny"](https://gitlab.com/jjatria/http-tiny/-/blob/master/examples/cookbook.md),
     it seems it is better to make the implementation of "WWW::OpenAI" more lightweight.
 
