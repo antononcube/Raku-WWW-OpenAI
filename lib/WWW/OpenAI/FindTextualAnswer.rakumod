@@ -51,7 +51,6 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy, @questions, :$sep is copy =
     # Process answers
     #------------------------------------------------------
 
-    note $res.lines.raku;
     my @answers = $res.lines.grep({ $_.chars > @questions.elems.Str.chars + $sep.chars + 1 });
     if @answers.elems == @questions.elems {
         return @answers.map({ $_.subst( / ^ \h* \d+ \h* $sep /, '' ).trim });
