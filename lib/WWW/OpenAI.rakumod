@@ -39,8 +39,8 @@ multi sub openai-completion($prompt,
     if $type.isa(Whatever) {
         $type = do given $model {
             when Whatever { 'text' }
+            when openai-is-chat-completion-model($_) { 'chat' };
             when $_.starts-with('text-') { 'text' };
-            when $_ ∈ <gpt-3.5-turbo gpt-3.5-turbo-0301> { 'chat' };
             default { 'text' }
         }
     }
