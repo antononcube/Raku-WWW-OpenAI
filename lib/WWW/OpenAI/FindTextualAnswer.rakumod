@@ -68,7 +68,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     # Delegate
     #------------------------------------------------------
 
-    my &func = openai-model-to-end-points($model).grep({ $_.contains('chat') }) ?? &OpenAIChatCompletion !! &OpenAITextCompletion;
+    my &func = openai-is-chat-completion-model($model) ?? &OpenAIChatCompletion !! &OpenAITextCompletion;
 
     my $res = &func($query, :$model, format => 'values', |%args.grep({ $_.key ne 'format' }).Hash);
 
