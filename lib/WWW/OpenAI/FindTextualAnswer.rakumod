@@ -30,7 +30,7 @@ multi sub OpenAIFindTextualAnswer(Str $text,
                                   :$prolog is copy = Whatever,
                                   :$request is copy = Whatever,
                                   *%args) {
-    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$prolog, :$request, |%args);
+    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$strip-with, :$prolog, :$request, |%args);
 }
 
 #| OpenAI utilization for finding textual answers.
