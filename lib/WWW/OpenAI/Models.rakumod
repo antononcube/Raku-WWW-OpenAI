@@ -73,6 +73,12 @@ multi sub openai-end-point-to-models(Str $endPoint) {
     return %endPointToModels{$endPoint};
 }
 
+proto sub openai-is-chat-completion-model($model) is export {*}
+
+multi sub openai-is-chat-completion-model(Str $model) {
+    return so (openai-model-to-end-points{$model} // Empty).grep({ $_.contains('chat') });
+}
+
 #------------------------------------------------------------
 # Invert to get model-to-end-point correspondence.
 # At this point (2023-04-14) only the model "whisper-1" has more than one end-point.
