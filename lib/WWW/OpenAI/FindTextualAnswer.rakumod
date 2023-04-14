@@ -1,5 +1,7 @@
 use v6.d;
 
+use WWW::OpenAI::ChatCompletions;
+use WWW::OpenAI::Models;
 use WWW::OpenAI::TextCompletions;
 
 unit module WWW::OpenAI::FindTextualAnswer;
@@ -11,14 +13,26 @@ unit module WWW::OpenAI::FindTextualAnswer;
 
 
 #| OpenAI utilization for finding textual answers.
-our proto OpenAIFindTextualAnswer(Str $text, $questions, :$sep = Whatever,  |) is export {*}
+our proto OpenAIFindTextualAnswer(Str $text,
+                                  $questions,
+                                  :$sep = Whatever,
+                                  :$model = Whatever,
+                                  |) is export {*}
 
-multi sub OpenAIFindTextualAnswer(Str $text, Str $question, :$sep = Whatever, *%args) {
-    return OpenAIFindTextualAnswer($text, [$question,], :$sep, |%args);
+multi sub OpenAIFindTextualAnswer(Str $text,
+                                  Str $question,
+                                  :$sep = Whatever,
+                                  :$model = Whatever,
+                                  *%args) {
+    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, |%args);
 }
 
 #| OpenAI utilization for finding textual answers.
-multi sub OpenAIFindTextualAnswer(Str $text is copy, @questions, :$sep is copy = Whatever, *%args) {
+multi sub OpenAIFindTextualAnswer(Str $text is copy,
+                                  @questions,
+                                  :$sep is copy = Whatever,
+                                  :$model is copy = Whatever,
+                                  *%args) {
 
     #------------------------------------------------------
     # Process separator
@@ -26,6 +40,15 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy, @questions, :$sep is copy =
 
     if $sep.isa(Whatever) { $sep = ')'; }
     die "The argument \$sep is expected to be a string or Whatever" unless $sep ~~ Str;
+
+    #------------------------------------------------------
+    # Process model
+    #------------------------------------------------------
+
+    if $model.isa(Whatever) { $model = 'gpt-3.5-turbo'; }
+    die "The argument \$model is expected to be Whatever or one of"
+    unless $model ∈ openai-model-to-end-points.keys;
+
 
     #------------------------------------------------------
     # Make query
@@ -45,7 +68,9 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy, @questions, :$sep is copy =
     # Delegate
     #------------------------------------------------------
 
-    my $res = OpenAITextCompletion($query, format => 'values', |%args.grep({ $_.key ne 'format' }).Hash);
+    my &func = openai-model-to-end-points($model).grep({ $_.contains('chat') }) ?? &OpenAIChatCompletion !! &OpenAITextCompletion;
+
+    my $res = &func($query, :$model, format => 'values', |%args.grep({ $_.key ne 'format' }).Hash);
 
     #------------------------------------------------------
     # Process answers
