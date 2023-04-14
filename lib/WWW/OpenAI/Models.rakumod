@@ -46,6 +46,50 @@ our sub openai-known-models() is export {
 }
 
 #============================================================
+# Compatibility of models and end-points
+#============================================================
+
+# Taken from:
+# https://platform.openai.com/docs/models/model-endpoint-compatibility
+
+my %endPointToModels =
+        '/v1/chat/completions' => <gpt-4 gpt-4-0314 gpt-4-32k gpt-4-32k-0314 gpt-3.5-turbo gpt-3.5-turbo-0301>,
+        '/v1/completions' => <text-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
+        '/v1/edits' => <text-davinci-edit-001 code-davinci-edit-001>,
+        '/v1/audio/transcriptions' => <whisper-1>,
+        '/v1/audio/translations' => <whisper-1>,
+        '/v1/fine-tunes' => <davinci curie babbage ada>,
+        '/v1/embeddings' => <text-embedding-ada-002 text-search-ada-doc-001>,
+        '/v1/moderations' => <text-moderation-stable text-moderation-latest>;
+
+#| End-point to models retrieval.
+proto sub openai-end-point-to-models(|) is export {*}
+
+multi sub openai-end-point-to-models() {
+    return %endPointToModels;
+}
+
+multi sub openai-end-point-to-models(Str $endPoint) {
+    return %endPointToModels{$endPoint};
+}
+
+#------------------------------------------------------------
+# Invert to get model-to-end-point correspondence.
+# At this point (2023-04-14) only the model "whisper-1" has more than one end-point.
+my %modelToEndPoints = %endPointToModels.map({ $_.value.Array X=> $_.key }).flat.classify({ $_.key }).map({ $_.key => $_.value>>.value.Array });
+
+#| Model to end-points retrieval.
+proto sub openai-model-to-end-points(|) is export {*}
+
+multi sub openai-model-to-end-points() {
+    return %modelToEndPoints;
+}
+
+multi sub openai-model-to-end-points(Str $model) {
+    return %modelToEndPoints{$model};
+}
+
+#============================================================
 # Models
 #============================================================
 
