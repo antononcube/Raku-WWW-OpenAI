@@ -65,7 +65,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     # Process prolog
     #------------------------------------------------------
 
-    if $prolog.isa(Whatever) { $prolog = 'Given the text'; }
+    if $prolog.isa(Whatever) { $prolog = 'Given the text: '; }
     die "The argument \$prolog is expected to be a string or Whatever."
     unless $prolog ~~ Str;
 
@@ -73,11 +73,9 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     # Process request
     #------------------------------------------------------
 
-    my $autoRequest = False;
     if $request.isa(Whatever) {
         my $s = @questions.elems == 1 ?? '' !! 's';
         $request = "{@questions.elems ==1 ?? 'give' !! 'list'} the shortest answer$s of the question$s:";
-        $autoRequest = True;
     }
     die "The argument \$request is expected to be a string or Whatever."
     unless $request ~~ Str;
