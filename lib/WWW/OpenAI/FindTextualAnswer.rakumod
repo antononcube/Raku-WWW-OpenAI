@@ -18,7 +18,7 @@ our proto OpenAIFindTextualAnswer(Str $text,
                                   :$sep = Whatever,
                                   :$model = Whatever,
                                   :$strip-with = Empty,
-                                  :$prolog is copy = Whatever,
+                                  :$prelude is copy = Whatever,
                                   :$request is copy = Whatever,
                                   Bool :p(:$pairs) = False,
                                   |) is export {*}
@@ -28,11 +28,11 @@ multi sub OpenAIFindTextualAnswer(Str $text,
                                   :$sep = Whatever,
                                   :$model = Whatever,
                                   :$strip-with = Empty,
-                                  :$prolog is copy = Whatever,
+                                  :$prelude is copy = Whatever,
                                   :$request is copy = Whatever,
                                   Bool :p(:$pairs) = False,
                                   *%args) {
-    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$strip-with, :$prolog, :$request, :$pairs, |%args);
+    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$strip-with, :$prelude, :$request, :$pairs, |%args);
 }
 
 #| OpenAI utilization for finding textual answers.
@@ -41,7 +41,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
                                   :$sep is copy = Whatever,
                                   :$model is copy = Whatever,
                                   :$strip-with is copy = Empty,
-                                  :$prolog is copy = Whatever,
+                                  :$prelude is copy = Whatever,
                                   :$request is copy = Whatever,
                                   Bool :p(:$pairs) = False,
                                   *%args) {
@@ -65,9 +65,9 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     # Process prolog
     #------------------------------------------------------
 
-    if $prolog.isa(Whatever) { $prolog = 'Given the text: '; }
-    die "The argument \$prolog is expected to be a string or Whatever."
-    unless $prolog ~~ Str;
+    if $prelude.isa(Whatever) { $prelude = 'Given the text: '; }
+    die "The argument \$prelude is expected to be a string or Whatever."
+    unless $prelude ~~ Str;
 
     #------------------------------------------------------
     # Process request
@@ -84,7 +84,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     # Make query
     #------------------------------------------------------
 
-    my Str $query = $prolog ~ ' "' ~ $text ~ '" ' ~ $request;
+    my Str $query = $prelude ~ ' "' ~ $text ~ '" ' ~ $request;
 
     if @questions == 1 {
         $query ~= "\n{@questions[0]}";
