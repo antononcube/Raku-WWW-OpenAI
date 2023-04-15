@@ -72,7 +72,8 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
 
     my $autoRequest = False;
     if $request.isa(Whatever) {
-        $request = "list the shortest answers of the {@questions.elems == 1 ?? 'question' !! 'quesitons'}:";
+        my $s = @questions.elems == 1 ?? '' !! 's';
+        $request = "{@questions.elems ==1 ?? 'give' !! 'list'} the shortest answer$s of the question$s:";
         $autoRequest = True;
     }
     die "The argument \$request is expected to be a string or Whatever."
@@ -85,7 +86,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     my Str $query = $prolog ~ ' "' ~ $text ~ '" ' ~ $request;
 
     if @questions == 1 {
-        $query ~= "\n { @questions[0] }";
+        $query ~= "\n{@questions[0]}";
     } else {
         for (1 .. @questions.elems) -> $i {
             $query ~= "\n$i$sep {@questions[$i-1]}";
