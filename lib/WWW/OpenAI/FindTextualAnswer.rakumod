@@ -32,7 +32,8 @@ multi sub OpenAIFindTextualAnswer(Str $text,
                                   :$request is copy = Whatever,
                                   Bool :p(:$pairs) = False,
                                   *%args) {
-    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$strip-with, :$prelude, :$request, :$pairs, |%args);
+    my $res = OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$strip-with, :$prelude, :$request, :$pairs, |%args);
+    return $res ~~ Positional ?? $res[0] !! $res;
 }
 
 #| OpenAI utilization for finding textual answers.
@@ -107,14 +108,17 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     #------------------------------------------------------
 
     # Pick answers the are long enough.
-    my @answers = $res.lines.grep({ $_.chars > @questions.elems.Str.chars + $sep.chars + 1 });
+    my @answers = [$res,];
+    if @questions.elems > 1 {
+        @answers = $res.lines.grep({ $_.chars > @questions.elems.Str.chars + $sep.chars + 1 });
+    }
 
     if @answers.elems == @questions.elems {
         @answers = @answers.map({ $_.subst( / ^ \h* \d+ \h* $sep /, '' ).trim });
         if $strip-with.isa(WhateverCode) {
             for (^@questions.elems) -> $i {
-                my $noWords = @questions[$i].split(/ <ws> | <punct> /, :skip-empty).unique.Array;
-                @answers[$i] = @answers[$i].split(/ <ws> | <punct> /, :skip-empty).grep({ $_ ∉ $noWords }).join(' ');
+                my $noWords = @questions[$i].split(/ <ws> /, :skip-empty).unique.Array;
+                @answers[$i] = @answers[$i].split(/ <ws> /, :skip-empty).grep({ $_ ∉ $noWords }).join;
                 @answers[$i] =
                         @answers[$i]
                         .subst( / ^ The /, '' )
@@ -125,7 +129,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
         } elsif $strip-with ~~ Positional {
             my $noWords = $strip-with.grep(* ~~ Str).Array;
             for (^@questions.elems) -> $i {
-                @answers[$i] = @answers[$i].split(/ <ws> | <punct> /, :skip-empty).grep({ $_.lc ∉ $noWords }).join(' ').trim;
+                @answers[$i] = @answers[$i].split(/ <ws> | <punct> /, :skip-empty).grep({ $_.lc ∉ $noWords }).join.trim;
             }
         } elsif $strip-with ~~ Callable {
             for (^@questions.elems) -> $i {
