@@ -65,7 +65,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     # Process prolog
     #------------------------------------------------------
 
-    if $prelude.isa(Whatever) { $prelude = 'Given the text: '; }
+    if $prelude.isa(Whatever) { $prelude = 'Given the text:'; }
     die "The argument \$prelude is expected to be a string or Whatever."
     unless $prelude ~~ Str;
 
