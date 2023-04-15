@@ -73,10 +73,18 @@ multi sub openai-end-point-to-models(Str $endPoint) {
     return %endPointToModels{$endPoint};
 }
 
+#| Checks if a given string an identifier of a chat completion model.
 proto sub openai-is-chat-completion-model($model) is export {*}
 
 multi sub openai-is-chat-completion-model(Str $model) {
-    return so (openai-model-to-end-points{$model} // Empty).grep({ $_.contains('chat') });
+    return $model ∈ openai-end-point-to-models{'/v1/chat/completions'};
+}
+
+#| Checks if a given string an identifier of a text completion model.
+proto sub openai-is-text-completion-model($model) is export {*}
+
+multi sub openai-is-text-completion-model(Str $model) {
+    return $model ∈ openai-end-point-to-models{'/v1/completions'};
 }
 
 #------------------------------------------------------------
