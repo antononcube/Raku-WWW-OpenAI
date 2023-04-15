@@ -53,7 +53,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character created by the Walt Disney Company. He does not exist in real life.}]
+# Roger Rabbit is a fictional character created by Disney in 1988. He has appeared in several movies and television shows, but is not an actual person.}]
 ```
 
 Another one using Bulgarian:
@@ -64,7 +64,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост от това, какъв е този облак от точки, може да}]
+# В зависимост от размера на облака от точки, може да бъдат}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -96,10 +96,7 @@ openai-completion(
         format => 'values');
 ```
 ```
-# # Create a list
-# my @list = (1, 2, 3, 4, 5);
-# 
-# # Iterate over list
+# my @list = <a b c d e f g h i j>;
 # for @list -> $item {
 #     say $item;
 # }
@@ -121,11 +118,11 @@ openai-completion(
 # my @list = (1, 2, 3, 4, 5);
 # 
 # for @list -> $item {
-#     say "Item: $item";
+#     say $item;
 # }
 # ```
 # 
-# In this code, we create a list `@list` with five numbers. We then use a `for` loop to iterate over each item in the list, assigning the current item to the variable `$item`. Inside the loop, we simply print out the value of `$item` using the `say` function.
+# In this code, we define a list `@list` with some values. Then, we use a `for` loop to iterate over each item in the list. The `-> $item` syntax specifies that we want to assign each item to the variable `$item` as we loop through the list. Finally, we use the
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -265,16 +262,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +-------------------------------+--------------------------------+---------------------------------+---------------------------------+
-# | 0                             | 2                              | 1                               | 3                               |
-# +-------------------------------+--------------------------------+---------------------------------+---------------------------------+
-# | Min    => -0.590541           | Min    => -0.6317091           | Min    => -0.6682107            | Min    => -0.6042805            |
-# | 1st-Qu => -0.013253814        | 1st-Qu => -0.012545814         | 1st-Qu => -0.012124679          | 1st-Qu => -0.0129210345         |
-# | Mean   => -0.0007620548729349 | Mean   => -0.00072974665905879 | Mean   => -0.000762886858567253 | Mean   => -0.000754102343022331 |
-# | Median => -0.00099546775      | Median => -0.0005900907        | Median => -0.000282800135       | Median => -0.0007270535         |
-# | 3rd-Qu => 0.012380486         | 3rd-Qu => 0.011856706          | 3rd-Qu => 0.011022749           | 3rd-Qu => 0.012135995           |
-# | Max    => 0.2120038           | Max    => 0.2126235            | Max    => 0.22743845            | Max    => 0.22198059            |
-# +-------------------------------+--------------------------------+---------------------------------+---------------------------------+
+# +--------------------------------+------------------------------+-------------------------------+-------------------------------+
+# | 3                              | 1                            | 0                             | 2                             |
+# +--------------------------------+------------------------------+-------------------------------+-------------------------------+
+# | Min    => -0.6049936           | Min    => -0.6674932         | Min    => -0.5897995          | Min    => -0.6316293          |
+# | 1st-Qu => -0.0128846505        | 1st-Qu => -0.012275769       | 1st-Qu => -0.013175397        | 1st-Qu => -0.0125476065       |
+# | Mean   => -0.00075456833016081 | Mean   => -0.000762535416627 | Mean   => -0.0007618981246602 | Mean   => -0.0007296895499115 |
+# | Median => -0.00069939          | Median => -0.0003188204      | Median => -0.00100605615      | Median => -0.00056341792      |
+# | 3rd-Qu => 0.012142678          | 3rd-Qu => 0.011146013        | 3rd-Qu => 0.012387738         | 3rd-Qu => 0.011868718         |
+# | Max    => 0.22202122           | Max    => 0.22815572         | Max    => 0.21172291          | Max    => 0.21270473          |
+# +--------------------------------+------------------------------+-------------------------------+-------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -290,19 +287,96 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.723637 | 0.756871 | 0.665119 |
-# | 1 | 0.723637 | 1.000000 | 0.812411 | 0.714687 |
-# | 2 | 0.756871 | 0.812411 | 1.000000 | 0.698599 |
-# | 3 | 0.665119 | 0.714687 | 0.698599 | 1.000000 |
+# | 0 | 1.000000 | 0.724412 | 0.756557 | 0.665149 |
+# | 1 | 0.724412 | 1.000000 | 0.811169 | 0.715543 |
+# | 2 | 0.756557 | 0.811169 | 1.000000 | 0.698977 |
+# | 3 | 0.665149 | 0.715543 | 0.698977 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
 **Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
 (Judging by the table with dot products.)
 
+### Finding textual answers
+
+Here is an example of finding textual answers:
+
+```perl6
+my $text = "Lake Titicaca is a large, deep lake in the Andes 
+on the border of Bolivia and Peru. By volume of water and by surface 
+area, it is the largest lake in South America";
+
+openai-find-textual-answer($text, "Where is Titicaca?")
+```
+```
+# [Andes on the border of Bolivia and Peru .]
+```
+
+By default `openai-find-textual-answer` tries to give short answers.
+If the option "request" is `Whatever` then depending on the number of questions 
+the request is one those phrases:
+- "give the shortest answer of the question:"
+- "list the shortest answers of the questions:"
+
+In the example above the full query given to OpenAI's models is
+
+> Given the text "Lake Titicaca is a large, deep lake in the Andes
+on the border of Bolivia and Peru. By volume of water and by surface
+area, it is the largest lake in South America" 
+> give the shortest answer of the question:   
+> Where is Titicaca?
+
+Here we get a longer answer by changing the value of "request":
+
+```perl6
+openai-find-textual-answer($text, "Where is Titicaca?", request => "answer the question:")
+```
+```
+# [Titicaca is in the Andes on the border of Bolivia and Peru .]
+```
+
+**Remark:** The function `openai-find-textual-answer` is inspired by the Mathematica function
+[`FindTextualAnswer`](https://reference.wolfram.com/language/ref/FindTextualAnswer.html); 
+see [JL1]. Unfortunately, at this time implementing the full signature of `FindTextualAnswer`
+with OpenAI's API is not easy. (Or cheap to execute.)
+
+#### Multiple questions
+
+If several questions are given to the function `openai-find-textual-answer`
+then all questions are spliced with the given text into one query (that is sent to OpenAI.)
+
+For example, consider the following text and questions:
+
+```perl6
+my $query = 'Make a classifier with the method RandomForest over the data dfTitanic; show precision and accuracy.';
+
+my @questions =
+        ['What is the dataset?',
+         'What is the method?',
+         'Which metrics to show?'
+        ];
+```
+
+Then the query send to OpenAI is:
+
+> Given the text: "Make a classifier with the method RandomForest over the data dfTitanic; show precision and accuracy."
+> list the shortest answers of the questions:   
+> 1) What is the dataset?   
+> 2) What is the method?    
+> 3) Which metrics to show?   
+
+
+The answers are assumed to be given in the same order as the questions, each answer in a separated line.
+Hence, by splitting the OpenAI result into lines we get the answers corresponding to the questions.  
+
+If the questions are missing question marks, it is likely that the result may have a completion as 
+a first line followed by the answers. In that situation the answers are not parsed and a warning message is given.
+
 -------
 
 ## Command Line Interface
+
+### Playground access
 
 The package provides a Command Line Interface (CLI) script:
 
@@ -331,6 +405,31 @@ openai-playground --help
 
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
 then `openai-playground` attempts to use the env variable `OPENAI_API_KEY`.
+
+### Finding textual answers
+
+The package provides a CLI script for finding textual answers:
+
+```shell
+openai-find-textual-answer --help
+```
+```
+# Usage:
+#   openai-find-textual-answer <text> -q=<Str> [--max-tokens[=UInt]] [-m|--model=<Str>] [-t|--temperature[=Real]] [-r|--request=<Str>] [-p|--pairs] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Text processing using the OpenAI API.
+#   openai-find-textual-answer [<words> ...] -q=<Str> [--max-tokens[=UInt]] [-m|--model=<Str>] [-t|--temperature[=Real]] [-r|--request=<Str>] [-p|--pairs] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
+#   
+#     <text>                     Text to be processed or audio file name.
+#     -q=<Str>                   Questions separated with '?' or ';'.
+#     --max-tokens[=UInt]        The maximum number of tokens to generate in the completion. [default: 300]
+#     -m|--model=<Str>           Model. [default: 'Whatever']
+#     -t|--temperature[=Real]    Temperature. [default: 0.7]
+#     -r|--request=<Str>         Request. [default: 'Whatever']
+#     -p|--pairs                 Should question-answer pairs be returned or not? [default: False]
+#     -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
+#     --timeout[=UInt]           Timeout. [default: 10]
+#     --format=<Str>             Format of the result; one of "json" or "hash". [default: 'json']
+#     --method=<Str>             Method for the HTTP POST query; one of "tiny" or "curl". [default: 'tiny']
+```
 
 --------
 
@@ -415,6 +514,7 @@ graph TD
   - [X] DONE Audio translation
   - [X] DONE Image generation
   - [X] DONE Embeddings
+  - [X] DONE Finding of textual answers
 
 - [X] DONE HTTP(S) retrieval methods
 
@@ -438,6 +538,8 @@ graph TD
     ["HTTP::Tiny"](https://gitlab.com/jjatria/http-tiny/-/blob/master/examples/cookbook.md),
     it seems it is better to make the implementation of "WWW::OpenAI" more lightweight.
 
+- [X] DONE Implement finding of textual answers
+
 --------
 
 ## References
@@ -448,6 +550,11 @@ graph TD
 ["Connecting Mathematica and Raku"](https://rakuforprediction.wordpress.com/2021/12/30/connecting-mathematica-and-raku/),
 (2021),
 [RakuForPrediction at WordPress](https://rakuforprediction.wordpress.com).
+
+[JL1] Jérôme Louradour,
+["New in the Wolfram Language: FindTextualAnswer"](https://blog.wolfram.com/2018/02/15/new-in-the-wolfram-language-findtextualanswer),
+(2018),
+[blog.wolfram.com](https://blog.wolfram.com/).
 
 ### Packages
 
