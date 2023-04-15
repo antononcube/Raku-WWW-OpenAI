@@ -20,6 +20,7 @@ our proto OpenAIFindTextualAnswer(Str $text,
                                   :$strip-with = Empty,
                                   :$prolog is copy = Whatever,
                                   :$request is copy = Whatever,
+                                  Bool :p(:$pairs) = False,
                                   |) is export {*}
 
 multi sub OpenAIFindTextualAnswer(Str $text,
@@ -29,8 +30,9 @@ multi sub OpenAIFindTextualAnswer(Str $text,
                                   :$strip-with = Empty,
                                   :$prolog is copy = Whatever,
                                   :$request is copy = Whatever,
+                                  Bool :p(:$pairs) = False,
                                   *%args) {
-    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$strip-with, :$prolog, :$request, |%args);
+    return OpenAIFindTextualAnswer($text, [$question,], :$sep, :$model, :$strip-with, :$prolog, :$request, :$pairs, |%args);
 }
 
 #| OpenAI utilization for finding textual answers.
@@ -41,6 +43,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
                                   :$strip-with is copy = Empty,
                                   :$prolog is copy = Whatever,
                                   :$request is copy = Whatever,
+                                  Bool :p(:$pairs) = False,
                                   *%args) {
 
     #------------------------------------------------------
@@ -131,9 +134,13 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
                 @answers[$i] = $strip-with(@answers[$i]);
             }
         }
+
+        if $pairs {
+            return (@questions Z=> @answers).Array;
+        }
         return @answers;
-    } else {
-        note 'The obtained answer does not have the expected form: a line with an answer for each question.';
-        return $res;
     }
+
+    note 'The obtained answer does not have the expected form: a line with an answer for each question.';
+    return $res;
 }
