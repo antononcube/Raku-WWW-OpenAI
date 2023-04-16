@@ -18,7 +18,8 @@ multi sub openai-front(Str $text,                                #= Text to be q
                        Str :r(:$request) = 'Whatever',           #= Request.
                        Bool :p(:$pairs) = False,                 #= Should question-answer pairs be returned or not?
                        Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
-                       UInt :$timeout= 10,                       #= Timeout.
+                       UInt :$timeout = 10,                      #= Timeout.
+                       Bool :$echo = False,                      #= Should the query, result, answer be echoed or not?
                        Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
                        Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
                        ) {
@@ -48,6 +49,7 @@ multi sub openai-front(Str $text,                                #= Text to be q
                     :$temperature,
                     :$auth-key,
                     :$timeout,
+                    :$echo,
                     :$format,
                     :$method);
 
@@ -68,10 +70,11 @@ multi sub MAIN(Str $text,                                #= Text to be processed
                Bool :p(:$pairs) = False,                 #= Should question-answer pairs be returned or not?
                Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
                UInt :$timeout= 10,                       #= Timeout.
+               Bool :$echo = False,                      #= Should the query, result, answer be echoed or not?
                Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
                Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
                ) {
-    return openai-front($text, $questions, :$model, :$max-tokens, :$temperature, :$request, :$pairs, :$auth-key, :$timeout, :$format, :$method);
+    return openai-front($text, $questions, :$model, :$max-tokens, :$temperature, :$request, :$pairs, :$auth-key, :$timeout, :$echo, :$format, :$method);
 }
 
 multi sub MAIN
@@ -85,8 +88,9 @@ multi sub MAIN
  Bool :p(:$pairs) = False,                 #= Should question-answer pairs be returned or not?
  Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
  UInt :$timeout= 10,                       #= Timeout.
+ Bool :$echo = False,                      #= Should the query, result, answer be echoed or not?
  Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
  Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
  ) {
-    return openai-front(@words.join(' ').Str, $questions, :$model, :$max-tokens, :$temperature, :$request, :$pairs, :$auth-key, :$timeout, :$format, :$method);
+    return openai-front(@words.join(' ').Str, $questions, :$model, :$max-tokens, :$temperature, :$request, :$pairs, :$auth-key, :$timeout, :$echo, :$format, :$method);
 }
