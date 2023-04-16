@@ -58,7 +58,7 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     # Process model
     #------------------------------------------------------
 
-    if $model.isa(Whatever) { $model = 'gpt-3.5-turbo'; }
+    if $model.isa(Whatever) { $model = 'text-curie-001'; }
     die "The argument \$model is expected to be Whatever or one of {openai-model-to-end-points.keys.join(', ')}."
     unless $model ∈ openai-model-to-end-points.keys;
 
@@ -82,6 +82,11 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
     unless $request ~~ Str;
 
     #------------------------------------------------------
+    # Process echo
+    #------------------------------------------------------
+    my $echo = so %args<echo> // False;
+
+    #------------------------------------------------------
     # Make query
     #------------------------------------------------------
 
@@ -95,13 +100,17 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
         }
     }
 
+    if $echo { note "Query:", $query.raku; }
+
     #------------------------------------------------------
     # Delegate
     #------------------------------------------------------
 
     my &func = openai-is-chat-completion-model($model) ?? &OpenAIChatCompletion !! &OpenAITextCompletion;
 
-    my $res = &func($query, :$model, format => 'values', |%args.grep({ $_.key ne 'format' }).Hash);
+    my $res = &func($query, :$model, format => 'values', |%args.grep({ $_.key ∉ <format echo> }).Hash);
+
+    if $echo { note "Result:", $res.raku; }
 
     #------------------------------------------------------
     # Process answers
@@ -113,23 +122,26 @@ multi sub OpenAIFindTextualAnswer(Str $text is copy,
         @answers = $res.lines.grep({ $_.chars > @questions.elems.Str.chars + $sep.chars + 1 });
     }
 
+    if $echo { note "Answers:", @answers.raku; }
+
     if @answers.elems == @questions.elems {
         @answers = @answers.map({ $_.subst( / ^ \h* \d+ \h* $sep /, '' ).trim });
-        if $strip-with.isa(WhateverCode) {
+        if $strip-with.isa(Whatever) || $strip-with.isa(WhateverCode) {
             for (^@questions.elems) -> $i {
-                my $noWords = @questions[$i].split(/ <ws> /, :skip-empty).unique.Array;
-                @answers[$i] = @answers[$i].split(/ <ws> /, :skip-empty).grep({ $_ ∉ $noWords }).join;
+                # @answers[$i] = @answers[$i].split(/ <ws> /, :skip-empty).grep({ $_.lc ∉ $noWords }).join;
+                my @noWords = @questions[$i].split(/ <ws> /, :skip-empty)>>.lc.unique.Array;
+                @answers[$i] = reduce( -> $x, $w { $x.subst(/:i <wb> $w <wb>/,''):g }, @answers[$i], |@noWords);
                 @answers[$i] =
                         @answers[$i]
                         .subst( / ^ The /, '' )
-                        .subst( / ^ \h+ are \h+ /, '' )
-                        .subst( / \h+ '.' $ /, '' )
+                        .subst( / ^ \h+ [ are | is ] \h+ /, '' )
+                        .subst( / '.' $ /, '' )
                         .trim;
             }
-        } elsif $strip-with ~~ Positional {
-            my $noWords = $strip-with.grep(* ~~ Str).Array;
+        } elsif $strip-with ~~ Positional && $strip-with.elems > 0 {
+            my @noWords = $strip-with.grep(* ~~ Str).Array;
             for (^@questions.elems) -> $i {
-                @answers[$i] = @answers[$i].split(/ <ws> | <punct> /, :skip-empty).grep({ $_.lc ∉ $noWords }).join.trim;
+                @answers[$i] = reduce( -> $x, $w { $x.subst(/:i <wb> $w <wb>/,''):g }, @answers[$i], |@noWords);
             }
         } elsif $strip-with ~~ Callable {
             for (^@questions.elems) -> $i {
