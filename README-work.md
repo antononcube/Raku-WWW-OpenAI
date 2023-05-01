@@ -10,8 +10,10 @@ For more details of the OpenAI's API usage see [the documentation](https://platf
 **Remark:** This Raku package is much "less ambitious" than the official Python package, [OAIp1], developed by OpenAI's team.
 Gradually, over time, I expect to add features to the Raku package that correspond to features of [OAIp1].
 
-The design and implementation of "WWW::OpenAI" are very similar to those of 
-["Lingua::Translation::DeepL"](https://raku.land/zef:antononcube/Lingua::Translation::DeepL), [AAp1]. 
+The original design and implementation of "WWW::OpenAI" were very similar to those of
+["Lingua::Translation::DeepL"](https://raku.land/zef:antononcube/Lingua::Translation::DeepL), [AAp1].
+Major refactoring of the original code was done -- now each OpenAI functionality targeted by "WWW::OpenAI"
+has its code placed in a separate file.
 
 -----
 
@@ -194,7 +196,7 @@ $embs.elems;
 ```
 
 Here we show:
-- That the result is an array of three vectors each with length 1536
+- That the result is an array of four vectors each with length 1536
 - The distributions of the values of each vector
 
 ```perl6
@@ -352,9 +354,14 @@ graph TD
 
 ## Potential problems
 
-**Remark:** Currently this package is tested on macOS only.
+### Tested on macOS only
 
-### SSL certificate problems
+Currently this package is tested on macOS only.
+
+### SSL certificate problems (original package version)
+
+*(This subsection is for the original version of the package, not for the most recent one.)*
+
 
 - On macOS I get the errors:
     
@@ -384,7 +391,7 @@ graph TD
 
 ## TODO
 
-- [ ] TODO Comprehensive unit tests
+- [X] DONE Comprehensive unit tests
   - Note that this requires OpenAI auth token and costs money. (Ideally, not much.)
   - [X] DONE Basic usage
   - [X] DONE Completions - chat
