@@ -169,7 +169,7 @@ multi sub openai-playground($text is copy,
         }
         when $_ ∈ <completion completions text/completions> {
             # my $url = 'https://api.openai.com/v1/completions';
-            my $expectedKeys = <model prompt suffix max-tokens temperature top-n n stream echo presence-penalty frequency-penalty best-of>;
+            my $expectedKeys = <model prompt suffix max-tokens temperature top-p n stream echo presence-penalty frequency-penalty best-of>;
             return openai-text-completion($text,
                     |%args.grep({ $_.key ∈ $expectedKeys }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
