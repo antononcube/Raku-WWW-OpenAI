@@ -18,7 +18,7 @@ my $textCompletitionStencil = q:to/END/;
   "suffix": "$suffix",
   "max_tokens": $max-tokens,
   "temperature": $temperature,
-  "top_n": $top-p,
+  "top_p": $top-p,
   "n": $n,
   "stream": $stream,
   "logprops": $logprops,
