@@ -12,7 +12,7 @@ my %*SUB-MAIN-OPTS =
 #| Finding textual answers using the OpenAI API.
 multi sub openai-front(Str $text,                                #= Text to be questioned.
                        Str $questions,                           #= Questions separated with '?' or ';'.
-                       UInt :$max-tokens = 300,                  #= The maximum number of tokens to generate in the completion.
+                       UInt :mt(:$max-tokens) = 300,             #= The maximum number of tokens to generate in the completion.
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
                        Real :t(:$temperature) = 0.7,             #= Temperature.
                        Str :r(:$request) = 'Whatever',           #= Request.
@@ -20,7 +20,7 @@ multi sub openai-front(Str $text,                                #= Text to be q
                        Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
                        UInt :$timeout = 10,                      #= Timeout.
                        Bool :$echo = False,                      #= Should the query, result, answer be echoed or not?
-                       Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+                       Str :f(:$format) is copy = 'values',      #= Format of the result; one of "json", "hash", "values", or "Whatever".
                        Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
                        ) {
 
@@ -38,6 +38,8 @@ multi sub openai-front(Str $text,                                #= Text to be q
             $auth-key = ''
         }
     }
+
+    if $format.lc ∈ <v auto whatever> { $format = 'values'; }
 
     my $res =
             openai-find-textual-answer($text,
@@ -60,36 +62,19 @@ multi sub openai-front(Str $text,                                #= Text to be q
     }
 }
 
-#| Text processing using the OpenAI API.
-multi sub MAIN(Str $text,                                #= Text to be processed or audio file name.
-               Str :q($questions)!,                      #= Questions separated with '?' or ';'.
-               UInt :$max-tokens = 300,                  #= The maximum number of tokens to generate in the completion.
-               Str :m(:$model) is copy = 'Whatever',     #= Model.
-               Real :t(:$temperature) = 0.7,             #= Temperature.
-               Str :r(:$request) = 'Whatever',           #= Request.
-               Bool :p(:$pairs) = False,                 #= Should question-answer pairs be returned or not?
-               Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
-               UInt :$timeout= 10,                       #= Timeout.
-               Bool :$echo = False,                      #= Should the query, result, answer be echoed or not?
-               Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
-               Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
-               ) {
-    return openai-front($text, $questions, :$model, :$max-tokens, :$temperature, :$request, :$pairs, :$auth-key, :$timeout, :$echo, :$format, :$method);
-}
-
 multi sub MAIN
 #= Command given as a sequence of words.
 (*@words,
  Str :q($questions)!,                      #= Questions separated with '?' or ';'.
- UInt :$max-tokens = 300,                  #= The maximum number of tokens to generate in the completion.
+ UInt :mt(:$max-tokens) = 300,             #= The maximum number of tokens to generate in the completion.
  Str :m(:$model) is copy = 'Whatever',     #= Model.
  Real :t(:$temperature) = 0.7,             #= Temperature.
  Str :r(:$request) = 'Whatever',           #= Request.
  Bool :p(:$pairs) = False,                 #= Should question-answer pairs be returned or not?
  Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
- UInt :$timeout= 10,                       #= Timeout.
+ UInt :$timeout = 10,                      #= Timeout.
  Bool :$echo = False,                      #= Should the query, result, answer be echoed or not?
- Str :$format is copy = 'json',            #= Format of the result; one of "json" or "hash".
+ Str :f(:$format) is copy = 'values',      #= Format of the result; one of "json", "hash", "values", or "Whatever".
  Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
  ) {
     return openai-front(@words.join(' ').Str, $questions, :$model, :$max-tokens, :$temperature, :$request, :$pairs, :$auth-key, :$timeout, :$echo, :$format, :$method);
