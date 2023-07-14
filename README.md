@@ -10,7 +10,7 @@ For more details of the OpenAI's API usage see [the documentation](https://platf
 **Remark:** This Raku package is much "less ambitious" than the official Python package, [OAIp1], developed by OpenAI's team.
 Gradually, over time, I expect to add features to the Raku package that correspond to features of [OAIp1].
 
-The original design and implementation of "WWW::OpenAI" were very similar to those of 
+The original design and implementation of "WWW::OpenAI" were very similar to those of
 ["Lingua::Translation::DeepL"](https://raku.land/zef:antononcube/Lingua::Translation::DeepL), [AAp1].
 Major refactoring of the original code was done -- now each OpenAI functionality targeted by "WWW::OpenAI"
 has its code placed in a separate file.
@@ -55,7 +55,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character created by Disney in 1988. He has appeared in several movies and television shows, but is not an actual person.}]
+# Roger Rabbit is a fictional character created by Disney and Amblin Entertainment. He is not a real person, so he does not exist in a physical location.}]
 ```
 
 Another one using Bulgarian:
@@ -66,7 +66,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост от размера на облака от точки, може да бъдат}]
+# В зависимост от конкретния облак от точки, може да има няк}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -82,7 +82,7 @@ The current OpenAI models can be found with the function `openai-models`:
 openai-models
 ```
 ```
-# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity ada:2020-05-03 babbage babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity babbage:2020-05-03 code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity curie:2020-05-03 cushman:2020-05-03 davinci davinci-if:3.0.0 davinci-instruct-beta davinci-instruct-beta:2.0.0 davinci-search-document davinci-search-query davinci-similarity davinci:2020-05-03 gpt-3.5-turbo gpt-3.5-turbo-0301 if-curie-v2 if-davinci-v2 if-davinci:3.0.0 text-ada-001 text-ada:001 text-babbage-001 text-babbage:001 text-curie-001 text-curie:001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-davinci:001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 whisper-1)
+# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity babbage babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity davinci davinci-instruct-beta davinci-search-document davinci-search-query davinci-similarity gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 text-ada-001 text-babbage-001 text-curie-001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 whisper-1)
 ```
 
 ### Code generation
@@ -98,7 +98,8 @@ openai-completion(
         format => 'values');
 ```
 ```
-# my @list = <a b c d e f g h i j>;
+# my @list = <1 2 3 4 5>;
+# 
 # for @list -> $item {
 #     say $item;
 # }
@@ -114,17 +115,17 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Here's an example of how to make a loop over a list in Raku:
+# Here's an example of Raku code that demonstrates how to create a loop over a list:
 # 
-# ```
-# my @list = (1, 2, 3, 4, 5);
+# ```perl6
+# my @list = 1, 2, 3, 4, 5;
 # 
-# for @list -> $item {
-#     say $item;
+# for @list -> $element {
+#     say $element;
 # }
 # ```
 # 
-# In this code, we define a list `@list` with some values. Then, we use a `for` loop to iterate over each item in the list. The `-> $item` syntax specifies that we want to assign each item to the variable `$item` as we loop through the list. Finally, we use the
+# In this code, we first define an array `@list` with five elements. Then, we use a `for` loop to iterate over each element in the list. The arrow `->` is used to declare a parameter `$element` that represents each individual element in the loop. Within the loop, we
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -185,13 +186,17 @@ method => 'tiny');
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
 ```
-# violence => 0.9635829329490662
-# hate => 0.2717878818511963
-# hate/threatening => 0.006235524546355009
-# sexual => 8.503619142175012e-07
-# violence/graphic => 2.7227645915672838e-08
-# self-harm => 1.6152158499593838e-09
-# sexual/minors => 1.3727728953583096e-09
+# violence => 0.99328965
+# harassment/threatening => 0.6620958
+# harassment => 0.39413515
+# hate/threatening => 0.009234421
+# hate => 0.008038729
+# violence/graphic => 1.0445025e-06
+# sexual => 7.530263e-07
+# sexual/minors => 2.3811237e-08
+# self-harm => 7.0877744e-09
+# self-harm/intent => 4.1689752e-10
+# self-harm/instructions => 1.2419451e-11
 ```
 
 ### Audio transcription and translation
@@ -224,7 +229,7 @@ say openai-audio(
 ```
 ```
 # {
-#   "text": "How are you, bandits, hooligans? I've lost my mind because of you. I've been working as a guard for my whole life."
+#   "text": "How are you, bandits, hooligans? I have long gone mad from you. I have been working as a guard all my life."
 # }
 ```
 
@@ -264,16 +269,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +--------------------------------+------------------------------+-------------------------------+-------------------------------+
-# | 3                              | 1                            | 0                             | 2                             |
-# +--------------------------------+------------------------------+-------------------------------+-------------------------------+
-# | Min    => -0.6049936           | Min    => -0.6674932         | Min    => -0.5897995          | Min    => -0.6316293          |
-# | 1st-Qu => -0.0128846505        | 1st-Qu => -0.012275769       | 1st-Qu => -0.013175397        | 1st-Qu => -0.0125476065       |
-# | Mean   => -0.00075456833016081 | Mean   => -0.000762535416627 | Mean   => -0.0007618981246602 | Mean   => -0.0007296895499115 |
-# | Median => -0.00069939          | Median => -0.0003188204      | Median => -0.00100605615      | Median => -0.00056341792      |
-# | 3rd-Qu => 0.012142678          | 3rd-Qu => 0.011146013        | 3rd-Qu => 0.012387738         | 3rd-Qu => 0.011868718         |
-# | Max    => 0.22202122           | Max    => 0.22815572         | Max    => 0.21172291          | Max    => 0.21270473          |
-# +--------------------------------+------------------------------+-------------------------------+-------------------------------+
+# +------------------------------+-------------------------------+-------------------------------+-------------------------------+
+# | 3                            | 1                             | 0                             | 2                             |
+# +------------------------------+-------------------------------+-------------------------------+-------------------------------+
+# | Min    => -0.60497487        | Min    => -0.6675025          | Min    => -0.5906437          | Min    => -0.6316078          |
+# | 1st-Qu => -0.0129341915      | 1st-Qu => -0.012251829        | 1st-Qu => -0.0132095815       | 1st-Qu => -0.0125404235       |
+# | Mean   => -0.000754570876938 | Mean   => -0.0007621980843776 | Mean   => -0.0007620045536823 | Mean   => -0.0007294776446914 |
+# | Median => -0.0007205479      | Median => -0.00030214088      | Median => -0.00099183735      | Median => -0.000608360825     |
+# | 3rd-Qu => 0.01216013775      | 3rd-Qu => 0.011142723         | 3rd-Qu => 0.01236832075       | 3rd-Qu => 0.011881824         |
+# | Max    => 0.22190022         | Max    => 0.22837932          | Max    => 0.21192607          | Max    => 0.2125894           |
+# +------------------------------+-------------------------------+-------------------------------+-------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -289,10 +294,10 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.724412 | 0.756557 | 0.665149 |
-# | 1 | 0.724412 | 1.000000 | 0.811169 | 0.715543 |
-# | 2 | 0.756557 | 0.811169 | 1.000000 | 0.698977 |
-# | 3 | 0.665149 | 0.715543 | 0.698977 | 1.000000 |
+# | 0 | 1.000000 | 0.724752 | 0.756754 | 0.665458 |
+# | 1 | 0.724752 | 1.000000 | 0.811262 | 0.715495 |
+# | 2 | 0.756754 | 0.811262 | 1.000000 | 0.698970 |
+# | 3 | 0.665458 | 0.715495 | 0.698970 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
@@ -301,26 +306,33 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 
 ### Finding textual answers
 
+The models of OpenAI can be used to find sub-strings in texts that appear to be
+answers to given questions. This is done via the package 
+["ML::FindTextualAnswer"](https://raku.land/zef:antononcube/ML::FindTextualAnswer), [AAp3],
+using the parameter specs `llm => 'chatgpt'` or `llm => 'openai'`.
+
+
 Here is an example of finding textual answers:
 
 ```perl6
+use ML::FindTextualAnswer;
 my $text = "Lake Titicaca is a large, deep lake in the Andes 
 on the border of Bolivia and Peru. By volume of water and by surface 
 area, it is the largest lake in South America";
 
-openai-find-textual-answer($text, "Where is Titicaca?")
+find-textual-answer($text, "Where is Titicaca?", llm => 'openai')
 ```
 ```
-# [Andes on the border of Bolivia and Peru .]
+# Titicaca is in Bolivia.
 ```
 
-By default `openai-find-textual-answer` tries to give short answers.
+By default `find-textual-answer` tries to give short answers.
 If the option "request" is `Whatever` then depending on the number of questions 
 the request is one those phrases:
 - "give the shortest answer of the question:"
 - "list the shortest answers of the questions:"
 
-In the example above the full query given to OpenAI's models is
+In the example above the full query given to OpenAI's models is:
 
 > Given the text "Lake Titicaca is a large, deep lake in the Andes
 on the border of Bolivia and Peru. By volume of water and by surface
@@ -331,20 +343,19 @@ area, it is the largest lake in South America"
 Here we get a longer answer by changing the value of "request":
 
 ```perl6
-openai-find-textual-answer($text, "Where is Titicaca?", request => "answer the question:")
+find-textual-answer($text, "Where is Titicaca?", llm => 'chatgpt', request => "answer the question:")
 ```
 ```
-# [Titicaca is in the Andes on the border of Bolivia and Peru .]
+# Titicaca is located in Peru.
 ```
 
-**Remark:** The function `openai-find-textual-answer` is inspired by the Mathematica function
+**Remark:** The function `find-textual-answer` is inspired by the Mathematica function
 [`FindTextualAnswer`](https://reference.wolfram.com/language/ref/FindTextualAnswer.html); 
-see [JL1]. Unfortunately, at this time implementing the full signature of `FindTextualAnswer`
-with OpenAI's API is not easy. (Or cheap to execute.)
+see [JL1].
 
 #### Multiple questions
 
-If several questions are given to the function `openai-find-textual-answer`
+If several questions are given to the function `find-textual-answer`
 then all questions are spliced with the given text into one query (that is sent to OpenAI.)
 
 For example, consider the following text and questions:
@@ -357,6 +368,9 @@ my @questions =
          'What is the method?',
          'Which metrics to show?'
         ];
+```
+```
+# [What is the dataset? What is the method? Which metrics to show?]
 ```
 
 Then the query send to OpenAI is:
@@ -387,51 +401,25 @@ openai-playground --help
 ```
 ```
 # Usage:
-#   openai-playground <text> [--path=<Str>] [-n[=UInt]] [--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Text processing using the OpenAI API.
-#   openai-playground [<words> ...] [-m|--model=<Str>] [--path=<Str>] [-n[=UInt]] [--max-tokens[=UInt]] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
+#   openai-playground [<words> ...] [--path=<Str>] [-n[=UInt]] [--mt|--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [-f|--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
 #   
-#     <text>                     Text to be processed or audio file name.
-#     --path=<Str>               Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
-#     -n[=UInt]                  Number of completions or generations. [default: 1]
-#     --max-tokens[=UInt]        The maximum number of tokens to generate in the completion. [default: 100]
-#     -m|--model=<Str>           Model. [default: 'Whatever']
-#     -r|--role=<Str>            Role. [default: 'user']
-#     -t|--temperature[=Real]    Temperature. [default: 0.7]
-#     -l|--language=<Str>        Language. [default: '']
-#     --response-format=<Str>    The format in which the generated images are returned; one of 'url' or 'b64_json'. [default: 'url']
-#     -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
-#     --timeout[=UInt]           Timeout. [default: 10]
-#     --format=<Str>             Format of the result; one of "json" or "hash". [default: 'json']
-#     --method=<Str>             Method for the HTTP POST query; one of "tiny" or "curl". [default: 'tiny']
+#     --path=<Str>                Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
+#     -n[=UInt]                   Number of completions or generations. [default: 1]
+#     --mt|--max-tokens[=UInt]    The maximum number of tokens to generate in the completion. [default: 100]
+#     -m|--model=<Str>            Model. [default: 'Whatever']
+#     -r|--role=<Str>             Role. [default: 'user']
+#     -t|--temperature[=Real]     Temperature. [default: 0.7]
+#     -l|--language=<Str>         Language. [default: '']
+#     --response-format=<Str>     The format in which the generated images are returned; one of 'url' or 'b64_json'. [default: 'url']
+#     -a|--auth-key=<Str>         Authorization key (to use OpenAI API.) [default: 'Whatever']
+#     --timeout[=UInt]            Timeout. [default: 10]
+#     -f|--format=<Str>           Format of the result; one of "json", "hash", "values", or "Whatever". [default: 'Whatever']
+#     --method=<Str>              Method for the HTTP POST query; one of "tiny" or "curl". [default: 'tiny']
 ```
 
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
 then `openai-playground` attempts to use the env variable `OPENAI_API_KEY`.
 
-### Finding textual answers
-
-The package provides a CLI script for finding textual answers:
-
-```shell
-openai-find-textual-answer --help
-```
-```
-# Usage:
-#   openai-find-textual-answer <text> -q=<Str> [--max-tokens[=UInt]] [-m|--model=<Str>] [-t|--temperature[=Real]] [-r|--request=<Str>] [-p|--pairs] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Text processing using the OpenAI API.
-#   openai-find-textual-answer [<words> ...] -q=<Str> [--max-tokens[=UInt]] [-m|--model=<Str>] [-t|--temperature[=Real]] [-r|--request=<Str>] [-p|--pairs] [-a|--auth-key=<Str>] [--timeout[=UInt]] [--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
-#   
-#     <text>                     Text to be processed or audio file name.
-#     -q=<Str>                   Questions separated with '?' or ';'.
-#     --max-tokens[=UInt]        The maximum number of tokens to generate in the completion. [default: 300]
-#     -m|--model=<Str>           Model. [default: 'Whatever']
-#     -t|--temperature[=Real]    Temperature. [default: 0.7]
-#     -r|--request=<Str>         Request. [default: 'Whatever']
-#     -p|--pairs                 Should question-answer pairs be returned or not? [default: False]
-#     -a|--auth-key=<Str>        Authorization key (to use OpenAI API.) [default: 'Whatever']
-#     --timeout[=UInt]           Timeout. [default: 10]
-#     --format=<Str>             Format of the result; one of "json" or "hash". [default: 'json']
-#     --method=<Str>             Method for the HTTP POST query; one of "tiny" or "curl". [default: 'tiny']
-```
 
 --------
 
@@ -474,13 +462,14 @@ graph TD
 
 ## Potential problems
 
-### Tested on macOS only 
+### Tested on macOS only
 
 Currently this package is tested on macOS only.
 
 ### SSL certificate problems (original package version)
 
 *(This subsection is for the original version of the package, not for the most recent one.)*
+
 
 - On macOS I get the errors:
     
@@ -546,6 +535,10 @@ Currently this package is tested on macOS only.
 
 - [X] DONE Implement finding of textual answers
 
+- [X] DONE Factor out finding of textual answers into a separate package
+  - So, other LLMs can be used.
+  - See ["ML::FindTextualAnswer"](https://github.com/antononcube/Raku-ML-FindTextualAnswer).
+
 --------
 
 ## References
@@ -573,6 +566,12 @@ Currently this package is tested on macOS only.
 [Text::CodeProcessing](https://github.com/antononcube/Raku-Text-CodeProcessing),
 (2021),
 [GitHub/antononcube](https://github.com/antononcube).
+
+[AAp3] Anton Antonov,
+[ML::FindTextualAnswer](https://github.com/antononcube/Raku-ML-FindTextualAnswer),
+(2023),
+[GitHub/antononcube](https://github.com/antononcube).
+
 
 [OAI1] OpenAI Platform, [OpenAI platform](https://platform.openai.com/).
 

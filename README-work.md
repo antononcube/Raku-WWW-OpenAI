@@ -223,23 +223,30 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 
 ### Finding textual answers
 
+The models of OpenAI can be used to find sub-strings in texts that appear to be
+answers to given questions. This is done via the package 
+["ML::FindTextualAnswer"](https://raku.land/zef:antononcube/ML::FindTextualAnswer), [AAp3],
+using the parameter specs `llm => 'chatgpt'` or `llm => 'openai'`.
+
+
 Here is an example of finding textual answers:
 
 ```perl6
+use ML::FindTextualAnswer;
 my $text = "Lake Titicaca is a large, deep lake in the Andes 
 on the border of Bolivia and Peru. By volume of water and by surface 
 area, it is the largest lake in South America";
 
-openai-find-textual-answer($text, "Where is Titicaca?")
+find-textual-answer($text, "Where is Titicaca?", llm => 'openai')
 ```
 
-By default `openai-find-textual-answer` tries to give short answers.
+By default `find-textual-answer` tries to give short answers.
 If the option "request" is `Whatever` then depending on the number of questions 
 the request is one those phrases:
 - "give the shortest answer of the question:"
 - "list the shortest answers of the questions:"
 
-In the example above the full query given to OpenAI's models is
+In the example above the full query given to OpenAI's models is:
 
 > Given the text "Lake Titicaca is a large, deep lake in the Andes
 on the border of Bolivia and Peru. By volume of water and by surface
@@ -250,17 +257,16 @@ area, it is the largest lake in South America"
 Here we get a longer answer by changing the value of "request":
 
 ```perl6
-openai-find-textual-answer($text, "Where is Titicaca?", request => "answer the question:")
+find-textual-answer($text, "Where is Titicaca?", llm => 'chatgpt', request => "answer the question:")
 ```
 
-**Remark:** The function `openai-find-textual-answer` is inspired by the Mathematica function
+**Remark:** The function `find-textual-answer` is inspired by the Mathematica function
 [`FindTextualAnswer`](https://reference.wolfram.com/language/ref/FindTextualAnswer.html); 
-see [JL1]. Unfortunately, at this time implementing the full signature of `FindTextualAnswer`
-with OpenAI's API is not easy. (Or cheap to execute.)
+see [JL1].
 
 #### Multiple questions
 
-If several questions are given to the function `openai-find-textual-answer`
+If several questions are given to the function `find-textual-answer`
 then all questions are spliced with the given text into one query (that is sent to OpenAI.)
 
 For example, consider the following text and questions:
@@ -305,13 +311,6 @@ openai-playground --help
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
 then `openai-playground` attempts to use the env variable `OPENAI_API_KEY`.
 
-### Finding textual answers
-
-The package provides a CLI script for finding textual answers:
-
-```shell
-openai-find-textual-answer --help
-```
 
 --------
 
@@ -427,6 +426,10 @@ Currently this package is tested on macOS only.
 
 - [X] DONE Implement finding of textual answers
 
+- [X] DONE Factor out finding of textual answers into a separate package
+  - So, other LLMs can be used.
+  - See ["ML::FindTextualAnswer"](https://github.com/antononcube/Raku-ML-FindTextualAnswer).
+
 --------
 
 ## References
@@ -454,6 +457,12 @@ Currently this package is tested on macOS only.
 [Text::CodeProcessing](https://github.com/antononcube/Raku-Text-CodeProcessing),
 (2021),
 [GitHub/antononcube](https://github.com/antononcube).
+
+[AAp3] Anton Antonov,
+[ML::FindTextualAnswer](https://github.com/antononcube/Raku-ML-FindTextualAnswer),
+(2023),
+[GitHub/antononcube](https://github.com/antononcube).
+
 
 [OAI1] OpenAI Platform, [OpenAI platform](https://platform.openai.com/).
 
