@@ -13,7 +13,6 @@ use WWW::OpenAI::Models;
 use WWW::OpenAI::Moderations;
 use WWW::OpenAI::Request;
 use WWW::OpenAI::TextCompletions;
-use WWW::OpenAI::FindTextualAnswer;
 
 
 #===========================================================
@@ -108,15 +107,6 @@ our proto openai-text-completion(|) is export {*}
 multi sub openai-text-completion(**@args, *%args) {
     return WWW::OpenAI::TextCompletions::OpenAITextCompletion(|@args, |%args);
 }
-
-#===========================================================
-#| OpenAI utilization for finding textual answers.
-our proto openai-find-textual-answer(|) is export {*}
-
-multi sub openai-find-textual-answer(**@args, *%args) {
-    return WWW::OpenAI::FindTextualAnswer::OpenAIFindTextualAnswer(|@args, |%args);
-}
-
 
 #============================================================
 # Playground
