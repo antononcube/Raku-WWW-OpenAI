@@ -17,6 +17,10 @@ my $knownRoles = Set.new(<user assistant>);
 # Completions
 #============================================================
 
+# In order to understand the design of [role => message,] argument see:
+# https://platform.openai.com/docs/api-reference/chat/create
+
+
 #| OpenAI completion access.
 our proto OpenAIChatCompletion($prompt is copy,
                                :$type is copy = Whatever,
@@ -36,12 +40,13 @@ our proto OpenAIChatCompletion($prompt is copy,
                                Str :$method = 'tiny') is export {*}
 
 #| OpenAI completion access.
-multi sub OpenAIChatCompletion(@prompts, *%args) {
-    return @prompts.map({ OpenAIChatCompletion($_, |%args) });
+multi sub OpenAIChatCompletion(Str $prompt, *%args) {
+    return OpenAIChatCompletion([$prompt,], |%args);
 }
 
+
 #| OpenAI completion access.
-multi sub OpenAIChatCompletion($prompt is copy,
+multi sub OpenAIChatCompletion(@prompts is copy,
                                :$role is copy = Whatever,
                                :$model is copy = Whatever,
                                :$temperature is copy = Whatever,
@@ -125,12 +130,23 @@ multi sub OpenAIChatCompletion($prompt is copy,
     unless $frequency-penalty ~~ Numeric && -2 ≤ $frequency-penalty ≤ 2;
 
     #------------------------------------------------------
+    # Messages
+    #------------------------------------------------------
+    my @messages = @prompts.map({
+        if $_ ~~ Pair {
+            %(role => $_.key, content => $_.value)
+        } else {
+            %(:$role, content => $_)
+        }
+    });
+
+    #------------------------------------------------------
     # Make OpenAI URL
     #------------------------------------------------------
 
     my %body = :$model, :$temperature, :$stream, :$n,
                top_p => $top-p,
-               messages => [%(:$role, content => $prompt),],
+               :@messages,
                max_tokens => $max-tokens,
                presence_penalty => $presence-penalty,
                frequency_penalty => $frequency-penalty;
