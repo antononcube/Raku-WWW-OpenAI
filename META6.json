@@ -1,7 +1,7 @@
 {
   "name": "WWW::OpenAI",
   "description": "WWW::OpenAI provides access to the OpenAI playground (https://platform.openai.com).",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "perl": "6.*",
   "authors": [
     "Anton Antonov"
@@ -26,7 +26,10 @@
   },
   "resources": [
     "HowAreYouRU.mp3",
-    "HelloRaccoonsEN.mp3"
+    "HelloRaccoonsEN.mp3",
+    "prompts/LAN-GPT.txt",
+    "prompts/Mind-Map.txt",
+    "prompts/Code-Writer.txt"
   ],
   "license": "Artistic-2.0",
   "tags": [
