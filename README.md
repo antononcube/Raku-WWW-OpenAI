@@ -55,7 +55,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character created by Disney and Amblin Entertainment. He is not a real person, so he does not exist in a physical location.}]
+# Roger Rabbit is a fictional character created by author Gary K. Wolf and featured in the 1988 live-action/animated film Who Framed Roger Rabbit. He is currently not located anywhere in particular since he is a fictional character.}]
 ```
 
 Another one using Bulgarian:
@@ -66,7 +66,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост от конкретния облак от точки, може да има няк}]
+# В зависимост от точната структура на облака от точки, броя}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -98,10 +98,10 @@ openai-completion(
         format => 'values');
 ```
 ```
-# my @list = <1 2 3 4 5>;
+# my @list = <one two three four five>;
 # 
-# for @list -> $item {
-#     say $item;
+# for @list -> $element {
+#     say $element;
 # }
 ```
 
@@ -115,17 +115,17 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Here's an example of Raku code that demonstrates how to create a loop over a list:
+# Sure! Here's an example of Raku code that creates a loop over a list:
 # 
 # ```perl6
 # my @list = 1, 2, 3, 4, 5;
 # 
-# for @list -> $element {
-#     say $element;
+# for @list -> $item {
+#     say $item;
 # }
 # ```
 # 
-# In this code, we first define an array `@list` with five elements. Then, we use a `for` loop to iterate over each element in the list. The arrow `->` is used to declare a parameter `$element` that represents each individual element in the loop. Within the loop, we
+# In this code, we first create a list `@list` containing the values 1, 2, 3, 4, and 5. The `for` loop then iterates over each item in the list, assigning the current item to the variable `$item`. Inside the loop, we simply print
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -186,17 +186,17 @@ method => 'tiny');
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
 ```
-# violence => 0.99328965
-# harassment/threatening => 0.6620958
-# harassment => 0.39413515
-# hate/threatening => 0.009234421
-# hate => 0.008038729
-# violence/graphic => 1.0445025e-06
-# sexual => 7.530263e-07
-# sexual/minors => 2.3811237e-08
-# self-harm => 7.0877744e-09
-# self-harm/intent => 4.1689752e-10
-# self-harm/instructions => 1.2419451e-11
+# violence => 0.9932476
+# harassment/threatening => 0.660469
+# harassment => 0.39464065
+# hate/threatening => 0.009168596
+# hate => 0.00803507
+# violence/graphic => 1.0666993e-06
+# sexual => 7.818392e-07
+# sexual/minors => 2.4557247e-08
+# self-harm => 7.333003e-09
+# self-harm/intent => 4.2876822e-10
+# self-harm/instructions => 1.252591e-11
 ```
 
 ### Audio transcription and translation
@@ -269,16 +269,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +------------------------------+-------------------------------+-------------------------------+-------------------------------+
-# | 3                            | 1                             | 0                             | 2                             |
-# +------------------------------+-------------------------------+-------------------------------+-------------------------------+
-# | Min    => -0.60497487        | Min    => -0.6675025          | Min    => -0.5906437          | Min    => -0.6316078          |
-# | 1st-Qu => -0.0129341915      | 1st-Qu => -0.012251829        | 1st-Qu => -0.0132095815       | 1st-Qu => -0.0125404235       |
-# | Mean   => -0.000754570876938 | Mean   => -0.0007621980843776 | Mean   => -0.0007620045536823 | Mean   => -0.0007294776446914 |
-# | Median => -0.0007205479      | Median => -0.00030214088      | Median => -0.00099183735      | Median => -0.000608360825     |
-# | 3rd-Qu => 0.01216013775      | 3rd-Qu => 0.011142723         | 3rd-Qu => 0.01236832075       | 3rd-Qu => 0.011881824         |
-# | Max    => 0.22190022         | Max    => 0.22837932          | Max    => 0.21192607          | Max    => 0.2125894           |
-# +------------------------------+-------------------------------+-------------------------------+-------------------------------+
+# +-------------------------------+-------------------------------+------------------------------+-------------------------------+
+# | 1                             | 2                             | 3                            | 0                             |
+# +-------------------------------+-------------------------------+------------------------------+-------------------------------+
+# | Min    => -0.6675025          | Min    => -0.6316078          | Min    => -0.60497487        | Min    => -0.5906437          |
+# | 1st-Qu => -0.012251829        | 1st-Qu => -0.0125404235       | 1st-Qu => -0.0129341915      | 1st-Qu => -0.0132095815       |
+# | Mean   => -0.0007621980843776 | Mean   => -0.0007294776446914 | Mean   => -0.000754570876938 | Mean   => -0.0007620045536823 |
+# | Median => -0.00030214088      | Median => -0.000608360825     | Median => -0.0007205479      | Median => -0.00099183735      |
+# | 3rd-Qu => 0.011142723         | 3rd-Qu => 0.011881824         | 3rd-Qu => 0.01216013775      | 3rd-Qu => 0.01236832075       |
+# | Max    => 0.22837932          | Max    => 0.2125894           | Max    => 0.22190022         | Max    => 0.21192607          |
+# +-------------------------------+-------------------------------+------------------------------+-------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -304,6 +304,43 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 **Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
 (Judging by the table with dot products.)
 
+### Chat completions with engineered prompts
+
+Here is a prompt for "emojification" (see the
+[Wolfram Prompt Repository](https://resources.wolframcloud.com/PromptRepository/)
+entry
+["Emojify"](https://resources.wolframcloud.com/PromptRepository/resources/Emojify/)):
+
+```perl6
+my $preEmojify = q:to/END/;
+Rewrite the following text and convert some of it into emojis.
+The emojis are all related to whatever is in the text.
+Keep a lot of the text, but convert key words into emojis.
+Do not modify the text except to add emoji.
+Respond only with the modified text, do not include any summary or explanation.
+Do not respond with only emoji, most of the text should remain as normal words.
+END
+```
+```
+# Rewrite the following text and convert some of it into emojis.
+# The emojis are all related to whatever is in the text.
+# Keep a lot of the text, but convert key words into emojis.
+# Do not modify the text except to add emoji.
+# Respond only with the modified text, do not include any summary or explanation.
+# Do not respond with only emoji, most of the text should remain as normal words.
+```
+
+Here is an example of chat completion with emojification:
+
+```perl6
+openai-chat-completion([ system => $preEmojify, user => 'Python sucks, Raku rocks, and Perl is annoying'], max-tokens => 200, format => 'values')
+```
+```
+# 🐍 Python 👎, 🦝 Raku 🤘, and Perl 😠 is annoying 🙄
+```
+
+For more examples see the document ["Chat-completion-examples"](./docs/Chat-completion-examples_woven.md).
+
 ### Finding textual answers
 
 The models of OpenAI can be used to find sub-strings in texts that appear to be
@@ -323,7 +360,7 @@ area, it is the largest lake in South America";
 find-textual-answer($text, "Where is Titicaca?", llm => 'openai')
 ```
 ```
-# Titicaca is in Bolivia.
+# located in Peru
 ```
 
 By default `find-textual-answer` tries to give short answers.
@@ -346,7 +383,7 @@ Here we get a longer answer by changing the value of "request":
 find-textual-answer($text, "Where is Titicaca?", llm => 'chatgpt', request => "answer the question:")
 ```
 ```
-# Titicaca is located in Peru.
+# Lake   located in Bolivia and Peru
 ```
 
 **Remark:** The function `find-textual-answer` is inspired by the Mathematica function

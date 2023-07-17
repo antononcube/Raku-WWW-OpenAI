@@ -221,6 +221,32 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 **Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
 (Judging by the table with dot products.)
 
+### Chat completions with engineered prompts
+
+Here is a prompt for "emojification" (see the
+[Wolfram Prompt Repository](https://resources.wolframcloud.com/PromptRepository/)
+entry
+["Emojify"](https://resources.wolframcloud.com/PromptRepository/resources/Emojify/)):
+
+```perl6
+my $preEmojify = q:to/END/;
+Rewrite the following text and convert some of it into emojis.
+The emojis are all related to whatever is in the text.
+Keep a lot of the text, but convert key words into emojis.
+Do not modify the text except to add emoji.
+Respond only with the modified text, do not include any summary or explanation.
+Do not respond with only emoji, most of the text should remain as normal words.
+END
+```
+
+Here is an example of chat completion with emojification:
+
+```perl6
+openai-chat-completion([ system => $preEmojify, user => 'Python sucks, Raku rocks, and Perl is annoying'], max-tokens => 200, format => 'values')
+```
+
+For more examples see the document ["Chat-completion-examples"](./docs/Chat-completion-examples_woven.md).
+
 ### Finding textual answers
 
 The models of OpenAI can be used to find sub-strings in texts that appear to be
