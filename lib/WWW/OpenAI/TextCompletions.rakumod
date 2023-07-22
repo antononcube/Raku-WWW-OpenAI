@@ -54,7 +54,7 @@ our proto OpenAITextCompletion($prompt is copy,
 
 #| OpenAI completion access.
 multi sub OpenAITextCompletion(@prompts, *%args) {
-    return @prompts.map({ OpenAITextCompletion($_, |%args) });
+    return @prompts.map({ OpenAITextCompletion($_, |%args) }).Array;
 }
 
 #| OpenAI completion access.

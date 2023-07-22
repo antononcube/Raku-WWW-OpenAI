@@ -177,16 +177,16 @@ multi sub openai-request(Str :$url!,
         when $_ eq 'values' {
             if $res<choices>:exists {
                 # Assuming text of chat completion
-                my @res2 = $res<choices>.map({ $_<text> // $_<message><content> });
+                my @res2 = $res<choices>.map({ $_<text> // $_<message><content> }).Array;
                 @res2.elems == 1 ?? @res2[0] !! @res2;
             } elsif $res<data> {
                 # Assuming image generation
-                $res<data>.map({ $_<url> // $_<b64_json> // $_<embedding> })
+                $res<data>.map({ $_<url> // $_<b64_json> // $_<embedding> }).Array;
             } elsif $res<results> {
                 # Assuming moderation
-                $res<results>.map({ $_<category_scores> // $_<categories> })
+                $res<results>.map({ $_<category_scores> // $_<categories> }).Array;
             } else {
-                $res
+                $res;
             }
         }
         when $_ ∈ <whatever hash raku> {
