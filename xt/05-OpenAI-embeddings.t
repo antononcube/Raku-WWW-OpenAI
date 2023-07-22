@@ -13,7 +13,7 @@ plan *;
 ## 1
 my $query = 'make a classifier with the method RandomForeset over the data dfTitanic; show precision and accuracy; plot True Positive Rate vs Positive Predictive Value.';
 
-is openai-embeddings($query, format => "values", :$method).WHAT ∈ (Positional, Seq), True;
+is openai-embeddings($query, format => "values", :$method).WHAT ∈ (Array, Positional, Seq), True;
 
 ## 2
 my @queries = [
@@ -23,7 +23,7 @@ my @queries = [
         'what is a good meat and potatoes recipe'
 ];
 
-is openai-embeddings(@queries, format => "values", :$method).WHAT ∈ (Positional, Seq), True;
+is openai-embeddings(@queries, format => "values", :$method).WHAT ∈ (Array, Positional, Seq), True;
 
 ## 3
 is openai-embeddings(@queries, format => "values", :$method).elems, @queries.elems;
