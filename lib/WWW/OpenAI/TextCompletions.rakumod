@@ -67,7 +67,7 @@ multi sub OpenAITextCompletion($prompt is copy,
                                UInt :$n = 1,
                                Bool :$stream = False,
                                Bool :$echo = False,
-                               :$stop = Whatever,
+                               :$stop is copy = Whatever,
                                Numeric :$presence-penalty = 0,
                                Numeric :$frequency-penalty = 0,
                                :$best-of is copy = Whatever,
@@ -136,6 +136,14 @@ multi sub OpenAITextCompletion($prompt is copy,
     if !$stop.isa(Whatever) {
         die "The argument \$stop is expected to be a string, a list strings, or Whatever."
         unless $stop ~~ Str || $stop ~~ Positional && $stop.all ~~ Str;
+    }
+
+    $stop = do given $stop {
+        when Str:D { [$_, ]}
+        when Empty { Whatever }
+        when $_ ~~ Positional && $_.elems { $_ }
+        when $_ ~~ Iterable   && $_.elems { $_.Array }
+        default { Whatever }
     }
 
     #------------------------------------------------------
