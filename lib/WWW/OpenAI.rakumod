@@ -8,6 +8,7 @@ unit module WWW::OpenAI;
 use WWW::OpenAI::Audio;
 use WWW::OpenAI::ChatCompletions;
 use WWW::OpenAI::Embeddings;
+use WWW::OpenAI::ImageEdits;
 use WWW::OpenAI::ImageGenerations;
 use WWW::OpenAI::ImageVariations;
 use WWW::OpenAI::Models;
@@ -83,6 +84,14 @@ our proto openai-create-image(|) is export {*}
 
 multi sub openai-create-image(**@args, *%args) {
     return WWW::OpenAI::ImageGenerations::OpenAICreateImage(|@args, |%args);
+}
+
+#===========================================================
+#| OpenAI image variation access.
+our proto openai-edit-image(|) is export {*}
+
+multi sub openai-edit-image(**@args, *%args) {
+    return WWW::OpenAI::ImageEdits::OpenAIEditImage(|@args, |%args);
 }
 
 #===========================================================
@@ -176,6 +185,11 @@ multi sub openai-playground($text is copy,
         when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
             # my $url = 'https://api.openai.com/v1/images/generations';
             return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
+                    :$timeout, :$format, :$method);
+        }
+        when $_ ∈ <edit-image image-edit image-edits images-edits images/edits> {
+            # my $url = 'https://api.openai.com/v1/images/edits';
+            return openai-edit-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
                     :$timeout, :$format, :$method);
         }
         when $_ ∈ <variate-image image-variation image-variations images-variations images/variations> {

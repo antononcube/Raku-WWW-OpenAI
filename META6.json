@@ -18,6 +18,7 @@
     "WWW::OpenAI::Audio": "lib/WWW/OpenAI/Audio.rakumod",
     "WWW::OpenAI::ChatCompletions": "lib/WWW/OpenAI/ChatCompletions.rakumod",
     "WWW::OpenAI::Embeddings": "lib/WWW/OpenAI/Embeddings.rakumod",
+    "WWW::OpenAI::ImageEdits": "lib/WWW/OpenAI/ImageEdits.rakumod",
     "WWW::OpenAI::ImageGenerations": "lib/WWW/OpenAI/ImageGenerations.rakumod",
     "WWW::OpenAI::ImageVariations": "lib/WWW/OpenAI/ImageVariations.rakumod",
     "WWW::OpenAI::Models": "lib/WWW/OpenAI/Models.rakumod",
@@ -27,7 +28,8 @@
   },
   "resources": [
     "HowAreYouRU.mp3",
-    "HelloRaccoonsEN.mp3"
+    "HelloRaccoonsEN.mp3",
+    "RandomMandala2.png"
   ],
   "license": "Artistic-2.0",
   "tags": [
