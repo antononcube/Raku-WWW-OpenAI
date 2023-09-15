@@ -47,8 +47,8 @@ multi sub OpenAICreateImage($prompt,
     #------------------------------------------------------
     # Process $n
     #------------------------------------------------------
-    die "The argument \$n is expected to be a positive integer."
-    unless 0 < $n;
+    die "The argument \$n is expected to be a positive integer between 1 and 10."
+    unless 0 < $n ≤ 10;
 
     #------------------------------------------------------
     # Process $size
