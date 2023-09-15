@@ -55,7 +55,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character created by author Gary K. Wolf and featured in the 1988 live-action/animated film Who Framed Roger Rabbit. He is currently not located anywhere in particular since he is a fictional character.}]
+# Roger Rabbit is a fictional character created by Disney. He is not a real person and does not exist in the physical world.}]
 ```
 
 Another one using Bulgarian:
@@ -66,7 +66,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# В зависимост от точната структура на облака от точки, броя}]
+# В облак от точки може да бъдат намерени произволен брой г}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -82,7 +82,7 @@ The current OpenAI models can be found with the function `openai-models`:
 openai-models
 ```
 ```
-# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity babbage babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity davinci davinci-instruct-beta davinci-search-document davinci-search-query davinci-similarity gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 text-ada-001 text-babbage-001 text-curie-001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 whisper-1)
+# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity babbage babbage-002 babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity davinci davinci-002 davinci-instruct-beta davinci-search-document davinci-search-query davinci-similarity gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 gpt-4 gpt-4-0314 gpt-4-0613 text-ada-001 text-babbage-001 text-curie-001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 whisper-1)
 ```
 
 ### Code generation
@@ -98,10 +98,10 @@ openai-completion(
         format => 'values');
 ```
 ```
-# my @list = <one two three four five>;
+# my @list = <a b c d e>;
 # 
-# for @list -> $element {
-#     say $element;
+# for @list -> $item {
+#     say $item;
 # }
 ```
 
@@ -115,9 +115,9 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Sure! Here's an example of Raku code that creates a loop over a list:
+# Sure! Here's an example of how you can create a loop over a list in Raku:
 # 
-# ```perl6
+# ```raku
 # my @list = 1, 2, 3, 4, 5;
 # 
 # for @list -> $item {
@@ -125,7 +125,7 @@ openai-completion(
 # }
 # ```
 # 
-# In this code, we first create a list `@list` containing the values 1, 2, 3, 4, and 5. The `for` loop then iterates over each item in the list, assigning the current item to the variable `$item`. Inside the loop, we simply print
+# This code declares an array `@list` containing the values `1, 2, 3, 4, 5`. Then, it uses a `for` loop to iterate over each item in the list. The loop variable `$item` takes on the value of each element in the list,
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -172,6 +172,47 @@ my @imgRes = |openai-create-image(
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
 
+### Image variation
+
+**Remark:** See the files ["Image-variation*"](./docs/Image-variation.md) for more details.
+
+Images variations over image files can be generated with the function `openai-variate-image` 
+-- see the section
+["Images"](https://platform.openai.com/docs/api-reference/images) of [OAI2].
+
+Here is an example:
+
+```perl6, eval=FALSE
+my $imgB64 = openai-variate-image(
+        $*CWD ~ '/resources/RandomMandala.png',
+        response-format => 'b64_json',
+        n => 1,
+        size => 'small',
+        format => 'values',
+        method => 'tiny');
+```
+
+Here are the options descriptions:
+
+- `response-format` takes the values "url" and "b64_json"
+- `n` takes a positive integer, for the number of images to be generated
+- `size` takes the values '1024x1024', '512x512', '256x256', 'large', 'medium', 'small'.
+
+**Remark:** Same arguments are used by `openai-generate-image`. See the previous sub-section.
+
+Here we generate an image, get its URL, and place (embed) a link to it via the output of the code cell:
+
+```perl6, results='asis', eval=FALSE
+my @imgRes = |openai-variate-image(
+        $*CWD ~ '/resources/RandomMandala.png',
+        response-format => 'url',
+        n => 1,
+        size => 'small',
+        method => 'tiny');
+
+'![](' ~ @imgRes.head<url> ~ ')';
+```
+
 ### Moderation
 
 Here is an example of using 
@@ -186,17 +227,17 @@ method => 'tiny');
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
 ```
-# violence => 0.9932476
-# harassment/threatening => 0.660469
-# harassment => 0.39464065
-# hate/threatening => 0.009168596
-# hate => 0.00803507
-# violence/graphic => 1.0666993e-06
-# sexual => 7.818392e-07
-# sexual/minors => 2.4557247e-08
-# self-harm => 7.333003e-09
-# self-harm/intent => 4.2876822e-10
-# self-harm/instructions => 1.252591e-11
+# violence => 0.99612075
+# harassment => 0.67532283
+# harassment/threatening => 0.62305135
+# hate => 0.12013233
+# hate/threatening => 0.019687966
+# sexual => 3.7803213e-07
+# sexual/minors => 8.417105e-08
+# violence/graphic => 7.003105e-08
+# self-harm => 3.3011907e-10
+# self-harm/intent => 4.8435887e-11
+# self-harm/instructions => 3.1562556e-13
 ```
 
 ### Audio transcription and translation
@@ -269,16 +310,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +-------------------------------+-------------------------------+------------------------------+-------------------------------+
-# | 1                             | 2                             | 3                            | 0                             |
-# +-------------------------------+-------------------------------+------------------------------+-------------------------------+
-# | Min    => -0.6675025          | Min    => -0.6316078          | Min    => -0.60497487        | Min    => -0.5906437          |
-# | 1st-Qu => -0.012251829        | 1st-Qu => -0.0125404235       | 1st-Qu => -0.0129341915      | 1st-Qu => -0.0132095815       |
-# | Mean   => -0.0007621980843776 | Mean   => -0.0007294776446914 | Mean   => -0.000754570876938 | Mean   => -0.0007620045536823 |
-# | Median => -0.00030214088      | Median => -0.000608360825     | Median => -0.0007205479      | Median => -0.00099183735      |
-# | 3rd-Qu => 0.011142723         | 3rd-Qu => 0.011881824         | 3rd-Qu => 0.01216013775      | 3rd-Qu => 0.01236832075       |
-# | Max    => 0.22837932          | Max    => 0.2125894           | Max    => 0.22190022         | Max    => 0.21192607          |
-# +-------------------------------+-------------------------------+------------------------------+-------------------------------+
+# +-------------------------------+--------------------------------+-------------------------------+-------------------------------+
+# | 0                             | 2                              | 3                             | 1                             |
+# +-------------------------------+--------------------------------+-------------------------------+-------------------------------+
+# | Min    => -0.5909183          | Min    => -0.6317349           | Min    => -0.6046351          | Min    => -0.6675025          |
+# | 1st-Qu => -0.0132305285       | 1st-Qu => -0.0125328135        | 1st-Qu => -0.0129117165       | 1st-Qu => -0.012251829        |
+# | Mean   => -0.0007621561868711 | Mean   => -0.00072983182428451 | Mean   => -0.0007544719890944 | Mean   => -0.0007621980843776 |
+# | Median => -0.00105795915      | Median => -0.000614395015      | Median => -0.00069994953      | Median => -0.00030214088      |
+# | 3rd-Qu => 0.01234658475       | 3rd-Qu => 0.0118909715         | 3rd-Qu => 0.012180326         | 3rd-Qu => 0.011142723         |
+# | Max    => 0.21186024          | Max    => 0.2126322            | Max    => 0.22217143          | Max    => 0.22837932          |
+# +-------------------------------+--------------------------------+-------------------------------+-------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -294,10 +335,10 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.724752 | 0.756754 | 0.665458 |
-# | 1 | 0.724752 | 1.000000 | 0.811262 | 0.715495 |
-# | 2 | 0.756754 | 0.811262 | 1.000000 | 0.698970 |
-# | 3 | 0.665458 | 0.715495 | 0.698970 | 1.000000 |
+# | 0 | 1.000000 | 0.724884 | 0.756981 | 0.665537 |
+# | 1 | 0.724884 | 1.000000 | 0.811288 | 0.715410 |
+# | 2 | 0.756981 | 0.811288 | 1.000000 | 0.698958 |
+# | 3 | 0.665537 | 0.715410 | 0.698958 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
@@ -336,7 +377,7 @@ Here is an example of chat completion with emojification:
 openai-chat-completion([ system => $preEmojify, user => 'Python sucks, Raku rocks, and Perl is annoying'], max-tokens => 200, format => 'values')
 ```
 ```
-# 🐍 Python 👎, 🦝 Raku 🤘, and Perl 😠 is annoying 🙄
+# 🐍 Python 🤬, 💎 Raku 🤘, and 🐪 Perl 😡
 ```
 
 For more examples see the document ["Chat-completion-examples"](./docs/Chat-completion-examples_woven.md).
@@ -360,7 +401,15 @@ area, it is the largest lake in South America";
 find-textual-answer($text, "Where is Titicaca?", llm => 'openai')
 ```
 ```
-# located in Peru
+#ERROR: Could not find ML::FindTextualAnswer in:
+#ERROR:     /Users/antonov/.raku
+#ERROR:     /Users/antonov/.rakubrew/versions/moar-2023.08/share/perl6/site
+#ERROR:     /Users/antonov/.rakubrew/versions/moar-2023.08/share/perl6/vendor
+#ERROR:     /Users/antonov/.rakubrew/versions/moar-2023.08/share/perl6/core
+#ERROR:     CompUnit::Repository::AbsolutePath<3853085078456>
+#ERROR:     CompUnit::Repository::NQP<3852978437320>
+#ERROR:     CompUnit::Repository::Perl5<3852978437360>
+# Nil
 ```
 
 By default `find-textual-answer` tries to give short answers.
@@ -383,7 +432,8 @@ Here we get a longer answer by changing the value of "request":
 find-textual-answer($text, "Where is Titicaca?", llm => 'chatgpt', request => "answer the question:")
 ```
 ```
-# Lake   located in Bolivia and Peru
+#ERROR: Variable '$text' is not declared.  Did you mean '&next'?
+# Nil
 ```
 
 **Remark:** The function `find-textual-answer` is inspired by the Mathematica function
@@ -438,9 +488,9 @@ openai-playground --help
 ```
 ```
 # Usage:
-#   openai-playground [<words> ...] [--path=<Str>] [-n[=UInt]] [--mt|--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [-f|--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
+#   /Users/antonov/.rakubrew/versions/moar-2023.08/share/perl6/site/bin/openai-playground [<words> ...] [--path=<Str>] [-n[=UInt]] [--mt|--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [-f|--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
 #   
-#     --path=<Str>                Path, one of 'chat/completions', 'images/generations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
+#     --path=<Str>                Path, one of 'chat/completions', 'images/generations', 'images/variations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
 #     -n[=UInt]                   Number of completions or generations. [default: 1]
 #     --mt|--max-tokens[=UInt]    The maximum number of tokens to generate in the completion. [default: 100]
 #     -m|--model=<Str>            Model. [default: 'Whatever']

@@ -139,6 +139,47 @@ my @imgRes = |openai-create-image(
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
 
+### Image variation
+
+**Remark:** See the files ["Image-variation*"](./docs/Image-variation.md) for more details.
+
+Images variations over image files can be generated with the function `openai-variate-image` 
+-- see the section
+["Images"](https://platform.openai.com/docs/api-reference/images) of [OAI2].
+
+Here is an example:
+
+```perl6, eval=FALSE
+my $imgB64 = openai-variate-image(
+        $*CWD ~ '/resources/RandomMandala.png',
+        response-format => 'b64_json',
+        n => 1,
+        size => 'small',
+        format => 'values',
+        method => 'tiny');
+```
+
+Here are the options descriptions:
+
+- `response-format` takes the values "url" and "b64_json"
+- `n` takes a positive integer, for the number of images to be generated
+- `size` takes the values '1024x1024', '512x512', '256x256', 'large', 'medium', 'small'.
+
+**Remark:** Same arguments are used by `openai-generate-image`. See the previous sub-section.
+
+Here we generate an image, get its URL, and place (embed) a link to it via the output of the code cell:
+
+```perl6, results='asis', eval=FALSE
+my @imgRes = |openai-variate-image(
+        $*CWD ~ '/resources/RandomMandala.png',
+        response-format => 'url',
+        n => 1,
+        size => 'small',
+        method => 'tiny');
+
+'![](' ~ @imgRes.head<url> ~ ')';
+```
+
 ### Moderation
 
 Here is an example of using 
