@@ -7,6 +7,11 @@ Here is a shell command:
 file-code-chunks-eval Image-generation.md 
 ```
 
+**Remark:** For doing image *variations* using image files see the document
+[Image-variation-and-edition.md](./Image-variation-and-edition.md)
+(and its woven version, [Image-variation-and-edition_woven.md](./Image-variation-and-edition_woven.md).)
+
+
 Here we load the Raku package "WWW::OpenAI", [AAp1]:
 
 ```perl6
@@ -16,11 +21,11 @@ use WWW::OpenAI;
 Images can be generated with the function `openai-create-image` -- see the section
 ["Images"](https://platform.openai.com/docs/api-reference/images) of [OAI2].
 
-Here is an example that returns the whole image in a [Base64 format](https://en.wikipedia.org/wiki/Base64):
+Here is an example that returns "whole images" in [Base64 format](https://en.wikipedia.org/wiki/Base64):
 
 ```perl6, results=asis
 my @imgResB64 = |openai-create-image(
-        "racoon with a sliced onion in the style of Raphael",
+        "raccoon with a sliced onion in the style of Raphael",
         n => 2,
         size => 'small',
         response-format => 'b64_json',
@@ -47,7 +52,7 @@ Here we generate a few images, get their URLs, and place (embed) the image links
 
 ```perl6, results=asis
 my @imgRes = |openai-create-image(
-        "racoon and onion in the style of Rene Magritte",
+        "painting of a racoon and onion in the style of Rene Magritte",
         response-format => 'url',
         n => 2,
         size => 'small',
