@@ -79,7 +79,7 @@ multi sub curl-post(Str :$url!,
             .trim-trailing;
 
     for $body.kv -> $k, $v {
-        my $sep = $k eq 'file' ?? '@' !! '';
+        my $sep = $k ∈ <file image> ?? '@' !! '';
         $textQuery ~= " \\\n  --form $k=$sep$v";
     }
 

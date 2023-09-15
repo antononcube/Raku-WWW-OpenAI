@@ -9,6 +9,7 @@ use WWW::OpenAI::Audio;
 use WWW::OpenAI::ChatCompletions;
 use WWW::OpenAI::Embeddings;
 use WWW::OpenAI::ImageGenerations;
+use WWW::OpenAI::ImageVariations;
 use WWW::OpenAI::Models;
 use WWW::OpenAI::Moderations;
 use WWW::OpenAI::Request;
@@ -82,6 +83,14 @@ our proto openai-create-image(|) is export {*}
 
 multi sub openai-create-image(**@args, *%args) {
     return WWW::OpenAI::ImageGenerations::OpenAICreateImage(|@args, |%args);
+}
+
+#===========================================================
+#| OpenAI image variation access.
+our proto openai-variate-image(|) is export {*}
+
+multi sub openai-variate-image(**@args, *%args) {
+    return WWW::OpenAI::ImageVariations::OpenAIVariateImage(|@args, |%args);
 }
 
 #===========================================================
@@ -167,6 +176,11 @@ multi sub openai-playground($text is copy,
         when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
             # my $url = 'https://api.openai.com/v1/images/generations';
             return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
+                    :$timeout, :$format, :$method);
+        }
+        when $_ ∈ <variate-image image-variation image-variations images-variations images/variations> {
+            # my $url = 'https://api.openai.com/v1/images/variations';
+            return openai-variate-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
                     :$timeout, :$format, :$method);
         }
         when $_ ∈ <moderations moderation censorship> {
