@@ -141,7 +141,7 @@ my @imgRes = |openai-create-image(
 
 ### Image variation
 
-**Remark:** See the files ["Image-variation*"](./docs/Image-variation.md) for more details.
+**Remark:** See the files ["Image-variation*"](./docs/Image-variation-and-edition.md) for more details.
 
 Images variations over image files can be generated with the function `openai-variate-image` 
 -- see the section
@@ -178,6 +178,46 @@ my @imgRes = |openai-variate-image(
         method => 'tiny');
 
 '![](' ~ @imgRes.head<url> ~ ')';
+```
+
+## Image edition
+
+**Remark:** See the files ["Image-variation*"](./docs/Image-variation-and-edition.md) for more details.
+
+Editions of images can be generated with the function `openai-edit-image` -- see the section
+["Images"](https://platform.openai.com/docs/api-reference/images) of [OAI2].
+
+Here are the descriptions of positional arguments:
+
+- `file` is a file name string (a PNG image with [RGBA color space](https://en.wikipedia.org/wiki/RGBA_color_model))
+- `prompt` is a prompt tha describes the image edition
+
+Here are the descriptions of the named arguments (options):
+
+- `mask-file` a file name of a mask image (can be an empty string or `Whatever`)
+- `n` takes a positive integer, for the number of images to be generated
+- `size` takes the values '1024x1024', '512x512', '256x256', 'large', 'medium', 'small'.
+- `response-format` takes the values "url" and "b64_json"
+- `method` takes the values "tiny" and "curl"
+
+Here is a random mandala color (RGBA) image:
+
+![](../resources/RandomMandala2.png)
+
+Here we generate a few editions of the colored mandala image above, get their URLs,
+and place (embed) the image links using a table:
+
+```perl6, results=asis, eval=FALSE
+my @imgRes = |openai-edit-image(
+        $*CWD ~ '/../resources/RandomMandala2.png',
+        'add cosmic background',
+        response-format => 'url',
+        n => 2,
+        size => 'small',
+        format => 'values',
+        method => 'tiny');
+
+@imgRes.map({ '![](' ~ $_ ~ ')' }).join("\n\n")       
 ```
 
 ### Moderation
@@ -466,6 +506,8 @@ Currently this package is tested on macOS only.
   - [X] DONE Audio transcription
   - [X] DONE Audio translation
   - [X] DONE Image generation
+  - [X] DONE Image variation
+  - [X] DONE Image edition
   - [X] DONE Embeddings
   - [X] DONE Finding of textual answers
 
