@@ -9,7 +9,7 @@ unit module WWW::OpenAI::Audio;
 #============================================================
 
 #| OpenAI image generation access.
-our proto OpenAIAudio($fileName,
+our proto OpenAIAudio($file,
                       :$type = 'transcriptions',
                       :$temperature is copy = Whatever,
                       :$language is copy = Whatever,
