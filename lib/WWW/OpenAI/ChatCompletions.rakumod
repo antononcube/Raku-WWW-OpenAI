@@ -23,7 +23,6 @@ my $knownRoles = Set.new(<user assistant>);
 
 #| OpenAI completion access.
 our proto OpenAIChatCompletion($prompt is copy,
-                               :$type is copy = Whatever,
                                :$role is copy = Whatever,
                                :$model is copy = Whatever,
                                :$temperature is copy = Whatever,
