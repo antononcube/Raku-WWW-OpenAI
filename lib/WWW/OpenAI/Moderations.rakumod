@@ -11,7 +11,7 @@ unit module WWW::OpenAI::Moderations;
 
 #| OpenAI image generation access.
 our proto OpenAIModeration($prompt,
-                            :$auth-key is copy = Whatever,
+                            :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
                             Str :$method = 'tiny'
@@ -24,7 +24,7 @@ multi sub OpenAIModeration(@prompts, *%args) {
 
 #| OpenAI image generation access.
 multi sub OpenAIModeration($prompt,
-                            :$auth-key is copy = Whatever,
+                            :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
                             Str :$method = 'tiny') {

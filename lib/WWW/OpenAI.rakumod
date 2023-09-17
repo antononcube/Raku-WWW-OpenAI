@@ -133,7 +133,7 @@ multi sub openai-text-completion(**@args, *%args) {
 #| OpenAI playground access.
 our proto openai-playground($text is copy = '',
                             Str :$path = 'completions',
-                            :$auth-key is copy = Whatever,
+                            :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
                             Str :$method = 'tiny',
@@ -153,7 +153,7 @@ multi sub openai-playground(@texts, *%args) {
 #| OpenAI playground access.
 multi sub openai-playground($text is copy,
                             Str :$path = 'completions',
-                            :$auth-key is copy = Whatever,
+                            :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
                             Str :$method = 'tiny',

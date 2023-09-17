@@ -111,7 +111,7 @@ multi sub openai-model-to-end-points(Str $model) {
 #============================================================
 
 #| OpenAI models.
-our sub OpenAIModels(:$auth-key is copy = Whatever, UInt :$timeout = 10) is export {
+our sub OpenAIModels(:api-key(:$auth-key) is copy = Whatever, UInt :$timeout = 10) is export {
     #------------------------------------------------------
     # Process $auth-key
     #------------------------------------------------------

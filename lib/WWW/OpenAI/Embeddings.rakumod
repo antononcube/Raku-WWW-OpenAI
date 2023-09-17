@@ -13,7 +13,7 @@ unit module WWW::OpenAI::Embeddings;
 #| OpenAI embeddings.
 our proto OpenAIEmbeddings($prompt,
                            :$model = Whatever,
-                           :$auth-key is copy = Whatever,
+                           :api-key(:$auth-key) is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
                            Str :$method = 'tiny'
@@ -23,7 +23,7 @@ our proto OpenAIEmbeddings($prompt,
 #| OpenAI embeddings.
 multi sub OpenAIEmbeddings($prompt,
                            :$model is copy = Whatever,
-                           :$auth-key is copy = Whatever,
+                           :api-key(:$auth-key) is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
                            Str :$method = 'tiny') {
