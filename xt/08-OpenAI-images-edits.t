@@ -11,6 +11,6 @@ my $method = 'tiny';
 plan *;
 
 ## 1
-ok openai-edit-image($*CWD ~ '/resources/RandomMandala.png', 'add cosmic background', size => 'small', :$method);
+ok openai-edit-image($*CWD ~ '/resources/RandomMandala2.png', 'add cosmic background', size => 'small', :$method);
 
 done-testing;
