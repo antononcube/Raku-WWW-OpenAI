@@ -19,6 +19,16 @@ use WWW::OpenAI::TextCompletions;
 
 #===========================================================
 #| OpenAI audio transcriptions and translations access.
+#| C<$file> -- file(s) to audio process;
+#| C<:$type> -- type of processing, one of <transcriptions translations>
+#| C<:$temperature> -- number between 0 and 2;
+#| C<:$language> -- language to process to;
+#| C<:$model> -- model;
+#| C<:$prompt> -- prompt for the audio processing;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-audio(|) is export {*}
 
 multi sub openai-audio(**@args, *%args) {
@@ -90,6 +100,12 @@ multi sub openai-chat-completion(**@args, *%args) {
 
 #===========================================================
 #| OpenAI embeddings access.
+#| C<$prompt> -- prompt to make embeddings for;
+#| C<:$model> -- model;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-embeddings(|) is export {*}
 
 multi sub openai-embeddings(**@args, *%args) {
@@ -98,6 +114,14 @@ multi sub openai-embeddings(**@args, *%args) {
 
 #===========================================================
 #| OpenAI image generation access.
+#| C<$prompt> -- prompt to generate the image with;
+#| C<:$n> -- number of generated images;
+#| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024>;
+#| C<:$response-format> -- image result format, one of <url b64_json>;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-create-image(|) is export {*}
 
 multi sub openai-create-image(**@args, *%args) {
@@ -106,6 +130,16 @@ multi sub openai-create-image(**@args, *%args) {
 
 #===========================================================
 #| OpenAI image variation access.
+#| C<$file> -- PNG image file to make edit(s) of;
+#| C<$prompt> -- prompt to generate the edit with;
+#| C<:$mask-file> -- PNG image file to mask the image given with C<$file>;
+#| C<:$n> -- number of generated images;
+#| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024>;
+#| C<:$response-format> -- image result format, one of <url b64_json>;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-edit-image(|) is export {*}
 
 multi sub openai-edit-image(**@args, *%args) {
@@ -114,6 +148,14 @@ multi sub openai-edit-image(**@args, *%args) {
 
 #===========================================================
 #| OpenAI image variation access.
+#| C<$file> -- file of a PNG to make variation(s) of;
+#| C<:$n> -- number of generated images;
+#| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024>;
+#| C<:$response-format> -- image result format, one of <url b64_json>;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-variate-image(|) is export {*}
 
 multi sub openai-variate-image(**@args, *%args) {
@@ -122,6 +164,8 @@ multi sub openai-variate-image(**@args, *%args) {
 
 #===========================================================
 #| OpenAI models access.
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout.
 our proto openai-models(|) is export {*}
 
 multi sub openai-models(*%args) {
@@ -130,6 +174,11 @@ multi sub openai-models(*%args) {
 
 #===========================================================
 #| OpenAI moderations access.
+#| C<$prompt> -- message(s) to be moderated;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-moderation(|) is export {*}
 
 multi sub openai-moderation(**@args, *%args) {
