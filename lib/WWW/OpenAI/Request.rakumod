@@ -133,9 +133,10 @@ multi sub openai-request(Str :$url!,
         if %*ENV<OPENAI_API_KEY>:exists {
             $auth-key = %*ENV<OPENAI_API_KEY>;
         } else {
-            note 'Cannot find OpenAI authorization key. ' ~
-                    'Please provide a valid key to the argument auth-key, or set the ENV variable OPENAI_API_KEY.';
-            $auth-key = ''
+            fail %( error => %(
+                message => 'Cannot find OpenAI authorization key. ' ~
+                    'Please provide a valid key to the argument auth-key, or set the ENV variable OPENAI_API_KEY.',
+                code => 401, status => 'NO_API_KEY'));
         }
     }
     die "The argument auth-key is expected to be a string or Whatever."
@@ -171,6 +172,10 @@ multi sub openai-request(Str :$url!,
             note 'Cannot convert from JSON, returning "asis".';
             return $res;
         }
+    }
+
+    if $res ~~ Map && $res<error> {
+        fail $res;
     }
 
     return do given $format.lc {
