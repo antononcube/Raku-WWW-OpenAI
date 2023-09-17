@@ -27,6 +27,9 @@ multi sub openai-audio(**@args, *%args) {
 
 #===========================================================
 #| OpenAI chat and text completions access.
+#| C<:type> -- type of text generation, one of 'chat', 'text', or Whatever;
+#| C<:model> -- LLM model to use.
+#| C<*%args> -- additional arguments, see C<openai-chat-completion> and C<openai-text-completion>.
 our proto openai-completion(|) is export {*}
 
 multi sub openai-completion($prompt,
@@ -64,6 +67,21 @@ multi sub openai-completion($prompt,
 
 #===========================================================
 #| OpenAI chat completions access.
+#| C<$prompt> -- message(s) to the LLM;
+#| C<:$role> -- role associated with the message(s);
+#| C<:$model> -- model;
+#| C<:$temperature> -- number between 0 and 2;
+#| C<:$max-tokens> -- max number of tokens of the results;
+#| C<:$top-p> -- top probability of tokens to use in the answer;
+#| C<:$n> -- number of answers;
+#| C<:$stop> -- stop tokens;
+#| C<:$stream> -- whether to stream the result or not;
+#| C<:$presence-penalty> -- presence penalty;
+#| C<:$frequency-penalty> -- frequency penalty;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-chat-completion(|) is export {*}
 
 multi sub openai-chat-completion(**@args, *%args) {
@@ -120,6 +138,22 @@ multi sub openai-moderation(**@args, *%args) {
 
 #===========================================================
 #| OpenAI text completions access.
+#| C<$prompt> -- message(s) to the LLM;
+#| C<:$model> -- model;
+#| C<:$suffix> -- suffix;
+#| C<:$max-tokens> -- max number of tokens of the results;
+#| C<:$temperature> -- number between 0 and 2;
+#| C<:$top-p> -- top probability of tokens to use in the answer;
+#| C<:$n> -- number of answers;
+#| C<:$stream> -- whether to stream the result or not;
+#| C<:$echo> -- whether to echo the prompt or not;
+#| C<:$presence-penalty> -- presence penalty;
+#| C<:$frequency-penalty> -- frequency penalty;
+#| C<:$best-of> -- number of best candidates to generate;
+#| C<:api-key($auth-key)> -- authorization key (API key);
+#| C<:$timeout> -- timeout;
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>.
 our proto openai-text-completion(|) is export {*}
 
 multi sub openai-text-completion(**@args, *%args) {
@@ -131,6 +165,12 @@ multi sub openai-text-completion(**@args, *%args) {
 #============================================================
 
 #| OpenAI playground access.
+#| C<:path> -- end point path;
+#| C<:api-key(:$auth-key)> -- authorization key (API key);
+#| C<:timeout> -- timeout
+#| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>,
+#| C<*%args> -- additional arguments, see C<openai-chat-completion> and C<openai-text-completion>.
 our proto openai-playground($text is copy = '',
                             Str :$path = 'completions',
                             :api-key(:$auth-key) is copy = Whatever,
