@@ -79,7 +79,7 @@ multi sub OpenAITextCompletion($prompt is copy,
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
-    if $model.isa(Whatever) { $model = 'text-davinci-003'; }
+    if $model.isa(Whatever) { $model = 'gpt-3.5-turbo-instruct'; }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-known-models.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ openai-known-models;
 

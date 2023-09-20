@@ -16,7 +16,7 @@ ok openai-completion('Generate Raku code for a loop over a list',
 
 ## 2
 ok openai-completion('Generate Raku code for a loop over a list',
-        type => Whatever, model => 'text-davinci-003', :$method);
+        type => Whatever, model => 'gpt-3.5-turbo-instruct', :$method);
 
 ## 3
 ok openai-completion('Generate Raku code for a loop over a list',

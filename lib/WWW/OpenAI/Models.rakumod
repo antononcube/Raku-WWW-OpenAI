@@ -28,7 +28,7 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "davinci-search-query", "davinci-similarity",
                            "gpt-4-0613", "gpt-4-0314", "gpt-4", "gpt-4-32k-0314",
                            "gpt-3.5-turbo-16k-0613", "gpt-3.5-turbo-16k",
-                           "gpt-3.5-turbo-0613", "gpt-3.5-turbo-0301", "gpt-3.5-turbo",
+                           "gpt-3.5-turbo-0613", "gpt-3.5-turbo-0301", "gpt-3.5-turbo", "gpt-3.5-turbo-instruct",
                            "if-curie-v2", "if-davinci:3.0.0",
                            "if-davinci-v2", "text-ada-001", "text-ada:001", "text-babbage-001",
                            "text-babbage:001", "text-curie-001", "text-curie:001",
@@ -57,7 +57,7 @@ our sub openai-known-models() is export {
 
 my %endPointToModels =
         '/v1/chat/completions' => <gpt-4 gpt-4-0314 gpt-4-32k gpt-4-32k-0314 gpt-3.5-turbo gpt-3.5-turbo-0301>,
-        '/v1/completions' => <text-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
+        '/v1/completions' => <tgpt-3.5-turbo-instruct ext-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
         '/v1/edits' => <text-davinci-edit-001 code-davinci-edit-001>,
         '/v1/audio/transcriptions' => <whisper-1>,
         '/v1/audio/translations' => <whisper-1>,
