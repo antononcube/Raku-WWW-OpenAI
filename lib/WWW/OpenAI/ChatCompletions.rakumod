@@ -33,6 +33,7 @@ our proto OpenAIChatCompletion($prompt is copy,
                                :$stop = Whatever,
                                Numeric :$presence-penalty = 0,
                                Numeric :$frequency-penalty = 0,
+                               :@images is copy = Empty,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
@@ -56,6 +57,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                                :$stop = Whatever,
                                Numeric :$presence-penalty = 0,
                                Numeric :$frequency-penalty = 0,
+                               :@images is copy = Empty,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
@@ -71,7 +73,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
-    if $model.isa(Whatever) { $model = 'gpt-3.5-turbo'; }
+    if $model.isa(Whatever) { $model = @images ?? 'gpt-4-vision-preview' !! 'gpt-3.5-turbo'; }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-known-models.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ openai-known-models;
 
@@ -129,6 +131,12 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     unless $frequency-penalty ~~ Numeric && -2 ≤ $frequency-penalty ≤ 2;
 
     #------------------------------------------------------
+    # Process @images
+    #------------------------------------------------------
+    die "The argument \@images is expected to be an empty Positional or a list of JPG image file names, image URLs, or base64 images."
+    unless !@images || [&&] @images.map({ $_ ~~ / ^ 'http' .? '://' / || !$_ ~~ / ^ 'data:image/jpeg;base64' / || $_.IO.e });
+
+    #------------------------------------------------------
     # Messages
     #------------------------------------------------------
     my @messages = @prompts.map({
@@ -138,6 +146,14 @@ multi sub OpenAIChatCompletion(@prompts is copy,
             %(:$role, content => $_)
         }
     });
+
+    if @images {
+        my $content = [
+            { type => 'text', text => @messages.tail<content> },
+            |@images.map({ %( type => 'image_url', image_url => %( url => $_ ) )})
+        ];
+        @messages = @messages.head(*- 1).Array.push({ :$role, :$content });
+    }
 
     #------------------------------------------------------
     # Make OpenAI URL
