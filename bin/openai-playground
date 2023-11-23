@@ -40,7 +40,9 @@ multi sub openai-front(Str $text,                                #= Text to be p
         }
     }
 
-    if $format.lc ∈ <v auto whatever> { $format = 'values'; }
+    if $format.lc ∈ <v value auto whatever> { $format = 'values'; }
+
+    my @imagesLocal = $images ?? $images.split(',', :skip-empty).map(*.trim).List !! Empty;
 
     my $res =
             openai-playground($text,
@@ -52,7 +54,7 @@ multi sub openai-front(Str $text,                                #= Text to be p
                     :$response-format,
                     :$language,
                     :$temperature,
-                    images => $images.split(',').List,
+                    images => @imagesLocal,
                     :$auth-key,
                     :$timeout,
                     :$format,
