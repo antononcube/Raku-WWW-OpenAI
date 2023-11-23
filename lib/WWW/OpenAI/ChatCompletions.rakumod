@@ -3,8 +3,25 @@ use v6.d;
 use WWW::OpenAI::Models;
 use WWW::OpenAI::Request;
 use JSON::Fast;
+use MIME::Base64;
 
 unit module WWW::OpenAI::ChatCompletions;
+
+our proto sub encode-image($image-path, Str :$type= 'jpeg'-->Str) {*}
+
+multi sub encode-image(Str $image-path, Str :$type= 'jpeg'-->Str) {
+    return encode-image($image-path.IO, :$type);
+}
+
+multi sub encode-image(IO::Path $image-path, Str :$type= 'jpeg'-->Str) {
+    if $image-path.e {
+        my $data = $image-path.IO.slurp(:bin);
+        my $img = MIME::Base64.encode($data, :oneline);
+        return "data:image/$type;base64,$img";
+    } else {
+        return Nil;
+    }
+}
 
 #============================================================
 # Known roles
@@ -134,7 +151,10 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     # Process @images
     #------------------------------------------------------
     die "The argument \@images is expected to be an empty Positional or a list of JPG image file names, image URLs, or base64 images."
-    unless !@images || [&&] @images.map({ $_ ~~ / ^ 'http' .? '://' / || $_ ~~ / ^ 'data:image/jpeg;base64' / || $_.IO.e });
+    unless !@images ||
+            [&&] @images.map({
+                $_ ~~ / ^ 'http' .? '://' / || $_.IO.e || $_ ~~ / ^ 'data:image/' ['jpeg' | 'png'] ';base64' /
+            });
 
     #------------------------------------------------------
     # Messages
@@ -150,7 +170,12 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     if @images {
         my $content = [
             { type => 'text', text => @messages.tail<content> },
-            |@images.map({ %( type => 'image_url', image_url => %( url => $_ ) )})
+            |@images.map({
+                %(
+                    type => 'image_url',
+                    image_url => %( url => $_.IO.e ?? encode-image($_, type => 'jpeg') !! $_)
+                )
+            })
         ];
         @messages = @messages.head(*- 1).Array.push({ :$role, :$content });
     }
