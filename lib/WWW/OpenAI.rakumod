@@ -263,13 +263,12 @@ multi sub openai-playground($text is copy,
     #------------------------------------------------------
     # Dispatch
     #------------------------------------------------------
-
     given $path.lc {
         when $_ eq 'models' {
             # my $url = 'https://api.openai.com/v1/models';
             return openai-models(:$auth-key, :$timeout);
         }
-        when 'images' ∈ %args.keys {
+        when so (%args<images> // '') {
             # Very similar to the one below, but since OpenAI's image-vision feature
             # is only available with certain models, the type and model determination
             # is delegated to openai-completion.
