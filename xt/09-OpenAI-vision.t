@@ -24,4 +24,11 @@ isa-ok openai-completion("How many mammals", images => $fname1, :$method, :$form
 #say openai-playground('How many mammals?', images => $*CWD ~ '/resources/ThreeHunters.jpg/', max-tokens => 900, :$format);
 isa-ok openai-playground('How many mammals?', images => $*CWD ~ '/resources/ThreeHunters.jpg/', max-tokens => 300, :$format), Str;
 
+## 4
+#note openai-playground('How many kind of mammal species on Earth?', max-tokens => 300, :$format), Str;
+isa-ok openai-playground('How many kind of mammal species on Earth?', max-tokens => 300, :$format), Str;
+
+## 5
+isa-ok openai-playground('How many kind of mammal species on Earth?', images => [], max-tokens => 300, :$format), Str;
+
 done-testing;
