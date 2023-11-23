@@ -9,7 +9,8 @@
   "auth": "zef:antononcube",
   "depends": [
     "HTTP::Tiny:ver<0.2.5+>",
-    "JSON::Fast:ver<0.17+>"
+    "JSON::Fast:ver<0.17+>",
+    "MIME::Base64:ver<1.2.3+>:auth<zef:raku-community-modules>"
   ],
   "build-depends": [],
   "test-depends": [],
@@ -30,7 +31,8 @@
     "HowAreYouRU.mp3",
     "HelloRaccoonsEN.mp3",
     "RandomMandala.png",
-    "RandomMandala2.png"
+    "RandomMandala2.png",
+    "ThreeHunters.jpg"
   ],
   "license": "Artistic-2.0",
   "tags": [
