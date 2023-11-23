@@ -69,7 +69,7 @@ multi sub openai-completion($prompt,
     # Process $images
     #------------------------------------------------------
     if (%args<images> // False) && %args<images> !~~ Iterable {
-        %args<images> = [%args<images>, ];
+        %args = %args , %( images => [%args<images>, ]);
     }
 
     #------------------------------------------------------
