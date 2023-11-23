@@ -52,7 +52,7 @@ multi sub openai-front(Str $text,                                #= Text to be p
                     :$response-format,
                     :$language,
                     :$temperature,
-                    images => $images.split(','),
+                    images => $images.split(',').List,
                     :$auth-key,
                     :$timeout,
                     :$format,
