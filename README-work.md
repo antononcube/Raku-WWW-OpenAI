@@ -302,6 +302,35 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 **Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
 (Judging by the table with dot products.)
 
+### Vision
+
+In the fall of 2023 OpenAI introduced image vision model 
+["gpt-4-vision-preview"](https://openai.com/blog/new-models-and-developer-products-announced-at-devday), [OAIb1].
+
+If the function `openai-completion` is given a list of images, textual results corresponding to those images is returned.
+The argument "images" is a list of image URLs, image file names, or image Base64 representations. (Any combination of those element types.)
+
+Here is 
+
+```perl6
+my $url1 = 'https://i.imgur.com/LEGfCeq.jpg';
+my $url2 = 'https://i.imgur.com/UcRYl9Y.jpg';
+my $fname3 = $*CWD ~ '/resources/ThreeHunters.jpg';
+my @images = [$url1, $url2, $fname3];
+say openai-completion("Give concise descriptions of the images.", :@images, max-tokens => 900, format => 'values');
+```
+
+The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
+to get Base64 image strings corresponding to image files. For example:
+
+```perl6, results=asis
+my $img3 = WWW::OpenAI::ChatCompletions::encode-image($fname3);
+'![](' ~ $img3 ~ ')';  
+```
+
+When a file name is given to the argument "images" of `openai-completion` then the function `encode-image` is applied to it.
+
+
 ### Chat completions with engineered prompts
 
 Here is a prompt for "emojification" (see the
@@ -464,6 +493,18 @@ graph TD
 
 Currently this package is tested on macOS only.
 
+### Not all models work
+
+Not all models listed and proclaimed by [OpenAI's documents](https://platform.openai.com/docs/models) 
+work with the corresponding endpoints. Certain models are not available for text- or chat completions,
+although the documentation says they are.
+
+See and run the file ["Models-run-verification.raku"](./experiments/Models-run-verification.raku) 
+to test the available models per endpoint.
+
+Related is a (current) deficiency of the package "WWW::OpenAI" -- the known models are hardcoded.
+(Although, there the function `openai-models` uses an endpoint provided by OpenAI.)
+
 ### SSL certificate problems (original package version)
 
 *(This subsection is for the original version of the package, not for the most recent one.)*
@@ -554,6 +595,11 @@ Currently this package is tested on macOS only.
 ["New in the Wolfram Language: FindTextualAnswer"](https://blog.wolfram.com/2018/02/15/new-in-the-wolfram-language-findtextualanswer),
 (2018),
 [blog.wolfram.com](https://blog.wolfram.com/).
+
+[OAIb1] OpenAI team,
+["New models and developer products announced at DevDay"](https://openai.com/blog/new-models-and-developer-products-announced-at-devday),
+(2023),
+[OpenAI/blog](https://openai.com/blog).
 
 ### Packages
 
