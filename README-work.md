@@ -323,9 +323,9 @@ say openai-completion("Give concise descriptions of the images.", :@images, max-
 The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
 to get Base64 image strings corresponding to image files. For example:
 
-```perl6, results=asis
+```perl6, results=asis, eval=FALSE
 my $img3 = WWW::OpenAI::ChatCompletions::encode-image($fname3);
-'![](' ~ $img3 ~ ')';  
+say "![]($img3)"  
 ```
 
 When a file name is given to the argument "images" of `openai-completion` then the function `encode-image` is applied to it.
@@ -579,6 +579,8 @@ Related is a (current) deficiency of the package "WWW::OpenAI" -- the known mode
 - [X] DONE Factor out finding of textual answers into a separate package
   - So, other LLMs can be used.
   - See ["ML::FindTextualAnswer"](https://github.com/antononcube/Raku-ML-FindTextualAnswer).
+
+- [X] DONE Implement vision (over images)
 
 --------
 
