@@ -16,6 +16,7 @@ multi sub openai-front(Str $text,                                #= Text to be p
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
                        Str :r(:$role) is copy = 'user',          #= Role.
                        Real :t(:$temperature) = 0.7,             #= Temperature.
+                       Str :i(:$images) = '',                    #= Image URLs or file names separated with comma (',').
                        Str :l(:$language) = '',                  #= Language.
                        Str :$response-format = 'url',            #= The format in which the generated images are returned; one of 'url' or 'b64_json'.
                        Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
@@ -51,6 +52,7 @@ multi sub openai-front(Str $text,                                #= Text to be p
                     :$response-format,
                     :$language,
                     :$temperature,
+                    images => $images.split(','),
                     :$auth-key,
                     :$timeout,
                     :$format,
@@ -72,6 +74,7 @@ multi sub MAIN
  Str :m(:$model) is copy = 'Whatever',     #= Model.
  Str :r(:$role) is copy = 'user',          #= Role.
  Real :t(:$temperature) = 0.7,             #= Temperature.
+ Str :i(:$images) = '',                    #= Image URLs or file names separated with comma (',').
  Str :l(:$language) = '',                  #= Language.
  Str :$response-format = 'url',            #= The format in which the generated images are returned; one of 'url' or 'b64_json'.
  Str :a(:$auth-key) is copy = 'Whatever',  #= Authorization key (to use OpenAI API.)
@@ -79,5 +82,5 @@ multi sub MAIN
  Str :f(:$format) is copy = 'Whatever',    #= Format of the result; one of "json", "hash", "values", or "Whatever".
  Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
  ) {
-    return openai-front(@words.join(' ').Str, :$model, :$path, :$n, :$max-tokens, :$role, :$temperature, :$language, :$response-format, :$auth-key, :$timeout, :$format, :$method);
+    return openai-front(@words.join(' ').Str, :$model, :$path, :$n, :$max-tokens, :$role, :$temperature, :$images, :$language, :$response-format, :$auth-key, :$timeout, :$format, :$method);
 }
