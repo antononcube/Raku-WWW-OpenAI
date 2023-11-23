@@ -269,10 +269,21 @@ multi sub openai-playground($text is copy,
             # my $url = 'https://api.openai.com/v1/models';
             return openai-models(:$auth-key, :$timeout);
         }
+        when 'images' ∈ %args.keys {
+            # Very similar to the one below, but since OpenAI's image-vision feature
+            # is only available with certain models, the type and model determination
+            # is delegated to openai-completion.
+            # my $url = 'https://api.openai.com/v1/chat/completions';
+            return openai-completion($text,
+                    type => Whatever,
+                    model => Whatever,
+                    |%args.grep({ $_.key ∈ <n role max-tokens temperature images> }).Hash,
+                    :$auth-key, :$timeout, :$format, :$method);
+        }
         when $_ ∈ <chat chat/completions> {
             # my $url = 'https://api.openai.com/v1/chat/completions';
             return openai-completion($text, type => 'chat',
-                    |%args.grep({ $_.key ∈ <n model role max-tokens temperature> }).Hash,
+                    |%args.grep({ $_.key ∈ <n model role max-tokens temperature images> }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
         }
         when $_ ∈ <completion completions text/completions> {
