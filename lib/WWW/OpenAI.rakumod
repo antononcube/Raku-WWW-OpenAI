@@ -52,6 +52,10 @@ multi sub openai-completion($prompt,
     #------------------------------------------------------
     if $type.isa(Whatever) {
         $type = do given $model {
+            when $_.isa(Whatever) && (so %args<images>) {
+                $model = 'gpt-4-vision-preview';
+                'chat'
+            }
             when Whatever { 'text' }
             when openai-is-chat-completion-model($_) { 'chat' };
             when $_.starts-with('text-') { 'text' };
@@ -60,6 +64,13 @@ multi sub openai-completion($prompt,
     }
     die "The argument \$type is expected to be one of 'chat', 'text', or Whatever."
     unless $type ∈ <chat text>;
+
+    #------------------------------------------------------
+    # Process $images
+    #------------------------------------------------------
+    if (%args<images> // False) && %args<images> !~~ Iterable {
+        %args<images> = [%args<images>, ];
+    }
 
     #------------------------------------------------------
     # Process $model
