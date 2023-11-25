@@ -55,7 +55,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character from the 1988 film "Who Framed Roger Rabbit." He is not a real person and therefore does not have a physical location.}]
+# Roger Rabbit is a fictional character from the 1988 movie "Who Framed Roger Rabbit." He is not a real person and therefore does not have a physical location.}]
 ```
 
 Another one using Bulgarian:
@@ -66,7 +66,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# Този облак от точки може да бъде разделен на произволен брой групи, в зависимост от критериите, които се изберат за тяхното форми}]
+# Това зависи от точките в облака и начина, по който се избират групите. Ако всички точки са подредени в редица, то ще има само една}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -101,8 +101,15 @@ openai-completion(
 # my @list = (1, 2, 3, 4, 5);
 # 
 # for @list -> $item {
-#     # do something with $item
+#     say $item;
 # }
+# 
+# # Output:
+# # 1
+# # 2
+# # 3
+# # 4
+# # 5
 ```
 
 Here is a chat completion:
@@ -115,17 +122,17 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Sure! Here's an example of Raku code that creates a loop over a list:
+# Sure, here's an example of how you can create a loop over a list in Raku:
 # 
 # ```raku
-# my @list = <apple banana cherry>;
+# my @list = 1, 2, 3, 4, 5;
 # 
-# for @list -> $item {
-#     say $item;
+# for @list -> $element {
+#     say $element;
 # }
 # ```
 # 
-# In this code, we have a list `@list` containing three elements: `apple`, `banana`, and `cherry`. The `for` loop iterates over each element in the list, assigning it to the `$item` variable, and then prints the value of `$item` using the `say` function.
+# In this example, we define an array `@list` containing some elements. We then use a `for` loop to iterate over each element in the list. The `-> $element` syntax defines a parameter that represents each element in the list, and `say $element` prints the value of each
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -213,7 +220,7 @@ my @imgRes = |openai-variate-image(
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
 
-## Image edition
+### Image edition
 
 **Remark:** See the files ["Image-variation*"](./docs/Image-variation-and-edition.md) for more details.
 
@@ -252,6 +259,43 @@ my @imgRes = |openai-edit-image(
 
 @imgRes.map({ '![](' ~ $_ ~ ')' }).join("\n\n")       
 ```
+
+
+### Vision
+
+In the fall of 2023 OpenAI introduced image vision model
+["gpt-4-vision-preview"](https://openai.com/blog/new-models-and-developer-products-announced-at-devday), [OAIb1].
+
+If the function `openai-completion` is given a list of images, textual results corresponding to those images is returned.
+The argument "images" is a list of image URLs, image file names, or image Base64 representations. (Any combination of those element types.)
+
+Here is an example with three images:
+
+```perl6
+my $url1 = 'https://i.imgur.com/LEGfCeq.jpg';
+my $url2 = 'https://i.imgur.com/UcRYl9Y.jpg';
+my $fname3 = $*CWD ~ '/resources/ThreeHunters.jpg';
+my @images = [$url1, $url2, $fname3];
+say openai-completion("Give concise descriptions of the images.", :@images, max-tokens => 900, format => 'values');
+```
+```
+# 1. A vibrant illustration featuring a raccoon on a tree branch surrounded by an array of colorful butterflies set against a green, leafy backdrop.
+# 
+# 2. A whimsical artwork showing two raccoons playing by a tree with a sign, amidst butterflies and a picturesque autumn landscape with rows of trees and scattered fruits on the ground.
+# 
+# 3. An enchanting image depicting three raccoons peeking out from a hollow in a tree, surrounded by an autumnal forest scene with butterflies and a warm, glowing light in the background.
+```
+
+The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
+to get Base64 image strings corresponding to image files. For example:
+
+```perl6, results=asis, eval=FALSE
+my $img3 = WWW::OpenAI::ChatCompletions::encode-image($fname3);
+say "![]($img3)"  
+```
+
+When a file name is given to the argument "images" of `openai-completion` then the function `encode-image` is applied to it.
+
 
 ### Moderation
 
@@ -350,16 +394,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +--------------------------------+------------------------------+--------------------------------+------------------------------+
-# | 1                              | 0                            | 2                              | 3                            |
-# +--------------------------------+------------------------------+--------------------------------+------------------------------+
-# | Min    => -0.6675609           | Min    => -0.5905979         | Min    => -0.6316688           | Min    => -0.60487235        |
-# | 1st-Qu => -0.0122597895        | 1st-Qu => -0.013208558       | 1st-Qu => -0.012534879         | 1st-Qu => -0.0129462655      |
-# | Mean   => -0.00076258629791471 | Mean   => -0.000762066322233 | Mean   => -0.00072970771235612 | Mean   => -0.000754160801387 |
-# | Median => -0.000313577955      | Median => -0.0010125666      | Median => -0.00061200845       | Median => -0.00072666709     |
-# | 3rd-Qu => 0.0111436975         | 3rd-Qu => 0.0123315665       | 3rd-Qu => 0.0118897265         | 3rd-Qu => 0.012172342        |
-# | Max    => 0.22817883           | Max    => 0.2120242          | Max    => 0.21271802           | Max    => 0.22197673         |
-# +--------------------------------+------------------------------+--------------------------------+------------------------------+
+# +------------------------------+--------------------------------+------------------------------+--------------------------------+
+# | 3                            | 1                              | 0                            | 2                              |
+# +------------------------------+--------------------------------+------------------------------+--------------------------------+
+# | Min    => -0.60487235        | Min    => -0.6675609           | Min    => -0.5905979         | Min    => -0.6316688           |
+# | 1st-Qu => -0.0129462655      | 1st-Qu => -0.0122597895        | 1st-Qu => -0.013208558       | 1st-Qu => -0.012534879         |
+# | Mean   => -0.000754160801387 | Mean   => -0.00076258629791471 | Mean   => -0.000762066322233 | Mean   => -0.00072970771235612 |
+# | Median => -0.00072666709     | Median => -0.000313577955      | Median => -0.0010125666      | Median => -0.00061200845       |
+# | 3rd-Qu => 0.012172342        | 3rd-Qu => 0.0111436975         | 3rd-Qu => 0.0123315665       | 3rd-Qu => 0.0118897265         |
+# | Max    => 0.22197673         | Max    => 0.22817883           | Max    => 0.2120242          | Max    => 0.21271802           |
+# +------------------------------+--------------------------------+------------------------------+--------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -384,42 +428,6 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 
 **Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
 (Judging by the table with dot products.)
-
-### Vision
-
-In the fall of 2023 OpenAI introduced image vision model 
-["gpt-4-vision-preview"](https://openai.com/blog/new-models-and-developer-products-announced-at-devday), [OAIb1].
-
-If the function `openai-completion` is given a list of images, textual results corresponding to those images is returned.
-The argument "images" is a list of image URLs, image file names, or image Base64 representations. (Any combination of those element types.)
-
-Here is 
-
-```perl6
-my $url1 = 'https://i.imgur.com/LEGfCeq.jpg';
-my $url2 = 'https://i.imgur.com/UcRYl9Y.jpg';
-my $fname3 = $*CWD ~ '/resources/ThreeHunters.jpg';
-my @images = [$url1, $url2, $fname3];
-say openai-completion("Give concise descriptions of the images.", :@images, max-tokens => 900, format => 'values');
-```
-```
-# Image 1: A vibrantly colored illustration of a raccoon on a tree branch surrounded by a swarm of butterflies in various colors.
-# 
-# Image 2: An artwork depicting two raccoons on a pathway lined with trees, with butterflies in the air and a detailed tree featuring a sign and fruits on the ground.
-# 
-# Image 3: A painting showing three raccoons in a forest setting with a warm, glowing background, surrounded by butterflies and lush foliage.
-```
-
-The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
-to get Base64 image strings corresponding to image files. For example:
-
-```perl6, results=asis, eval=FALSE
-my $img3 = WWW::OpenAI::ChatCompletions::encode-image($fname3);
-say "![]($img3)"  
-```
-
-When a file name is given to the argument "images" of `openai-completion` then the function `encode-image` is applied to it.
-
 
 ### Chat completions with engineered prompts
 
@@ -453,7 +461,7 @@ Here is an example of chat completion with emojification:
 openai-chat-completion([ system => $preEmojify, user => 'Python sucks, Raku rocks, and Perl is annoying'], max-tokens => 200, format => 'values')
 ```
 ```
-# 🐍 Python 🚫, 🪨 Raku 🤘, and Perl 😒 are 🤬.
+# 🐍 Python 🤮, 🦝 Raku 🤘, and Perl 😠 are 🔀 annoying.
 ```
 
 For more examples see the document ["Chat-completion-examples"](./docs/Chat-completion-examples_woven.md).
@@ -477,7 +485,7 @@ area, it is the largest lake in South America";
 find-textual-answer($text, "Where is Titicaca?", llm => 'openai')
 ```
 ```
-# Titicaca is on the border of Bolivia and Peru in the Andes.
+# On the border of Bolivia and Peru.
 ```
 
 By default `find-textual-answer` tries to give short answers.
@@ -757,3 +765,6 @@ Related is a (current) deficiency of the package "WWW::OpenAI" -- the known mode
 [OpenAI Python Library](https://github.com/openai/openai-python),
 (2020),
 [GitHub/openai](https://github.com/openai/).
+
+### Videos
+

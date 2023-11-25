@@ -180,7 +180,7 @@ my @imgRes = |openai-variate-image(
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
 
-## Image edition
+### Image edition
 
 **Remark:** See the files ["Image-variation*"](./docs/Image-variation-and-edition.md) for more details.
 
@@ -219,6 +219,36 @@ my @imgRes = |openai-edit-image(
 
 @imgRes.map({ '![](' ~ $_ ~ ')' }).join("\n\n")       
 ```
+
+
+### Vision
+
+In the fall of 2023 OpenAI introduced image vision model
+["gpt-4-vision-preview"](https://openai.com/blog/new-models-and-developer-products-announced-at-devday), [OAIb1].
+
+If the function `openai-completion` is given a list of images, textual results corresponding to those images is returned.
+The argument "images" is a list of image URLs, image file names, or image Base64 representations. (Any combination of those element types.)
+
+Here is an example with three images:
+
+```perl6
+my $url1 = 'https://i.imgur.com/LEGfCeq.jpg';
+my $url2 = 'https://i.imgur.com/UcRYl9Y.jpg';
+my $fname3 = $*CWD ~ '/resources/ThreeHunters.jpg';
+my @images = [$url1, $url2, $fname3];
+say openai-completion("Give concise descriptions of the images.", :@images, max-tokens => 900, format => 'values');
+```
+
+The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
+to get Base64 image strings corresponding to image files. For example:
+
+```perl6, results=asis, eval=FALSE
+my $img3 = WWW::OpenAI::ChatCompletions::encode-image($fname3);
+say "![]($img3)"  
+```
+
+When a file name is given to the argument "images" of `openai-completion` then the function `encode-image` is applied to it.
+
 
 ### Moderation
 
@@ -301,35 +331,6 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 
 **Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
 (Judging by the table with dot products.)
-
-### Vision
-
-In the fall of 2023 OpenAI introduced image vision model 
-["gpt-4-vision-preview"](https://openai.com/blog/new-models-and-developer-products-announced-at-devday), [OAIb1].
-
-If the function `openai-completion` is given a list of images, textual results corresponding to those images is returned.
-The argument "images" is a list of image URLs, image file names, or image Base64 representations. (Any combination of those element types.)
-
-Here is 
-
-```perl6
-my $url1 = 'https://i.imgur.com/LEGfCeq.jpg';
-my $url2 = 'https://i.imgur.com/UcRYl9Y.jpg';
-my $fname3 = $*CWD ~ '/resources/ThreeHunters.jpg';
-my @images = [$url1, $url2, $fname3];
-say openai-completion("Give concise descriptions of the images.", :@images, max-tokens => 900, format => 'values');
-```
-
-The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
-to get Base64 image strings corresponding to image files. For example:
-
-```perl6, results=asis, eval=FALSE
-my $img3 = WWW::OpenAI::ChatCompletions::encode-image($fname3);
-say "![]($img3)"  
-```
-
-When a file name is given to the argument "images" of `openai-completion` then the function `encode-image` is applied to it.
-
 
 ### Chat completions with engineered prompts
 
@@ -629,3 +630,6 @@ Related is a (current) deficiency of the package "WWW::OpenAI" -- the known mode
 [OpenAI Python Library](https://github.com/openai/openai-python),
 (2020),
 [GitHub/openai](https://github.com/openai/).
+
+### Videos
+
