@@ -7,19 +7,55 @@ use MIME::Base64;
 
 unit module WWW::OpenAI::ChatCompletions;
 
-our proto sub encode-image($image-path, Str :$type= 'jpeg'-->Str) {*}
+#============================================================
+# Encode image
+#============================================================
 
-multi sub encode-image(Str $image-path, Str :$type= 'jpeg'-->Str) {
-    return encode-image($image-path.IO, :$type);
+our proto sub EncodeImage($path, Str :$type= 'jpeg'-->Str) {*}
+
+multi sub EncodeImage(Str $path, Str :$type= 'jpeg'-->Str) {
+    return EncodeImage($path.IO, :$type);
 }
 
-multi sub encode-image(IO::Path $image-path, Str :$type= 'jpeg'-->Str) {
-    if $image-path.e {
-        my $data = $image-path.IO.slurp(:bin);
+multi sub EncodeImage(IO::Path $path, Str :$type= 'jpeg'-->Str) {
+    if $path.e {
+        my $data = $path.IO.slurp(:bin);
         my $img = MIME::Base64.encode($data, :oneline);
         return "data:image/$type;base64,$img";
     } else {
         return Nil;
+    }
+}
+
+#============================================================
+# Export image
+#============================================================
+
+our proto sub ExportImage($path, Str $image, Bool :$createonly = False -->Bool) {*}
+
+multi sub ExportImage(Str $path, Str $image, Bool :$createonly = False -->Bool) {
+    return ExportImage($path.IO, $image, :$createonly);
+}
+
+multi sub ExportImage(IO::Path $path, Str $image, Bool :$createonly = False-->Bool) {
+
+    my &rg = / ^ '![](data:image/' \w*? ';base64,' /;
+    my $img = do if $image ~~ &rg {
+        $image.subst(&rg).chop
+    } else {
+        $image.subst(/ ^ 'data:image/' \w*? ';base64,'/)
+    };
+
+    my $data = MIME::Base64.decode($img);
+
+    try {
+        my $fh = $path.open(:bin, :w, create => !$createonly);
+        $fh.write($data);
+        return $fh.close;
+    }
+    if $! {
+        note $!.Str;
+        return False;
     }
 }
 
@@ -60,7 +96,6 @@ our proto OpenAIChatCompletion($prompt is copy,
 multi sub OpenAIChatCompletion(Str $prompt, *%args) {
     return OpenAIChatCompletion([$prompt,], |%args);
 }
-
 
 #| OpenAI completion access.
 multi sub OpenAIChatCompletion(@prompts is copy,
@@ -173,7 +208,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
             |@images.map({
                 %(
                     type => 'image_url',
-                    image_url => %( url => $_.IO.e ?? encode-image($_, type => 'jpeg') !! $_)
+                    image_url => %( url => $_.IO.e ?? EncodeImage($_, type => 'jpeg') !! $_)
                 )
             })
         ];
