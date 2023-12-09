@@ -126,6 +126,7 @@ multi sub openai-embeddings(**@args, *%args) {
 #===========================================================
 #| OpenAI image generation access.
 #| C<$prompt> -- prompt to generate the image with;
+#| C<:$model> -- model;
 #| C<:$n> -- number of generated images;
 #| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024>;
 #| C<:$response-format> -- image result format, one of <url b64_json>;
@@ -335,4 +336,25 @@ multi sub openai-playground($text is copy,
             die 'Do not know how to process the given path.';
         }
     }
+}
+
+#===========================================================
+#| Encode to Base64 image from a given file path.
+#| C<$path> -- path of the image file;
+#| C<:$type> -- image type, like "jpeg" or "png".
+our proto encode-image(|) is export {*}
+
+multi sub encode-image(**@args, *%args) {
+    return WWW::OpenAI::ChatCompletions::EncodeImage(|@args, |%args);
+}
+
+#===========================================================
+#| Export image to a given file path.
+#| C<$path> -- path of the image file;
+#| C<$img> -- image string to export to;
+#| C<:$createonly> -- Boolean indicating whether to fail if the file already exists. Defaults to False.
+our proto export-image(|) is export {*}
+
+multi sub export-image(**@args, *%args) {
+    return WWW::OpenAI::ChatCompletions::ExportImage(|@args, |%args);
 }
