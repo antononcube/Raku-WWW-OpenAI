@@ -23,8 +23,9 @@ END
 our proto OpenAICreateImage($prompt,
                             :$model is copy = Whatever,
                             UInt :$n = 1,
-                            :$size is copy = Whatever,
                             :$response-format is copy = Whatever,
+                            :$size is copy = Whatever,
+                            :$style is copy = Whatever,
                             :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
@@ -40,8 +41,9 @@ multi sub OpenAICreateImage(@prompts, *%args) {
 multi sub OpenAICreateImage($prompt,
                             :$model is copy = Whatever,
                             UInt :$n = 1,
-                            :$size is copy = Whatever,
                             :$response-format is copy = Whatever,
+                            :$size is copy = Whatever,
+                            :$style is copy = Whatever,
                             :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
@@ -106,6 +108,13 @@ multi sub OpenAICreateImage($prompt,
     $size = %sizeMap3{$size} // %sizeMap2{$size} // $size;
 
     #------------------------------------------------------
+    # Process $style
+    #------------------------------------------------------
+    if $style.isa(Whatever) { $style = 'vivid'; }
+    die "The argument \$style is expected to be Whatever or one of 'vivid' or 'natural'."
+    unless $style ~~ Str && $style.lc ∈ <vivid natural>;
+
+    #------------------------------------------------------
     # Process $format
     #------------------------------------------------------
     my Bool $asMDImage = False;
@@ -126,7 +135,7 @@ multi sub OpenAICreateImage($prompt,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my %body = :$model, :$prompt, :$size, response_format => $response-format, :$n;
+    my %body = :$model, :$prompt, :$size, :$style, response_format => $response-format, :$n;
 
     my $url = 'https://api.openai.com/v1/images/generations';
 
