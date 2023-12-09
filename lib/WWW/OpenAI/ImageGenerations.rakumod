@@ -23,6 +23,7 @@ END
 our proto OpenAICreateImage($prompt,
                             :$model is copy = Whatever,
                             UInt :$n = 1,
+                            :$quality is copy = Whatever,
                             :$response-format is copy = Whatever,
                             :$size is copy = Whatever,
                             :$style is copy = Whatever,
@@ -41,6 +42,7 @@ multi sub OpenAICreateImage(@prompts, *%args) {
 multi sub OpenAICreateImage($prompt,
                             :$model is copy = Whatever,
                             UInt :$n = 1,
+                            :$quality is copy = Whatever,
                             :$response-format is copy = Whatever,
                             :$size is copy = Whatever,
                             :$style is copy = Whatever,
@@ -115,6 +117,13 @@ multi sub OpenAICreateImage($prompt,
     unless $style ~~ Str && $style.lc ∈ <vivid natural>;
 
     #------------------------------------------------------
+    # Process $quality
+    #------------------------------------------------------
+    if $quality.isa(Whatever) { $quality = 'standard'; }
+    die "The argument \$quality is expected to be Whatever or one of 'hd' or 'standard'."
+    unless $quality ~~ Str && $quality.lc ∈ <hd standard>;
+
+    #------------------------------------------------------
     # Process $format
     #------------------------------------------------------
     my Bool $asMDImage = False;
@@ -135,7 +144,7 @@ multi sub OpenAICreateImage($prompt,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my %body = :$model, :$prompt, :$size, :$style, response_format => $response-format, :$n;
+    my %body = :$model, :$prompt, :$size, :$quality, :$style, response_format => $response-format, :$n;
 
     my $url = 'https://api.openai.com/v1/images/generations';
 

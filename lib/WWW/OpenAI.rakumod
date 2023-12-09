@@ -128,8 +128,10 @@ multi sub openai-embeddings(**@args, *%args) {
 #| C<$prompt> -- prompt to generate the image with;
 #| C<:$model> -- model;
 #| C<:$n> -- number of generated images;
-#| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024>;
 #| C<:$response-format> -- image result format, one of <url b64_json>;
+#| C<:$quality> -- quality of the image, one of <hd standard>, applies only for the model "dall-e-3";
+#| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024 square landscape portrait 1792x1024 1024x1792>;
+#| C<:$style> -- style of the image, one of <vivid natural>, applies only for the model "dall-e-3";
 #| C<:api-key($auth-key)> -- authorization key (API key);
 #| C<:$timeout> -- timeout;
 #| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
@@ -339,7 +341,7 @@ multi sub openai-playground($text is copy,
 }
 
 #===========================================================
-#| Encode to Base64 image from a given file path.
+#| Import and encode to Base64 an image from a given file path.
 #| C<$path> -- path of the image file;
 #| C<:$type> -- image type, like "jpeg" or "png".
 our proto encode-image(|) is export {*}
@@ -349,7 +351,7 @@ multi sub encode-image(**@args, *%args) {
 }
 
 #===========================================================
-#| Export image to a given file path.
+#| Export an image to a given file path.
 #| C<$path> -- path of the image file;
 #| C<$img> -- image string to export to;
 #| C<:$createonly> -- Boolean indicating whether to fail if the file already exists. Defaults to False.
