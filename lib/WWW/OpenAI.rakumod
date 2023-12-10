@@ -339,24 +339,3 @@ multi sub openai-playground($text is copy,
         }
     }
 }
-
-#===========================================================
-#| Import and encode to Base64 an image from a given file path.
-#| C<$path> -- path of the image file;
-#| C<:$type> -- image type, like "jpeg" or "png".
-our proto encode-image(|) is export {*}
-
-multi sub encode-image(**@args, *%args) {
-    return WWW::OpenAI::ChatCompletions::EncodeImage(|@args, |%args);
-}
-
-#===========================================================
-#| Export an image to a given file path.
-#| C<$path> -- path of the image file;
-#| C<$img> -- image string to export to;
-#| C<:$createonly> -- Boolean indicating whether to fail if the file already exists. Defaults to False.
-our proto export-image(|) is export {*}
-
-multi sub export-image(**@args, *%args) {
-    return WWW::OpenAI::ChatCompletions::ExportImage(|@args, |%args);
-}
