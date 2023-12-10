@@ -134,10 +134,14 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     #------------------------------------------------------
     # Process @images
     #------------------------------------------------------
+
+    my &b64-mmd = / ^ \h* '![](data:image/' \w*? ';base64' /;
+    @images = @images.map({ $_ ~~ Str && $_ ~~ &b64-mmd ?? $_.subst(/^ \h* '![](' /).chop !! $_ });
+
     die "The argument \@images is expected to be an empty Positional or a list of JPG image file names, image URLs, or base64 images."
     unless !@images ||
             [&&] @images.map({
-                $_ ~~ / ^ 'http' .? '://' / || $_.IO.e || $_ ~~ / ^ 'data:image/' ['jpeg' | 'png'] ';base64' /
+                $_ ~~ / ^ 'http' .? '://' / || $_.IO.e || $_ ~~ / ^ 'data:image/' \w*? ';base64' /
             });
 
     #------------------------------------------------------
