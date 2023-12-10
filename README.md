@@ -55,7 +55,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character from the 1988 movie "Who Framed Roger Rabbit." He is not a real person and therefore does not have a physical location.}]
+# Roger Rabbit is a fictional character from the 1988 film "Who Framed Roger Rabbit." He does not exist in real life. }]
 ```
 
 Another one using Bulgarian:
@@ -66,7 +66,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# Това зависи от точките в облака и начина, по който се избират групите. Ако всички точки са подредени в редица, то ще има само една}]
+# Трудно е да се определи точен брой на групите в този облак от точки, защото това зависи от това какво се счита за група и каква е}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -82,7 +82,7 @@ The current OpenAI models can be found with the function `openai-models`:
 openai-models
 ```
 ```
-# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity babbage babbage-002 babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity canary-tts canary-whisper code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity dall-e-2 davinci davinci-002 davinci-instruct-beta davinci-search-document davinci-search-query davinci-similarity gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-1106 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 gpt-3.5-turbo-instruct gpt-3.5-turbo-instruct-0914 gpt-4 gpt-4-0314 gpt-4-0613 gpt-4-1106-preview gpt-4-vision-preview text-ada-001 text-babbage-001 text-curie-001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 tts-1 tts-1-1106 tts-1-hd tts-1-hd-1106 whisper-1)
+# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity babbage babbage-002 babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity code-davinci-edit-001 code-search-ada-code-001 code-search-ada-text-001 code-search-babbage-code-001 code-search-babbage-text-001 curie curie-instruct-beta curie-search-document curie-search-query curie-similarity dall-e-2 dall-e-3 davinci davinci-002 davinci-instruct-beta davinci-search-document davinci-search-query davinci-similarity gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-1106 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 gpt-3.5-turbo-instruct gpt-3.5-turbo-instruct-0914 gpt-4 gpt-4-0314 gpt-4-0613 gpt-4-1106-preview gpt-4-vision-preview text-ada-001 text-babbage-001 text-curie-001 text-davinci-001 text-davinci-002 text-davinci-003 text-davinci-edit-001 text-embedding-ada-002 text-search-ada-doc-001 text-search-ada-query-001 text-search-babbage-doc-001 text-search-babbage-query-001 text-search-curie-doc-001 text-search-curie-query-001 text-search-davinci-doc-001 text-search-davinci-query-001 text-similarity-ada-001 text-similarity-babbage-001 text-similarity-curie-001 text-similarity-davinci-001 tts-1 tts-1-1106 tts-1-hd tts-1-hd-1106 whisper-1)
 ```
 
 ### Code generation
@@ -122,17 +122,19 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Sure, here's an example of how you can create a loop over a list in Raku:
+# Sure! Here's an example of Raku code to loop over a list:
 # 
 # ```raku
-# my @list = 1, 2, 3, 4, 5;
+# my @list = 1..5;
 # 
 # for @list -> $element {
 #     say $element;
 # }
 # ```
 # 
-# In this example, we define an array `@list` containing some elements. We then use a `for` loop to iterate over each element in the list. The `-> $element` syntax defines a parameter that represents each element in the list, and `say $element` prints the value of each
+# This code creates an array `@list` containing the numbers 1 to 5. Then, it uses a `for` loop to iterate over each element in the list and assigns it to the variable `$element`. Finally, it prints each element using the `say` statement.
+# 
+# You can replace `1..5` with any list of elements you want to iterate over.
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -148,14 +150,16 @@ For example:
 Images can be generated with the function `openai-create-image` -- see the section
 ["Images"](https://platform.openai.com/docs/api-reference/images) of [OAI2].
 
+
 Here is an example:
 
 ```perl6, eval=FALSE
 my $imgB64 = openai-create-image(
         "racoon with a sliced onion in the style of Raphael",
         response-format => 'b64_json',
+        model = 'dalle-e-3',
         n => 1,
-        size => 'small',
+        size => '1024x1024',
         format => 'values',
         method => 'tiny');
 ```
@@ -178,6 +182,12 @@ my @imgRes = |openai-create-image(
 
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
+
+**Remark:** The argument "model" can be `Whatever` of one of "dall-e-2" or "dall-e-3". 
+Not all parameters that are valid for one of the models are valid or respected by the other --
+see the subsection ["Create image"](https://platform.openai.com/docs/api-reference/images/create) of 
+[OpenAI's documentation](https://platform.openai.com/docs/api-reference).
+
 
 ### Image variation
 
@@ -279,11 +289,11 @@ my @images = [$url1, $url2, $fname3];
 say openai-completion("Give concise descriptions of the images.", :@images, max-tokens => 900, format => 'values');
 ```
 ```
-# 1. A vibrant illustration featuring a raccoon on a tree branch surrounded by an array of colorful butterflies set against a green, leafy backdrop.
+# 1. A vivid illustration of a raccoon on a tree branch surrounded by multicolored butterflies and leaves.
 # 
-# 2. A whimsical artwork showing two raccoons playing by a tree with a sign, amidst butterflies and a picturesque autumn landscape with rows of trees and scattered fruits on the ground.
+# 2. Artwork depicting two raccoons in a colorful autumn setting with butterflies, a tree with a sign, and various fruits on the ground.
 # 
-# 3. An enchanting image depicting three raccoons peeking out from a hollow in a tree, surrounded by an autumnal forest scene with butterflies and a warm, glowing light in the background.
+# 3. An illustration showing three raccoons sitting in a tree hollow in an autumnal forest with butterflies fluttering around.
 ```
 
 The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
@@ -394,16 +404,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +------------------------------+--------------------------------+------------------------------+--------------------------------+
-# | 3                            | 1                              | 0                            | 2                              |
-# +------------------------------+--------------------------------+------------------------------+--------------------------------+
-# | Min    => -0.60487235        | Min    => -0.6675609           | Min    => -0.5905979         | Min    => -0.6316688           |
-# | 1st-Qu => -0.0129462655      | 1st-Qu => -0.0122597895        | 1st-Qu => -0.013208558       | 1st-Qu => -0.012534879         |
-# | Mean   => -0.000754160801387 | Mean   => -0.00076258629791471 | Mean   => -0.000762066322233 | Mean   => -0.00072970771235612 |
-# | Median => -0.00072666709     | Median => -0.000313577955      | Median => -0.0010125666      | Median => -0.00061200845       |
-# | 3rd-Qu => 0.012172342        | 3rd-Qu => 0.0111436975         | 3rd-Qu => 0.0123315665       | 3rd-Qu => 0.0118897265         |
-# | Max    => 0.22197673         | Max    => 0.22817883           | Max    => 0.2120242          | Max    => 0.21271802           |
-# +------------------------------+--------------------------------+------------------------------+--------------------------------+
+# +-------------------------------+-------------------------------+-------------------------------+--------------------------------+
+# | 1                             | 0                             | 3                             | 2                              |
+# +-------------------------------+-------------------------------+-------------------------------+--------------------------------+
+# | Min    => -0.66754395         | Min    => -0.5907037          | Min    => -0.60495615         | Min    => -0.6316688           |
+# | 1st-Qu => -0.012314593        | 1st-Qu => -0.013189442        | 1st-Qu => -0.012919523        | 1st-Qu => -0.012534879         |
+# | Mean   => -0.0007625400302132 | Mean   => -0.0007625227818828 | Mean   => -0.0007545703147669 | Mean   => -0.00072970771235612 |
+# | Median => -0.00029763855      | Median => -0.0010373618       | Median => -0.000765558445     | Median => -0.00061200845       |
+# | 3rd-Qu => 0.011153749         | 3rd-Qu => 0.0123480965        | 3rd-Qu => 0.012131225         | 3rd-Qu => 0.0118897265         |
+# | Max    => 0.22817306          | Max    => 0.21206218          | Max    => 0.22189334          | Max    => 0.21271802           |
+# +-------------------------------+-------------------------------+-------------------------------+--------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -419,10 +429,10 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.724735 | 0.756752 | 0.665397 |
-# | 1 | 0.724735 | 1.000000 | 0.811177 | 0.715478 |
-# | 2 | 0.756752 | 0.811177 | 1.000000 | 0.698925 |
-# | 3 | 0.665397 | 0.715478 | 0.698925 | 1.000000 |
+# | 0 | 1.000000 | 0.724845 | 0.756871 | 0.665475 |
+# | 1 | 0.724845 | 1.000000 | 0.811253 | 0.715529 |
+# | 2 | 0.756871 | 0.811253 | 1.000000 | 0.698925 |
+# | 3 | 0.665475 | 0.715529 | 0.698925 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
@@ -461,7 +471,7 @@ Here is an example of chat completion with emojification:
 openai-chat-completion([ system => $preEmojify, user => 'Python sucks, Raku rocks, and Perl is annoying'], max-tokens => 200, format => 'values')
 ```
 ```
-# 🐍 Python 🤮, 🦝 Raku 🤘, and Perl 😠 are 🔀 annoying.
+# 🐍 Python 😠 sucks, 💥 Raku 🤘 rocks, and 🐪 Perl 😒 is annoying
 ```
 
 For more examples see the document ["Chat-completion-examples"](./docs/Chat-completion-examples_woven.md).
@@ -485,7 +495,7 @@ area, it is the largest lake in South America";
 find-textual-answer($text, "Where is Titicaca?", llm => 'openai')
 ```
 ```
-# On the border of Bolivia and Peru.
+# Titicaca is on the border of Bolivia and Peru in the Andes.
 ```
 
 By default `find-textual-answer` tries to give short answers.

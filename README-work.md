@@ -108,14 +108,16 @@ For example:
 Images can be generated with the function `openai-create-image` -- see the section
 ["Images"](https://platform.openai.com/docs/api-reference/images) of [OAI2].
 
+
 Here is an example:
 
 ```perl6, eval=FALSE
 my $imgB64 = openai-create-image(
         "racoon with a sliced onion in the style of Raphael",
         response-format => 'b64_json',
+        model = 'dalle-e-3',
         n => 1,
-        size => 'small',
+        size => '1024x1024',
         format => 'values',
         method => 'tiny');
 ```
@@ -138,6 +140,12 @@ my @imgRes = |openai-create-image(
 
 '![](' ~ @imgRes.head<url> ~ ')';
 ```
+
+**Remark:** The argument "model" can be `Whatever` of one of "dall-e-2" or "dall-e-3". 
+Not all parameters that are valid for one of the models are valid or respected by the other --
+see the subsection ["Create image"](https://platform.openai.com/docs/api-reference/images/create) of 
+[OpenAI's documentation](https://platform.openai.com/docs/api-reference).
+
 
 ### Image variation
 
