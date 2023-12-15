@@ -13,6 +13,7 @@ unit module WWW::OpenAI::Embeddings;
 #| OpenAI embeddings.
 our proto OpenAIEmbeddings($prompt,
                            :$model = Whatever,
+                           :$encoding-format = Whatever,
                            :api-key(:$auth-key) is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
@@ -23,6 +24,7 @@ our proto OpenAIEmbeddings($prompt,
 #| OpenAI embeddings.
 multi sub OpenAIEmbeddings($prompt,
                            :$model is copy = Whatever,
+                           :$encoding-format is copy = Whatever,
                            :api-key(:$auth-key) is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
@@ -36,6 +38,13 @@ multi sub OpenAIEmbeddings($prompt,
     unless $model ∈ openai-known-models;
 
     #------------------------------------------------------
+    # Process $encoding-format
+    #------------------------------------------------------
+    if $encoding-format.isa(Whatever) { $encoding-format = 'float'; }
+    die "The argument \$encoding-format is expected to be Whatever or one of the strings 'float' or 'base64'."
+    unless $encoding-format ~~ Str && $encoding-format.lc ∈ <float base64>;
+
+    #------------------------------------------------------
     # OpenAI URL
     #------------------------------------------------------
 
@@ -47,13 +56,13 @@ multi sub OpenAIEmbeddings($prompt,
     if ($prompt ~~ Positional || $prompt ~~ Seq) && $method ∈ <tiny> {
 
         return openai-request(:$url,
-                body => to-json({ input => $prompt.Array, :$model }),
+                body => to-json({ input => $prompt.Array, :$model, encoding_format => $encoding-format}),
                 :$auth-key, :$timeout, :$format, :$method);
 
     } else {
 
         return openai-request(:$url,
-                body => to-json({ input => $prompt.Array, :$model }),
+                body => to-json({ input => $prompt.Array, :$model, encoding_format => $encoding-format}),
                 :$auth-key, :$timeout, :$format, :$method);
     }
 }

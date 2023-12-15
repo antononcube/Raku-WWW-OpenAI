@@ -331,7 +331,7 @@ multi sub openai-playground($text is copy,
         when $_ ∈ <embedding embeddings> {
             # my $url = 'https://api.openai.com/v1/embeddings';
             return openai-embeddings($text,
-                    |%args.grep({ $_.key ∈ <model> }).Hash,
+                    |%args.grep({ $_.key ∈ <model encoding-format> }).Hash,
                     :$auth-key, :$timeout, :$format, :$method);
         }
         default {

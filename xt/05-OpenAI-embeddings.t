@@ -23,7 +23,7 @@ my @queries = [
         'what is a good meat and potatoes recipe'
 ];
 
-is openai-embeddings(@queries, format => "values", :$method).WHAT ∈ (Array, Positional, Seq), True;
+is openai-embeddings(@queries, format => "values", :$method, encoding-format => 'base64').WHAT ∈ (Array, Positional, Seq), True;
 
 ## 3
 is openai-embeddings(@queries, format => "values", :$method).elems, @queries.elems;
