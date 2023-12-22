@@ -96,7 +96,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     # Process $top-p
     #------------------------------------------------------
     if $top-p.isa(Whatever) { $top-p = 1.0; }
-    die "The argument \$temperature is expected to be Whatever or number between 0 and 1."
+    die "The argument \$top-p is expected to be Whatever or number between 0 and 1."
     unless $top-p ~~ Numeric && 0 ≤ $top-p ≤ 1;
 
     #------------------------------------------------------
