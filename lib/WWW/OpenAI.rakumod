@@ -56,10 +56,11 @@ multi sub openai-completion($prompt,
                 $model = 'gpt-4-vision-preview';
                 'chat'
             }
-            when Whatever { 'text' }
+            when Whatever { 'chat' }
             when openai-is-chat-completion-model($_) { 'chat' };
+            when openai-is-text-completion-model($_) { 'text' };
             when $_.starts-with('text-') { 'text' };
-            default { 'text' }
+            default { 'chat' }
         }
     }
     die "The argument \$type is expected to be one of 'chat', 'text', or Whatever."
