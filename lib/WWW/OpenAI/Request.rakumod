@@ -14,27 +14,40 @@ proto sub tiny-post(Str :$url!, |) is export {*}
 multi sub tiny-post(Str :$url!,
                     Str :$body!,
                     Str :api-key(:$auth-key)!,
+                    Str :$output-file = '',
+                    Bool :$decode = True,
                     UInt :$timeout = 10) {
+
     my $resp = HTTP::Tiny.post: $url,
             headers => { authorization => "Bearer $auth-key",
                          Content-Type => "application/json" },
             content => $body;
 
-    return $resp<content>.decode;
+    if $output-file {
+        spurt($output-file, $resp<content>);
+    }
+    return $decode ?? $resp<content>.decode !! $resp<content>;
 }
 
 multi sub tiny-post(Str :$url!,
                     :$body! where *~~ Map,
                     Str :api-key(:$auth-key)!,
                     Bool :$json = False,
+                    Str :$output-file = '',
+                    Bool :$decode = True,
                     UInt :$timeout = 10) {
     if $json {
-        return tiny-post(:$url, body => to-json($body), :$auth-key, :$timeout);
+        return tiny-post(:$url, body => to-json($body), :$auth-key, :$output-file, :$timeout);
     }
+
     my $resp = HTTP::Tiny.post: $url,
             headers => { authorization => "Bearer $auth-key" },
             content => $body;
-    return $resp<content>.decode;
+
+    if $output-file {
+        spurt($output-file, $resp<content>);
+    }
+    return $decode ?? $resp<content>.decode !! $resp<content>;
 }
 
 
@@ -48,12 +61,20 @@ curl $URL \
   -d '$BODY'
 END
 
-multi sub curl-post(Str :$url!, Str :$body!, Str :api-key(:$auth-key)!, UInt :$timeout = 10) {
+multi sub curl-post(Str :$url!,
+                    Str :$body!,
+                    Str :api-key(:$auth-key)!,
+                    Str :$output-file = '',
+                    UInt :$timeout = 10) {
 
     my $textQuery = $curlQuery
             .subst('$URL', $url)
             .subst('$OPENAI_API_KEY', $auth-key)
             .subst('$BODY', $body);
+
+    if $output-file {
+        $textQuery = $textQuery.trim-trailing ~ " \\\n  --output '$output-file'";
+    }
 
     my $proc = shell $textQuery, :out, :err;
 
@@ -71,6 +92,7 @@ END
 multi sub curl-post(Str :$url!,
                     :$body! where *~~ Map,
                     Str :api-key(:$auth-key)!,
+                    Str :$output-file = '',
                     UInt :$timeout = 10) {
 
     my $textQuery = $curlFormQuery
@@ -81,6 +103,10 @@ multi sub curl-post(Str :$url!,
     for $body.kv -> $k, $v {
         my $sep = $k ∈ <file image mask> ?? '@' !! '';
         $textQuery ~= " \\\n  --form $k=$sep$v";
+    }
+
+    if $output-file {
+        $textQuery = $textQuery.trim-trailing ~ " \\\n  --output '$output-file'";
     }
 
     my $proc = shell $textQuery, :out, :err;
@@ -101,6 +127,7 @@ our proto openai-request(Str :$url!,
                          :api-key(:$auth-key) is copy = Whatever,
                          UInt :$timeout= 10,
                          :$format is copy = Whatever,
+                         Str :$output-file = '',
                          Str :$method = 'tiny',
                          ) is export {*}
 
@@ -110,6 +137,7 @@ multi sub openai-request(Str :$url!,
                          :api-key(:$auth-key) is copy = Whatever,
                          UInt :$timeout= 10,
                          :$format is copy = Whatever,
+                         Str :$output-file = '',
                          Str :$method = 'tiny'
                          ) {
 
@@ -147,10 +175,10 @@ multi sub openai-request(Str :$url!,
     #------------------------------------------------------
     my $res = do given $method.lc {
         when 'curl' {
-            curl-post(:$url, :$body, :$auth-key, :$timeout);
+            curl-post(:$url, :$body, :$auth-key, :$output-file, :$timeout);
         }
         when 'tiny' {
-            tiny-post(:$url, :$body, :$auth-key, :$timeout);
+            tiny-post(:$url, :$body, :$auth-key, :$output-file, decode => $format ne 'asis', :$timeout);
         }
         default {
             die 'Unknown method.'
