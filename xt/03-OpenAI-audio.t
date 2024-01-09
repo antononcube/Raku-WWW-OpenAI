@@ -28,4 +28,14 @@ ok openai-audio(
         format => "json",
         :$method);
 
+## 3
+my $fileName3 = $*TMPDIR ~ '/HowMuchIsTheFisth.mp3';
+
+ok openai-audio(
+        $fileName3,
+        prompt => 'How much is the fish?',
+        type => 'speech',
+        format => "mp3",
+        :$method);
+
 done-testing;
