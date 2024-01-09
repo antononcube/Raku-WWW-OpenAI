@@ -11,13 +11,15 @@ use WWW::OpenAI::Request;
 #| OpenAI image generation access.
 our proto OpenAIAudio($file,
                       :$type = 'transcriptions',
+                      Str :$prompt = '',
                       :$temperature is copy = Whatever,
                       :$language is copy = Whatever,
+                      :$voice is copy = Whatever,
+                      Numeric :$speed = 1.0,
                       :$model is copy = Whatever,
-                      Str :$prompt = '',
                       :api-key(:$auth-key) is copy = Whatever,
                       UInt :$timeout= 10,
-                      :$format is copy = Whatever,
+                      :response-format(:$format) is copy = Whatever,
                       Str :$method = 'tiny'
                       ) is export {*}
 
@@ -28,8 +30,8 @@ multi sub OpenAIAudio(@fileNames, *%args) {
 
 #| OpenAI image generation access.
 multi sub OpenAIAudio($file,
-                      Str :$prompt = '',
                       :$type is copy = 'transcriptions',
+                      Str :$prompt = '',
                       :$temperature is copy = Whatever,
                       :$language is copy = Whatever,
                       :$voice is copy = Whatever,
