@@ -46,7 +46,9 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "text-search-curie-query-001", "text-search-davinci-doc-001",
                            "text-search-davinci-query-001", "text-similarity-ada-001",
                            "text-similarity-babbage-001", "text-similarity-curie-001",
-                           "text-similarity-davinci-001", "whisper-1"]);
+                           "text-similarity-davinci-001",
+                           "whisper-1",
+                           "tts-1", "tts-1-hd"]);
 
 
 our sub openai-known-models() is export {
@@ -64,6 +66,7 @@ my %endPointToModels =
         '/v1/chat/completions' => [|openai-known-models.grep(* ~~ / ^ 'gpt-4' / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-1106>],
         '/v1/completions' => <gpt-3.5-turbo gpt-3.5-turbo-instruct text-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
         '/v1/edits' => <text-davinci-edit-001 code-davinci-edit-001>,
+        '/v1/audio/speech' => <tts-1 tts-1-hd>,
         '/v1/audio/transcriptions' => <whisper-1>,
         '/v1/audio/translations' => <whisper-1>,
         '/v1/images/generations' => <dall-e-2 dall-e-3>,
