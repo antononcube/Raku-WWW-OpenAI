@@ -315,6 +315,13 @@ multi sub openai-playground($text is copy,
             # my $url = 'https://api.openai.com/v1/moderations';
             return openai-moderation($text, :$auth-key, :$timeout, :$format, :$method);
         }
+        when $_ ∈ <speak speech audio/speech> {
+            # my $url = 'https://api.openai.com/v1/audio';
+            # Here $text is a file name
+            return openai-audio($text,
+                    |%args.grep({ $_.key ∈ <prompt model voice speed> }).Hash,
+                    type => 'speech', :$auth-key, :$timeout, :$format, :$method);
+        }
         when $_ ∈ <transcriptions transcription transcribe audio/transcriptions> {
             # my $url = 'https://api.openai.com/v1/audio';
             # Here $text is a file name
