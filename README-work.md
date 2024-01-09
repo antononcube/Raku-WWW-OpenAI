@@ -296,6 +296,23 @@ say openai-audio(
         method => 'tiny');
 ```
 
+### Audio speech generation
+
+Here is an example of text-to-speech generation - `type`, `prompt`, have to be specified:
+
+```perl6
+my $fileName = $*CWD ~ '/resources/EveryDay.mp3';
+my $res = openai-audio(
+        $fileName, 
+        prompt => 'Every day is a summer day!',
+        type => 'speech',
+        format => 'mp3',
+        voice => 'alloy',
+        speed => 1,
+        method => 'tiny');
+```
+
+
 ### Embeddings
 
 [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
@@ -560,6 +577,7 @@ Related is a (current) deficiency of the package "WWW::OpenAI" -- the known mode
   - [X] DONE Image edition
   - [X] DONE Embeddings
   - [X] DONE Finding of textual answers
+  - [X] DONE Audio speech generation
 
 - [X] DONE HTTP(S) retrieval methods
 
