@@ -42,6 +42,7 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "text-davinci-001", "text-davinci:001", "text-davinci-002",
                            "text-davinci-003", "text-davinci-edit-001",
                            "text-davinci-insert-001", "text-davinci-insert-002",
+                           "text-embedding-3-large", "text-embedding-3-small", "text-embedding-002",
                            "text-embedding-ada-002", "text-search-ada-doc-001",
                            "text-search-ada-query-001", "text-search-babbage-doc-001",
                            "text-search-babbage-query-001", "text-search-curie-doc-001",
@@ -65,6 +66,7 @@ our sub openai-known-models() is export {
 # https://platform.openai.com/docs/models/model-endpoint-compatibility
 
 my %endPointToModels =
+        '/v1/assistants' => [|openai-known-models.grep(* ~~ / ^ 'gpt-4' / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-1106>],
         '/v1/chat/completions' => [|openai-known-models.grep(* ~~ / ^ 'gpt-4' / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-1106>],
         '/v1/completions' => <gpt-3.5-turbo gpt-3.5-turbo-instruct text-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
         '/v1/edits' => <text-davinci-edit-001 code-davinci-edit-001>,
@@ -73,7 +75,8 @@ my %endPointToModels =
         '/v1/audio/translations' => <whisper-1>,
         '/v1/images/generations' => <dall-e-2 dall-e-3>,
         '/v1/fine-tunes' => <davinci curie babbage ada>,
-        '/v1/embeddings' => <text-embedding-ada-002 text-search-ada-doc-001>,
+        '/v1/fine-tunes/jobs' => <gpt-3.5-turbo babbage-002 davinci-002>,
+        '/v1/embeddings' =>  [|openai-known-models.grep(* ~~ / ^ 'text-embedding' / ).Hash.keys, 'text-search-ada-doc-001'],
         '/v1/moderations' => <text-moderation-stable text-moderation-latest>;
 
 #| End-point to models retrieval.
