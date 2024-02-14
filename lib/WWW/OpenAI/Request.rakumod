@@ -191,6 +191,7 @@ multi sub openai-request(Str :$url!,
     without $res { return Nil; }
 
     if $format.lc ∈ <asis as-is as_is> { return $res; }
+    if $url.contains(/transcriptions | translations/) && $format.lc ∈ <text srt vtt> { return $res; }
 
     if $method ∈ <curl tiny> && $res ~~ Str {
         try {
