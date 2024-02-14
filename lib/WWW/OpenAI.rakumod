@@ -20,7 +20,7 @@ use WWW::OpenAI::TextCompletions;
 #===========================================================
 #| OpenAI audio transcriptions and translations access.
 #| C<$file> -- file(s) to audio process;
-#| C<:$type> -- type of processing, one of <transcriptions translations>
+#| C<:$type> -- type of processing, one of <transcriptions translations speech>
 #| C<:$temperature> -- number between 0 and 2;
 #| C<:$language> -- language to process to;
 #| C<:$model> -- model;
