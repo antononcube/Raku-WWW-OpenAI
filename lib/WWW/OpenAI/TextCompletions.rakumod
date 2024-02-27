@@ -50,7 +50,8 @@ our proto OpenAITextCompletion($prompt is copy,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
-                               Str :$method = 'tiny') is export {*}
+                               Str :$method = 'tiny',
+                               Str :$base-url = 'https://api.openai.com/v1') is export {*}
 
 #| OpenAI completion access.
 multi sub OpenAITextCompletion(@prompts, *%args) {
@@ -74,7 +75,8 @@ multi sub OpenAITextCompletion($prompt is copy,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
-                               Str :$method = 'tiny') {
+                               Str :$method = 'tiny',
+                               Str :$base-url = 'https://api.openai.com/v1') {
 
     #------------------------------------------------------
     # Process $model
@@ -180,7 +182,7 @@ multi sub OpenAITextCompletion($prompt is copy,
     if !$suffix.isa(Whatever) { %body<suffix> = $suffix; }
     if !$best-of.isa(Whatever) { %body<best_of> = $best-of; }
 
-    my $url = 'https://api.openai.com/v1/completions';
+    my $url = $base-url ~ '/completions';
 
     #------------------------------------------------------
     # Delegate

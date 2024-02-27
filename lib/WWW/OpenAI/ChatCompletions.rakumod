@@ -39,7 +39,8 @@ our proto OpenAIChatCompletion($prompt is copy,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
-                               Str :$method = 'tiny') is export {*}
+                               Str :$method = 'tiny',
+                               Str :$base-url = 'https://api.openai.com/v1') is export {*}
 
 #| OpenAI completion access.
 multi sub OpenAIChatCompletion(Str $prompt, *%args) {
@@ -62,7 +63,8 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
-                               Str :$method = 'tiny') {
+                               Str :$method = 'tiny',
+                               Str :$base-url = 'https://api.openai.com/v1') {
 
     #------------------------------------------------------
     # Process $role
@@ -179,7 +181,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                presence_penalty => $presence-penalty,
                frequency_penalty => $frequency-penalty;
 
-    my $url = 'https://api.openai.com/v1/chat/completions';
+    my $url = $base-url ~ '/chat/completions';
 
     #------------------------------------------------------
     # Delegate

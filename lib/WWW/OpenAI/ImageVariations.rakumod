@@ -26,7 +26,8 @@ our proto OpenAIVariateImage($file,
                              :api-key(:$auth-key) is copy = Whatever,
                              UInt :$timeout= 10,
                              :$format is copy = Whatever,
-                             Str :$method = 'tiny'
+                             Str :$method = 'tiny',
+                             Str :$base-url = 'https://api.openai.com/v1'
                              ) is export {*}
 
 #| OpenAI image generation access.
@@ -42,7 +43,8 @@ multi sub OpenAIVariateImage($file,
                              :api-key(:$auth-key) is copy = Whatever,
                              UInt :$timeout= 10,
                              :$format is copy = Whatever,
-                             Str :$method = 'tiny') {
+                             Str :$method = 'tiny',
+                             Str :$base-url = 'https://api.openai.com/v1') {
 
     #------------------------------------------------------
     # Process $file
@@ -78,7 +80,7 @@ multi sub OpenAIVariateImage($file,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my $url = 'https://api.openai.com/v1/images/variations';
+    my $url = $base-url ~ '/images/variations';
 
     #------------------------------------------------------
     # Delegate

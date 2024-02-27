@@ -20,7 +20,8 @@ our proto OpenAIAudio($file,
                       :api-key(:$auth-key) is copy = Whatever,
                       UInt :$timeout= 10,
                       :response-format(:$format) is copy = Whatever,
-                      Str :$method = 'tiny'
+                      Str :$method = 'tiny',
+                      Str :$base-url = 'https://api.openai.com/v1'
                       ) is export {*}
 
 #| OpenAI image generation access.
@@ -40,7 +41,8 @@ multi sub OpenAIAudio($file,
                       :api-key(:$auth-key) is copy = Whatever,
                       UInt :$timeout= 10,
                       :response-format(:$format) is copy = Whatever,
-                      Str :$method = 'tiny') {
+                      Str :$method = 'tiny',
+                      Str :$base-url = 'https://api.openai.com/v1') {
 
     #------------------------------------------------------
     # Process type
@@ -129,7 +131,7 @@ multi sub OpenAIAudio($file,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my $url = 'https://api.openai.com/v1/audio/' ~ $type;
+    my $url = $base-url ~ '/audio/' ~ $type;
 
     #------------------------------------------------------
     # Delegate

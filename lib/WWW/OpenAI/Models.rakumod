@@ -125,7 +125,10 @@ multi sub openai-model-to-end-points(Str $model) {
 #============================================================
 
 #| OpenAI models.
-our sub OpenAIModels(:api-key(:$auth-key) is copy = Whatever, UInt :$timeout = 10) is export {
+our sub OpenAIModels(:api-key(:$auth-key) is copy = Whatever,
+                     UInt :$timeout = 10,
+                     Str :$method = 'tiny',
+                     Str :$base-url = 'https://api.openai.com/v1') is export {
     #------------------------------------------------------
     # Process $auth-key
     #------------------------------------------------------
@@ -145,7 +148,7 @@ our sub OpenAIModels(:api-key(:$auth-key) is copy = Whatever, UInt :$timeout = 1
     #------------------------------------------------------
     # Retrieve
     #------------------------------------------------------
-    my Str $url = 'https://api.openai.com/v1/models';
+    my Str $url = $base-url ~ '/models';
 
     my $resp = HTTP::Tiny.get: $url,
             headers => { authorization => "Bearer $auth-key" };

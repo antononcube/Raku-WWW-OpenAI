@@ -233,7 +233,8 @@ multi sub openai-text-completion(**@args, *%args) {
 #| C<:api-key(:$auth-key)> -- authorization key (API key);
 #| C<:timeout> -- timeout
 #| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);
-#| C<:$method> -- method to WWW API call with, one of <curl tiny>,
+#| C<:$method> -- method to WWW API call with, one of <curl tiny>;
+#| C<:$base-url> -- base URL of the WWW API;
 #| C<*%args> -- additional arguments, see C<openai-chat-completion> and C<openai-text-completion>.
 our proto openai-playground($text is copy = '',
                             Str :$path = 'completions',
@@ -241,6 +242,7 @@ our proto openai-playground($text is copy = '',
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
                             Str :$method = 'tiny',
+                            Str :$base-url = 'https://api.openai.com/v1',
                             *%args
                             ) is export {*}
 
@@ -261,6 +263,7 @@ multi sub openai-playground($text is copy,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
                             Str :$method = 'tiny',
+                            Str :$base-url = 'https://api.openai.com/v1',
                             *%args
                             ) {
 
@@ -270,7 +273,7 @@ multi sub openai-playground($text is copy,
     given $path.lc {
         when $_ eq 'models' {
             # my $url = 'https://api.openai.com/v1/models';
-            return openai-models(:$auth-key, :$timeout);
+            return openai-models(:$auth-key, :$timeout, :$method, :$base-url);
         }
         when so (%args<images> // '') {
             # Very similar to the one below, but since OpenAI's image-vision feature
@@ -281,66 +284,66 @@ multi sub openai-playground($text is copy,
                     type => Whatever,
                     model => Whatever,
                     |%args.grep({ $_.key ∈ <n role max-tokens temperature images> }).Hash,
-                    :$auth-key, :$timeout, :$format, :$method);
+                    :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <chat chat/completions> {
             # my $url = 'https://api.openai.com/v1/chat/completions';
             return openai-completion($text, type => 'chat',
                     |%args.grep({ $_.key ∈ <n model role max-tokens temperature images> }).Hash,
-                    :$auth-key, :$timeout, :$format, :$method);
+                    :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <completion completions text/completions> {
             # my $url = 'https://api.openai.com/v1/completions';
             my $expectedKeys = <model prompt suffix max-tokens temperature top-p n stream echo presence-penalty frequency-penalty best-of stop>;
             return openai-text-completion($text,
                     |%args.grep({ $_.key ∈ $expectedKeys }).Hash,
-                    :$auth-key, :$timeout, :$format, :$method);
+                    :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
             # my $url = 'https://api.openai.com/v1/images/generations';
             return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
-                    :$timeout, :$format, :$method);
+                    :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <edit-image image-edit image-edits images-edits images/edits> {
             # my $url = 'https://api.openai.com/v1/images/edits';
             return openai-edit-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
-                    :$timeout, :$format, :$method);
+                    :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <variate-image image-variation image-variations images-variations images/variations> {
             # my $url = 'https://api.openai.com/v1/images/variations';
             return openai-variate-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
-                    :$timeout, :$format, :$method);
+                    :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <moderations moderation censorship> {
             # my $url = 'https://api.openai.com/v1/moderations';
-            return openai-moderation($text, :$auth-key, :$timeout, :$format, :$method);
+            return openai-moderation($text, :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <speak speech audio/speech> {
             # my $url = 'https://api.openai.com/v1/audio';
             # Here $text is a file name
             return openai-audio($text,
                     |%args.grep({ $_.key ∈ <prompt model voice speed> }).Hash,
-                    type => 'speech', :$auth-key, :$timeout, :$format, :$method);
+                    type => 'speech', :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <transcriptions transcription transcribe audio/transcriptions> {
             # my $url = 'https://api.openai.com/v1/audio';
             # Here $text is a file name
             return openai-audio($text,
                     |%args.grep({ $_.key ∈ <prompt model temperature language> }).Hash,
-                    type => 'transcriptions', :$auth-key, :$timeout, :$format, :$method);
+                    type => 'transcriptions', :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <translations translation translate audio/translations> {
             # my $url = 'https://api.openai.com/v1/audio';
             # Here $text is a file name
             return openai-audio($text,
                     |%args.grep({ $_.key ∈ <prompt model temperature language> }).Hash,
-                    type => 'translations', :$auth-key, :$timeout, :$format, :$method);
+                    type => 'translations', :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <embedding embeddings> {
             # my $url = 'https://api.openai.com/v1/embeddings';
             return openai-embeddings($text,
                     |%args.grep({ $_.key ∈ <model encoding-format> }).Hash,
-                    :$auth-key, :$timeout, :$format, :$method);
+                    :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         default {
             die 'Do not know how to process the given path.';

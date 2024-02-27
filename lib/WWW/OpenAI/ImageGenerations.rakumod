@@ -30,7 +30,8 @@ our proto OpenAICreateImage($prompt,
                             :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
-                            Str :$method = 'tiny'
+                            Str :$method = 'tiny',
+                            Str :$base-url = 'https://api.openai.com/v1'
                             ) is export {*}
 
 #| OpenAI image generation access.
@@ -49,7 +50,8 @@ multi sub OpenAICreateImage($prompt,
                             :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
-                            Str :$method = 'tiny') {
+                            Str :$method = 'tiny',
+                            Str :$base-url = 'https://api.openai.com/v1') {
 
     #------------------------------------------------------
     # Process $n
@@ -146,7 +148,7 @@ multi sub OpenAICreateImage($prompt,
 
     my %body = :$model, :$prompt, :$size, :$quality, :$style, response_format => $response-format, :$n;
 
-    my $url = 'https://api.openai.com/v1/images/generations';
+    my $url = $base-url ~ '/images/generations';
 
     #------------------------------------------------------
     # Delegate

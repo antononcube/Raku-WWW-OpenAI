@@ -17,7 +17,8 @@ our proto OpenAIEmbeddings($prompt,
                            :api-key(:$auth-key) is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
-                           Str :$method = 'tiny'
+                           Str :$method = 'tiny',
+                           Str :$base-url = 'https://api.openai.com/v1'
                            ) is export {*}
 
 
@@ -28,7 +29,8 @@ multi sub OpenAIEmbeddings($prompt,
                            :api-key(:$auth-key) is copy = Whatever,
                            UInt :$timeout= 10,
                            :$format is copy = Whatever,
-                           Str :$method = 'tiny') {
+                           Str :$method = 'tiny',
+                           Str :$base-url = 'https://api.openai.com/v1') {
 
     #------------------------------------------------------
     # Process $model
@@ -48,7 +50,7 @@ multi sub OpenAIEmbeddings($prompt,
     # OpenAI URL
     #------------------------------------------------------
 
-    my $url = 'https://api.openai.com/v1/embeddings';
+    my $url = $base-url ~ '/embeddings';
 
     #------------------------------------------------------
     # Delegate
