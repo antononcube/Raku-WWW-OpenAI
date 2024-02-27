@@ -18,6 +18,10 @@ use WWW::OpenAI::TextCompletions;
 
 
 #===========================================================
+#| Gives the base URL of OpenAI's endpoints.
+our sub openai-base-url(-->Str) is export { return 'https://api.openai.com/v1';}
+
+#===========================================================
 #| OpenAI audio transcriptions and translations access.
 #| C<$file> -- file(s) to audio process;
 #| C<:$type> -- type of processing, one of <transcriptions translations speech>
