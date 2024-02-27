@@ -4,6 +4,7 @@ use lib '.';
 use lib './lib';
 
 use WWW::OpenAI;
+use Image::Markup::Utilities;
 use Test;
 
 my $method = 'tiny';
@@ -13,7 +14,7 @@ plan *;
 
 ## 1
 my $fname1 = $*CWD ~ '/resources/ThreeHunters.jpg';
-my $img1 = WWW::OpenAI::ChatCompletions::encode-image($fname1);
+my $img1 = Image::Markup::Utilities::image-encode($fname1);
 isa-ok $img1, Str;
 
 ## 2
