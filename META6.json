@@ -15,7 +15,9 @@
     "IO::Socket::SSL:ver<0.0.2+>"
   ],
   "build-depends": [],
-  "test-depends": [],
+  "test-depends": [
+    "Image::Markup::Utilities:ver<0.1.1+>"
+  ],
   "provides": {
     "WWW::OpenAI": "lib/WWW/OpenAI.rakumod",
     "WWW::OpenAI::Audio": "lib/WWW/OpenAI/Audio.rakumod",
