@@ -55,7 +55,7 @@ openai-playground('Where is Roger Rabbit?', max-tokens => 64);
 ```
 # [{finish_reason => stop, index => 0, logprobs => (Any), text => 
 # 
-# Roger Rabbit is a fictional character from the 1988 film "Who Framed Roger Rabbit". He is not a real person and exists only in the movie and related media.}]
+# Roger Rabbit is a fictional character from the movie "Who Framed Roger Rabbit" and he does not exist in real life. He can only be found in the movie and its related merchandise.}]
 ```
 
 Another one using Bulgarian:
@@ -66,7 +66,7 @@ openai-playground('Колко групи могат да се намерят в 
 ```
 # [{finish_reason => length, index => 0, logprobs => (Any), text => 
 # 
-# Това зависи от това колко точки има в облака и как са разположени. Ако точките са много близо една до друга, може да има само една гру}]
+# Не може да се даде точен отговор на този въпрос без да се предостави допълнителна информация за облака от точки. Броят на групите може да зав}]
 ```
 
 **Remark:** The function `openai-completion` can be used instead in the examples above. 
@@ -82,7 +82,7 @@ The current OpenAI models can be found with the function `openai-models`:
 openai-models
 ```
 ```
-# (ada ada-code-search-code ada-code-search-text ada-search-document ada-search-query ada-similarity babbage babbage-002 babbage-code-search-code babbage-code-search-text babbage-search-document babbage-search-query babbage-similarity curie curie-search-document curie-search-query curie-similarity dall-e-2 dall-e-3 davinci davinci-002 davinci-search-document davinci-search-query davinci-similarity gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-1106 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 gpt-3.5-turbo-instruct gpt-3.5-turbo-instruct-0914 gpt-4 gpt-4-0314 gpt-4-0613 gpt-4-1106-preview gpt-4-vision-preview text-embedding-ada-002 tts-1 tts-1-1106 tts-1-hd tts-1-hd-1106 whisper-1)
+# (babbage-002 dall-e-2 dall-e-3 davinci-002 gpt-3.5-turbo gpt-3.5-turbo-0125 gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-1106 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 gpt-3.5-turbo-instruct gpt-3.5-turbo-instruct-0914 gpt-4 gpt-4-0125-preview gpt-4-0613 gpt-4-1106-preview gpt-4-turbo-preview gpt-4-vision-preview text-embedding-3-large text-embedding-3-small text-embedding-ada-002 tts-1 tts-1-1106 tts-1-hd tts-1-hd-1106 whisper-1)
 ```
 
 ### Code generation
@@ -98,10 +98,10 @@ openai-completion(
         format => 'values');
 ```
 ```
-# my @list = (1, 2, 3, 4, 5);
+# my @list = (1, 2, 3, 4, 5, 6); # example list
 # 
-# for @list -> $item {
-#   say $item;
+# for @list -> $item { # loop over the list using the for loop
+#     say $item; # print each item in the list
 # }
 # 
 # # Output:
@@ -110,6 +110,7 @@ openai-completion(
 # # 3
 # # 4
 # # 5
+# # 6
 ```
 
 Here is a chat completion:
@@ -122,17 +123,24 @@ openai-completion(
         format => 'values');
 ```
 ```
-# Here's an example of Raku code that creates a loop over a list:
+# Here is an example of Raku code that loops over a list and prints each element:
 # 
 # ```raku
-# my @list = 1..5;
+# my @list = 1, 2, 3, 4, 5;
 # 
-# for @list -> $item {
-#     say "Item: $item";
+# for @list -> $element {
+#     say $element;
 # }
 # ```
 # 
-# In this code, we first create a list `@list` containing the values from 1 to 5. Then, we use a `for` loop to iterate over each element in the list. The `->` symbol is used to bind each element to the variable `$item`. Finally, we print the value of each item using the `say` function
+# This code will output:
+# ```
+# 1
+# 2
+# 3
+# 4
+# 5
+# ```
 ```
 
 **Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
@@ -287,9 +295,11 @@ my @images = [$url1, $url2, $fname3];
 say openai-completion("Give concise descriptions of the images.", :@images, max-tokens => 900, format => 'values');
 ```
 ```
-# 1. An illustration of a raccoon on a tree branch, surrounded by a multitude of colorful butterflies and lush greenery.
-# 2. Two raccoons in a vibrant autumnal landscape, with butterflies flying around, near a tree with a sign that includes the text "SEOEHONLNCUESLA 2023.11."
-# 3. Three raccoons on a tree branch in a forest setting with butterflies and autumn-colored foliage in the background.
+# 1. The first image is a vibrant illustration of a raccoon perched on a tree branch surrounded by a flurry of colorful butterflies.
+# 
+# 2. The second image depicts two raccoons running along a path next to a large tree with a sign, surrounded by butterflies, in a colorful autumn landscape.
+# 
+# 3. The third image shows a trio of raccoons sitting in a tree hollow, with a warm, luminous backdrop and butterflies fluttering around, set in an autumnal forest scene.
 ```
 
 The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
@@ -317,17 +327,17 @@ method => 'tiny');
 for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 ```
 ```
-# violence => 0.9961207509040833
-# harassment => 0.6753228306770325
-# harassment/threatening => 0.6230513453483582
-# hate => 0.12013232707977295
-# hate/threatening => 0.019687965512275696
-# sexual => 3.780321264912345e-07
-# sexual/minors => 8.417104879754334e-08
-# violence/graphic => 7.003104940395133e-08
-# self-harm => 3.3011907096813786e-10
-# self-harm/intent => 4.843588724545711e-11
-# self-harm/instructions => 3.1562556387920715e-13
+# violence => 0.998648464679718
+# harassment/threatening => 0.5217957496643066
+# harassment => 0.49981600046157837
+# hate => 0.1619441658258438
+# hate/threatening => 0.04833448305726051
+# violence/graphic => 0.000130274318507872528
+# sexual => 0.0000252172667387640096
+# self-harm => 4.838872882828582e-06
+# self-harm/intent => 2.9584793992398772e-06
+# sexual/minors => 1.4673852888336114e-07
+# self-harm/instructions => 1.7596822887711028e-09
 ```
 
 ### Audio transcription and translation
@@ -380,7 +390,7 @@ my $res = openai-audio(
         method => 'tiny');
 ```
 ```
-# Buf[uint8]:0x<FF F3 E4 C4 00 61 CC 39 B0 05 5A C0 00 46 4E 5C 93 86 EC D7 A3 03 23 1C 08 65 11 1A A6 06 C1 71 AA 38 69 CE 99 B3 66 5C 98 08 BB 3A 02 06 31 83 00 C4 19 89 86 10 61 80 23 E2 C2 17 F0 C0 06 31 83 8C 91 23 24 30 EA F3 7B CD AB 35 A4 D2 93 4A 4D 29 34 A4 D6 73 72 8D 06 31 00 B3 05 C8 2E 41 69 0B 20 06 ...>
+# Buf[uint8]:0x<FF F3 E4 C4 00 5F 94 39 D8 17 5A C0 00 06 53 52 1C 77 E6 BC B9 73 8C C2 A3 68 E0 DB 30 35 48 0C D1 43 20 20 C8 89 30 E0 C0 40 CB 36 5A 72 CB 98 10 26 0C 29 85 02 62 03 18 60 C6 18 21 84 08 61 02 18 20 46 08 00 08 01 6B 0B 46 5B 32 CB 96 4C B2 65 A7 2E 59 6C CB 36 66 11 88 05 98 2E 42 0E 24 42 62 28 ...>
 ```
 
 
@@ -420,16 +430,16 @@ records-summary($embs.kv.Hash.&transpose);
 ```
 # $embs.elems : 4
 # $embs>>.elems : 1536 1536 1536 1536
-# +------------------------------+--------------------------------+--------------------------------+------------------------------+
-# | 3                            | 2                              | 1                              | 0                            |
-# +------------------------------+--------------------------------+--------------------------------+------------------------------+
-# | Min    => -0.60487235        | Min    => -0.6316688           | Min    => -0.6675609           | Min    => -0.5905979         |
-# | 1st-Qu => -0.0129462655      | 1st-Qu => -0.012534879         | 1st-Qu => -0.0122597895        | 1st-Qu => -0.013208558       |
-# | Mean   => -0.000754160801387 | Mean   => -0.00072970771235612 | Mean   => -0.00076258629791471 | Mean   => -0.000762066322233 |
-# | Median => -0.00072666709     | Median => -0.00061200845       | Median => -0.000313577955      | Median => -0.0010125666      |
-# | 3rd-Qu => 0.012172342        | 3rd-Qu => 0.0118897265         | 3rd-Qu => 0.0111436975         | 3rd-Qu => 0.0123315665       |
-# | Max    => 0.22197673         | Max    => 0.21271802           | Max    => 0.22817883           | Max    => 0.2120242          |
-# +------------------------------+--------------------------------+--------------------------------+------------------------------+
+# +--------------------------------+-------------------------------+--------------------------------+-------------------------------+
+# | 3                              | 1                             | 2                              | 0                             |
+# +--------------------------------+-------------------------------+--------------------------------+-------------------------------+
+# | Min    => -0.6047187           | Min    => -0.6678709          | Min    => -0.6308942           | Min    => -0.590719           |
+# | 1st-Qu => -0.012928714         | 1st-Qu => -0.012335346        | 1st-Qu => -0.012563366         | 1st-Qu => -0.01316472075      |
+# | Mean   => -0.00075381957348203 | Mean   => -0.0007606080686471 | Mean   => -0.00072762704473066 | Mean   => -0.0007624376152279 |
+# | Median => -0.00081807276       | Median => -0.000239203835     | Median => -0.00061062546       | Median => -0.00098278925      |
+# | 3rd-Qu => 0.01215142175        | 3rd-Qu => 0.0114232735        | 3rd-Qu => 0.011824543          | 3rd-Qu => 0.012312613         |
+# | Max    => 0.22180624           | Max    => 0.2273228           | Max    => 0.21278104           | Max    => 0.21206765          |
+# +--------------------------------+-------------------------------+--------------------------------+-------------------------------+
 ```
 
 Here we find the corresponding dot products and (cross-)tabulate them:
@@ -445,10 +455,10 @@ say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs
 # +---+----------+----------+----------+----------+
 # |   |    0     |    1     |    2     |    3     |
 # +---+----------+----------+----------+----------+
-# | 0 | 1.000000 | 0.724735 | 0.756752 | 0.665397 |
-# | 1 | 0.724735 | 1.000000 | 0.811177 | 0.715478 |
-# | 2 | 0.756752 | 0.811177 | 1.000000 | 0.698925 |
-# | 3 | 0.665397 | 0.715478 | 0.698925 | 1.000000 |
+# | 0 | 1.000000 | 0.724379 | 0.756525 | 0.665386 |
+# | 1 | 0.724379 | 1.000000 | 0.808996 | 0.716001 |
+# | 2 | 0.756525 | 0.808996 | 1.000000 | 0.698533 |
+# | 3 | 0.665386 | 0.716001 | 0.698533 | 1.000000 |
 # +---+----------+----------+----------+----------+
 ````
 
@@ -487,7 +497,7 @@ Here is an example of chat completion with emojification:
 openai-chat-completion([ system => $preEmojify, user => 'Python sucks, Raku rocks, and Perl is annoying'], max-tokens => 200, format => 'values')
 ```
 ```
-# 🐍 Python 😠 sucks, 💎 Raku 🤘 rocks, and Perl 😡 is annoying 😒
+# 🐍 Python sucks, 🦝 Raku rocks, and Perl is 😒 annoying
 ```
 
 For more examples see the document ["Chat-completion-examples"](./docs/Chat-completion-examples_woven.md).
@@ -511,7 +521,7 @@ area, it is the largest lake in South America";
 find-textual-answer($text, "Where is Titicaca?", llm => 'openai')
 ```
 ```
-# Lake Titicaca is located on the border of Bolivia and Peru.
+# Andes
 ```
 
 By default `find-textual-answer` tries to give short answers.
@@ -534,7 +544,7 @@ Here we get a longer answer by changing the value of "request":
 find-textual-answer($text, "Where is Titicaca?", llm => 'chatgpt', request => "answer the question:")
 ```
 ```
-# Titicaca is located in the Andes on the border of Bolivia and Peru.
+# Lake Titicaca is located in the Andes on the border of Bolivia and Peru in South America.
 ```
 
 **Remark:** The function `find-textual-answer` is inspired by the Mathematica function
@@ -589,7 +599,7 @@ openai-playground --help
 ```
 ```
 # Usage:
-#   openai-playground [<words> ...] [--path=<Str>] [-n[=UInt]] [--mt|--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-i|--images=<Str>] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [-f|--format=<Str>] [--method=<Str>] -- Command given as a sequence of words.
+#   openai-playground [<words> ...] [--path=<Str>] [-n[=UInt]] [--mt|--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-i|--images=<Str>] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [-f|--format=<Str>] [--method=<Str>] [--base-url=<Str>] -- Command given as a sequence of words.
 #   
 #     --path=<Str>                Path, one of 'chat/completions', 'images/generations', 'images/edits', 'images/variations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
 #     -n[=UInt]                   Number of completions or generations. [default: 1]
@@ -604,6 +614,7 @@ openai-playground --help
 #     --timeout[=UInt]            Timeout. [default: 10]
 #     -f|--format=<Str>           Format of the result; one of "json", "hash", "values", or "Whatever". [default: 'Whatever']
 #     --method=<Str>              Method for the HTTP POST query; one of "tiny" or "curl". [default: 'tiny']
+#     --base-url=<Str>            URL of the Web API service. [default: 'Whatever']
 ```
 
 **Remark:** When the authorization key argument "auth-key" is specified set to "Whatever"
