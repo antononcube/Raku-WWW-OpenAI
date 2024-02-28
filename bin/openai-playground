@@ -23,12 +23,15 @@ multi sub openai-front(Str $text,                                #= Text to be p
                        UInt :$timeout= 10,                       #= Timeout.
                        Str :f(:$format) is copy = 'Whatever',    #= Format of the result; one of "json", "hash", "values", or "Whatever".
                        Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
+                       Str :$base-url is copy = 'Whatever',      #= URL of the Web API service.
                        ) {
 
     if $text.chars == 0 {
         note 'Nothing.';
         return;
     }
+
+    if $base-url eq 'Whatever' { $base-url = openai-base-url; }
 
     if $auth-key eq 'Whatever' {
         if %*ENV<OPENAI_API_KEY>:exists {
@@ -58,7 +61,8 @@ multi sub openai-front(Str $text,                                #= Text to be p
                     :$auth-key,
                     :$timeout,
                     :$format,
-                    :$method);
+                    :$method,
+                    :$base-url);
 
     if $format.lc ∈ <hash raku> {
         say $res.raku;
@@ -83,6 +87,7 @@ multi sub MAIN
  UInt :$timeout= 10,                       #= Timeout.
  Str :f(:$format) is copy = 'Whatever',    #= Format of the result; one of "json", "hash", "values", or "Whatever".
  Str :$method is copy = 'tiny',            #= Method for the HTTP POST query; one of "tiny" or "curl".
+ Str :$base-url is copy = 'Whatever',      #= URL of the Web API service.
  ) {
-    return openai-front(@words.join(' ').Str, :$model, :$path, :$n, :$max-tokens, :$role, :$temperature, :$images, :$language, :$response-format, :$auth-key, :$timeout, :$format, :$method);
+    return openai-front(@words.join(' ').Str, :$model, :$path, :$n, :$max-tokens, :$role, :$temperature, :$images, :$language, :$response-format, :$auth-key, :$timeout, :$format, :$method, :$base-url);
 }
