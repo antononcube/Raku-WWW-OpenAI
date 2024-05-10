@@ -57,10 +57,11 @@ multi sub openai-completion($prompt,
     if $type.isa(Whatever) {
         $type = do given $model {
             when $_.isa(Whatever) && (so %args<images>) {
-                $model = 'gpt-4-vision-preview';
+                $model = 'gpt-4-turbo';
                 'chat'
             }
             when Whatever { 'chat' }
+            when $_.contains('vision') && (so %args<images>) { 'chat' }
             when openai-is-chat-completion-model($_) { 'chat' };
             when openai-is-text-completion-model($_) { 'text' };
             when $_.starts-with('text-') { 'text' };
@@ -286,7 +287,7 @@ multi sub openai-playground($text is copy,
             # my $url = 'https://api.openai.com/v1/chat/completions';
             return openai-completion($text,
                     type => Whatever,
-                    model => Whatever,
+                    model => %args<model> // Whatever,
                     |%args.grep({ $_.key ∈ <n role max-tokens temperature images> }).Hash,
                     :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }

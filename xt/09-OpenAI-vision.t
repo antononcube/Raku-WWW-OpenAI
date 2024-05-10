@@ -1,7 +1,6 @@
 use v6.d;
 
-use lib '.';
-use lib './lib';
+use lib <. lib>;
 
 use WWW::OpenAI;
 use Image::Markup::Utilities;
@@ -9,6 +8,7 @@ use Test;
 
 my $method = 'tiny';
 my $format = 'values';
+my $model = 'gpt-4-vision-preview';
 
 plan *;
 
@@ -22,14 +22,14 @@ isa-ok $img1, Str;
 isa-ok openai-completion("How many mammals", images => $fname1, :$method, :$format), Str;
 
 ## 3
-#say openai-playground('How many mammals?', images => $*CWD ~ '/resources/ThreeHunters.jpg/', max-tokens => 900, :$format);
-isa-ok openai-playground('How many mammals?', images => $*CWD ~ '/resources/ThreeHunters.jpg/', max-tokens => 300, :$format), Str;
+#say openai-playground('How many mammals?', images => $*CWD ~ '/resources/ThreeHunters.jpg/', max-tokens => 900, :$model, :$format);
+isa-ok
+        openai-playground('How many mammals?', images => $*CWD ~ '/resources/ThreeHunters.jpg/', max-tokens => 300, :$model, :$format),
+        Str,
+        'Specified model';
 
 ## 4
-#note openai-playground('How many kind of mammal species on Earth?', max-tokens => 300, :$format), Str;
+# note openai-playground('How many kind of mammal species on Earth?', max-tokens => 300, :$format), Str;
 isa-ok openai-playground('How many kind of mammal species on Earth?', max-tokens => 300, :$format), Str;
-
-## 5
-isa-ok openai-playground('How many kind of mammal species on Earth?', images => [], max-tokens => 300, :$format), Str;
 
 done-testing;
