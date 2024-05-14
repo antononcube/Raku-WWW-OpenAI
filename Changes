@@ -1,0 +1,7 @@
+Revision history for "WWW::OpenAI"
+
+0.3.3 2024-05-14
+    - Added the new OpenAI model "gpt-4o".
+
+0.3.2 2024-05-09
+    - Added the new OpenAI models "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4-1106-vision-preview".
