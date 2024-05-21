@@ -1,10 +1,10 @@
 use v6.d;
+unit module WWW::OpenAI::Embeddings;
 
 use WWW::OpenAI::Models;
 use WWW::OpenAI::Request;
 use JSON::Fast;
 
-unit module WWW::OpenAI::Embeddings;
 
 #============================================================
 # Embeddings
@@ -44,7 +44,7 @@ multi sub OpenAIEmbeddings($prompt,
     #------------------------------------------------------
     if $encoding-format.isa(Whatever) { $encoding-format = 'float'; }
     die "The argument \$encoding-format is expected to be Whatever or one of the strings 'float' or 'base64'."
-    unless $encoding-format ~~ Str && $encoding-format.lc ∈ <float base64>;
+    unless $encoding-format ~~ Str:D && $encoding-format.lc ∈ <float base64>;
 
     #------------------------------------------------------
     # OpenAI URL
