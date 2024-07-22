@@ -21,8 +21,10 @@
   "provides": {
     "WWW::OpenAI": "lib/WWW/OpenAI.rakumod",
     "WWW::OpenAI::Audio": "lib/WWW/OpenAI/Audio.rakumod",
+    "WWW::OpenAI::Batches": "lib/WWW/OpenAI/Batches.rakumod",
     "WWW::OpenAI::ChatCompletions": "lib/WWW/OpenAI/ChatCompletions.rakumod",
     "WWW::OpenAI::Embeddings": "lib/WWW/OpenAI/Embeddings.rakumod",
+    "WWW::OpenAI::Files": "lib/WWW/OpenAI/Files.rakumod",
     "WWW::OpenAI::ImageEdits": "lib/WWW/OpenAI/ImageEdits.rakumod",
     "WWW::OpenAI::ImageGenerations": "lib/WWW/OpenAI/ImageGenerations.rakumod",
     "WWW::OpenAI::ImageVariations": "lib/WWW/OpenAI/ImageVariations.rakumod",
