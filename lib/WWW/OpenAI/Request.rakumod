@@ -6,6 +6,24 @@ use HTTP::Tiny;
 unit module WWW::OpenAI::Request;
 
 #============================================================
+# DELETE Tiny call
+#============================================================
+proto sub tiny-delete(Str :$url!, |) is export {*}
+
+multi sub tiny-delete(Str :$url!,
+                      Str :api-key(:$auth-key)!,
+                      Bool :$decode = True,
+                      UInt :$timeout = 10) {
+
+    my $resp = HTTP::Tiny.delete: $url,
+            headers => { authorization => "Bearer $auth-key",
+                         Content-Type => "application/json" };
+
+    return $decode ?? $resp<content>.decode !! $resp<content>;
+}
+
+
+#============================================================
 # POST Tiny call
 #============================================================
 
