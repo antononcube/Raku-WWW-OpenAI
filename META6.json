@@ -1,8 +1,8 @@
 {
   "name": "WWW::OpenAI",
   "description": "WWW::OpenAI provides access to the OpenAI playground (https://platform.openai.com).",
-  "version": "0.3.3",
-  "perl": "6.*",
+  "version": "0.3.4",
+  "perl": "6.d",
   "authors": [
     "Anton Antonov"
   ],
