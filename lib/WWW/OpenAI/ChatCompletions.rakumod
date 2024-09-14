@@ -181,6 +181,11 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                presence_penalty => $presence-penalty,
                frequency_penalty => $frequency-penalty;
 
+    if $model.starts-with('o1-') {
+        %body<temperature>:delete;
+        %body<max_tokens>:delete;
+        %body<max_completion_tokens> = $max-tokens;
+    }
     my $url = $base-url ~ '/chat/completions';
 
     #------------------------------------------------------
