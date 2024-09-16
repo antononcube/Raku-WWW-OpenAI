@@ -30,7 +30,7 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "davinci-search-query", "davinci-similarity",
                            "o1-preview", "o1-preview-2024-09-12", "o1-mini", "o1-mini-2024-09-12",
                            "gpt-4-vision-preview", "gpt-4-1106-preview",
-                           "gpt-4o", "gpt-4o-2024-05-13",
+                           "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-2024-08-06", "chatgpt-4o-latest",
                            "gpt-4o-mini", "gpt-4o-mini-2024-07-18",
                            "gpt-4-turbo", "gpt-4-turbo-2024-04-09",
                            "gpt-4-turbo-preview", "gpt-4-1106-vision-preview", "gpt-4-0125-preview",
@@ -72,7 +72,7 @@ our sub openai-known-models() is export {
 
 my %endPointToModels =
         '/v1/assistants' => [|openai-known-models.grep(* ~~ / ^ ['gpt-4' | 'o1-'] / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-1106>],
-        '/v1/chat/completions' => [|openai-known-models.grep(* ~~ / ^ ['gpt-4' | 'o1-'] / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-1106>],
+        '/v1/chat/completions' => [|openai-known-models.grep(* ~~ / ^ ['gpt-4' | 'o1-'] / ).Hash.keys, |<chatgpt-4o-latest gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-1106>],
         '/v1/completions' => <gpt-3.5-turbo gpt-3.5-turbo-instruct text-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
         '/v1/edits' => <text-davinci-edit-001 code-davinci-edit-001>,
         '/v1/audio/speech' => <tts-1 tts-1-hd>,
