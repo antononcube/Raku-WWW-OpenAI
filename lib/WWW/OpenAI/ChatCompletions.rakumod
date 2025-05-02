@@ -181,7 +181,8 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                presence_penalty => $presence-penalty,
                frequency_penalty => $frequency-penalty;
 
-    if $model.starts-with('o1-') {
+    # Initially was: $model.starts-with('o1-')
+    if $model ~~ / ^ 'o' \d [ $ | '-' ] / {
         %body<temperature>:delete;
         %body<max_tokens>:delete;
         %body<max_completion_tokens> = $max-tokens;
