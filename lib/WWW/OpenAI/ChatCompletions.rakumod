@@ -154,6 +154,13 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     my @messages = @prompts.map({
         if $_ ~~ Pair {
             %(role => $_.key, content => $_.value)
+        } elsif $_ ~~ Map:D && ($_<role>:exists) {
+            # Not making checks like  ($_<role>:exists) && ($_<content>:exists)
+            # because tool workflows might attach messages with keys like <type call_id output>.
+            $_
+        } elsif $_ ~~ Map:D {
+            note "Potentially problematic message: no role specified.";
+            $_
         } else {
             %(:$role, content => $_)
         }
