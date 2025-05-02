@@ -105,6 +105,8 @@ multi sub openai-completion($prompt,
 #| C<:$stream> -- whether to stream the result or not;
 #| C<:$presence-penalty> -- presence penalty;
 #| C<:$frequency-penalty> -- frequency penalty;
+#| C<:@images> -- images;
+#| C<:@tools> -- function descriptions for function calling;
 #| C<:api-key($auth-key)> -- authorization key (API key);
 #| C<:$timeout> -- timeout;
 #| C<:$format> -- format to use in answers post processing, one of <values json hash asis>);

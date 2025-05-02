@@ -36,6 +36,7 @@ our proto OpenAIChatCompletion($prompt is copy,
                                Numeric :$presence-penalty = 0,
                                Numeric :$frequency-penalty = 0,
                                :@images is copy = Empty,
+                               :@tools = Empty,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
@@ -60,6 +61,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                                Numeric :$presence-penalty = 0,
                                Numeric :$frequency-penalty = 0,
                                :@images is copy = Empty,
+                               :@tools = Empty,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
@@ -180,6 +182,11 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                max_tokens => $max-tokens,
                presence_penalty => $presence-penalty,
                frequency_penalty => $frequency-penalty;
+
+    # Add tools with caution
+    if @tools {
+        %body = %body , {:@tools};
+    }
 
     # Initially was: $model.starts-with('o1-')
     if $model ~~ / ^ 'o' \d [ $ | '-' ] / {
