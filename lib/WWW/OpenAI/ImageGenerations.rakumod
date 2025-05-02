@@ -76,6 +76,7 @@ multi sub OpenAICreateImage($prompt,
     #------------------------------------------------------
     if $model ~~ Str && $model.lc ∈ <dalle2 dall-e2 dall-e-2> { $model = 'dall-e-2'; }
     if $model ~~ Str && $model.lc ∈ <dalle3 dall-e3 dall-e-3> { $model = 'dall-e-3'; }
+    if $model ~~ Str && $model.lc ∈ <gpt-image-1 gpt-image image> { $model = 'gpt-image-1'; }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-end-point-to-models('/v1/images/generations').join('", "') ~ '"' }."
     unless $model.isa(Whatever) || $model ∈ openai-end-point-to-models('/v1/images/generations');
 
