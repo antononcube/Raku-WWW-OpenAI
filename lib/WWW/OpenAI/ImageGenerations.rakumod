@@ -122,9 +122,9 @@ multi sub OpenAICreateImage($prompt,
     #------------------------------------------------------
     # Process $quality
     #------------------------------------------------------
-    if $quality.isa(Whatever) { $quality = 'standard'; }
-    die "The argument \$quality is expected to be Whatever or one of 'hd' or 'standard'."
-    unless $quality ~~ Str && $quality.lc ∈ <hd standard>;
+    if $quality.isa(Whatever) { $quality = $model.starts-with('dall-e') ?? 'standard' !! 'medium'; }
+    die "The argument \$quality is expected to be Whatever or one of 'hd' or 'standard' for 'dall-e-3' and 'high', 'medium', or 'low' for 'gpt-image-1'."
+    unless $quality ~~ Str && $quality.lc ∈ <hd standard high medium low>;
 
     #------------------------------------------------------
     # Process $format
@@ -147,7 +147,15 @@ multi sub OpenAICreateImage($prompt,
     # Make OpenAI URL
     #------------------------------------------------------
 
-    my %body = :$model, :$prompt, :$size, :$quality, :$style, response_format => $response-format, :$n;
+    my %body = :$model, :$prompt, :$size, :$quality, :$n;
+
+    if $model eq 'dall-e-3' {
+        %body = %body , {:$style}
+    }
+
+    if $model ∈ <dall-e-2 dall-e-3> {
+        %body = %body , {response_format => $response-format}
+    }
 
     my $url = $base-url ~ '/images/generations';
 
