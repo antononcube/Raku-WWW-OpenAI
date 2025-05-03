@@ -609,6 +609,8 @@ Related is a (current) deficiency of the package "WWW::OpenAI" -- the known mode
 
 - [X] DONE Implement vision (over images)
 
+- [X] DONE Implement handling of tools (function calling)
+
 --------
 
 ## References
