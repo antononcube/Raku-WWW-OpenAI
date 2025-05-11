@@ -808,3 +808,12 @@ Related is a (current) deficiency of the package "WWW::OpenAI" -- the known mode
 
 ### Videos
 
+[AAv1] Anton Antonov,
+["Jupyter Chatbook LLM cells demo (Raku)"](https://www.youtube.com/watch?v=cICgnzYmQZg),
+(2023),
+[YouTube/@AAA4prediction](https://www.youtube.com/@AAA4prediction).
+
+[AAv2] Anton Antonov,
+["Integrating Large Language Models with Raku"](https://www.youtube.com/watch?v=-OxKqRrQvh0),
+(2023),
+[The Raku Conference at YouTube](https://www.youtube.com/@therakuconference6823).
