@@ -1,5 +1,9 @@
 Revision history for "WWW::OpenAI"
 
+0.3.6 2025-05-02
+    - Added :@tools chat completion option and related usage messages.
+    - Added the new OpenAI models "o4*", "gpt-4.1*", and "gpt-image-1".
+
 0.3.3 2024-05-14
     - Added the new OpenAI model "gpt-4o".
 
