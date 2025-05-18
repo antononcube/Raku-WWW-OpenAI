@@ -1,5 +1,12 @@
 Revision history for "WWW::OpenAI"
 
+0.3.8 2025-05-18
+    - Added a new formats to &Request : <choices message messages>
+        - It is more general _and_ needed in order to facilitate function calling.
+
+0.3.7 2025-05-02
+    - Minor changes trying to convince fez to upload.
+
 0.3.6 2025-05-02
     - Added :@tools chat completion option and related usage messages.
     - Added the new OpenAI models "o4*", "gpt-4.1*", and "gpt-image-1".
