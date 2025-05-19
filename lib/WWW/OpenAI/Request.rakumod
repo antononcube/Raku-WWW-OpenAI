@@ -1,9 +1,8 @@
 use v6.d;
+unit module WWW::OpenAI::Request;
 
 use JSON::Fast;
 use HTTP::Tiny;
-
-unit module WWW::OpenAI::Request;
 
 #============================================================
 # DELETE Tiny call
@@ -226,8 +225,11 @@ multi sub openai-request(Str :$url!,
     }
 
     return do given $format.lc {
-        when $_ ∈ <choices message messages> && ($res<choices>:exists) {
-            $res<choices>.map({ from-json($_<message>) }).Array;
+        when $_ ∈ <choices> && ($res<choices>:exists) {
+            $res<choices>
+        }
+        when $_ ∈ <message messages> && ($res<choices>:exists) {
+            $res<choices>.map({ $_<message> }).Array;
         }
         when $_ eq 'values' {
             if $res<choices>:exists {
