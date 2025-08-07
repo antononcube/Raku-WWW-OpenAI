@@ -33,6 +33,10 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "o3-mini", "o3-mini-2025-01-31",
                            "o1-preview", "o1-preview-2024-09-12", "o1-mini", "o1-mini-2024-09-12",
                            "chatgpt-4o-latest",
+                           "gpt-5-chat-latest",
+                           "gpt-5", "gpt-5-2025-08-07",
+                           "gpt-5-mini", "gpt-5-mini-2025-08-07",
+                           "gpt-5-nano", "gpt-5-nano-2025-08-07",
                            "gpt-4-vision-preview", "gpt-4-1106-preview",
                            "gpt-4.1", "gpt-4.1-2025-04-14",
                            "gpt-4.1-mini", "gpt-4.1-mini-2025-04-14",
@@ -78,8 +82,8 @@ our sub openai-known-models() is export {
 # https://platform.openai.com/docs/models/model-endpoint-compatibility
 
 my %endPointToModels =
-        '/v1/assistants' => [|openai-known-models.grep(* ~~ / ^ ['gpt-4' | 'o' \d '-'] / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-1106>],
-        '/v1/chat/completions' => [|openai-known-models.grep(* ~~ / ^ ['gpt-4' | 'o' \d '-'] / ).Hash.keys, |<chatgpt-4o-latest gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-1106>],
+        '/v1/assistants' => [|openai-known-models.grep(* ~~ / ^ ['gpt-' ['4' | '5'] | 'o' \d '-'] / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-1106>],
+        '/v1/chat/completions' => [|openai-known-models.grep(* ~~ / ^ ['gpt-' ['4' | '5'] | 'o' \d '-'] / ).Hash.keys, |<chatgpt-4o-latest gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-1106>],
         '/v1/completions' => <gpt-3.5-turbo gpt-3.5-turbo-instruct text-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
         '/v1/edits' => <text-davinci-edit-001 code-davinci-edit-001>,
         '/v1/audio/speech' => <tts-1 tts-1-hd>,
