@@ -190,6 +190,12 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                presence_penalty => $presence-penalty,
                frequency_penalty => $frequency-penalty;
 
+    if $model.starts-with('gpt-5') {
+        %body<max_completion_tokens> = %body<max_tokens>;
+        %body<max_tokens>:delete;
+        %body<temperature> = 1; # Or just %body<temperature>:delete ?
+    }
+
     # Add tools with caution
     if @tools {
         %body = %body , {:@tools};
