@@ -12,7 +12,7 @@ my %*SUB-MAIN-OPTS =
 multi sub openai-front(Str $text,                                #= Text to be processed or audio file name.
                        Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'images/edits', 'images/variations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
                        UInt :$n = 1,                             #= Number of completions or generations.
-                       UInt :mt(:$max-tokens) = 100,             #= The maximum number of tokens to generate in the completion.
+                       UInt :mt(:$max-tokens) = 4096,            #= The maximum number of tokens to generate in the completion.
                        Str :m(:$model) is copy = 'Whatever',     #= Model.
                        Str :r(:$role) is copy = 'user',          #= Role.
                        Real :t(:$temperature) = 0.7,             #= Temperature.
@@ -76,7 +76,7 @@ multi sub MAIN
 (*@words,
  Str :$path = 'chat/completions',          #= Path, one of 'chat/completions', 'images/generations', 'images/edits', 'images/variations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'.
  UInt :$n = 1,                             #= Number of completions or generations.
- UInt :mt(:$max-tokens) = 100,            #= The maximum number of tokens to generate in the completion.
+ UInt :mt(:$max-tokens) = 4096,            #= The maximum number of tokens to generate in the completion.
  Str :m(:$model) is copy = 'Whatever',     #= Model.
  Str :r(:$role) is copy = 'user',          #= Role.
  Real :t(:$temperature) = 0.7,             #= Temperature.
