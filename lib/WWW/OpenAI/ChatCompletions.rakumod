@@ -190,23 +190,18 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                presence_penalty => $presence-penalty,
                frequency_penalty => $frequency-penalty;
 
-    if $model.starts-with('gpt-5') {
-        %body<max_completion_tokens> = %body<max_tokens>;
-        %body<max_tokens>:delete;
-        %body<temperature> = 1; # Or just %body<temperature>:delete ?
-    }
-
     # Add tools with caution
     if @tools {
         %body = %body , {:@tools};
     }
 
     # Initially was: $model.starts-with('o1-')
-    if $model ~~ / ^ 'o' \d [ $ | '-' ] / {
+    if $model ~~ / ^ 'o' \d [ $ | '-' ] | ^ 'gpt-5' / {
         %body<temperature>:delete;
         %body<max_tokens>:delete;
         %body<max_completion_tokens> = $max-tokens;
     }
+
     my $url = $base-url ~ '/chat/completions';
 
     #------------------------------------------------------
