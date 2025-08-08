@@ -6,14 +6,21 @@ use WWW::OpenAI;
 my $reasoning-effort = 'minimal';
 my $verbosity = 'low';
 my $model = 'gpt-5-nano';
-my $base-url = 'https://api.openai.com/v1/responses';
+my $base-url = 'https://api.openai.com/v1/';
 my $path = 'responses';
 my $max-tokens = 4096;
 
-ok openai-chat-completion('how many people migrate to USA per year?', :$model, :$reasoning-effort, :$path, :$max-tokens);
+## 1
+# Full reasoning spec.
+# Note, :$max-tokens is taken but ignored in the code: gpt-5 models are complaining.
+ok openai-chat-completion('how many people migrate to USA per year?', :$model, :$reasoning-effort, :$verbosity, :$path, :$max-tokens);
 
+## 2
+# Automatic determination of path
 ok openai-chat-completion('how many people migrate to USA per year?', :$model, :$reasoning-effort);
 
+## 3
+# Automatic determination of path
 ok openai-chat-completion('how many people migrate to USA per year?', :$model, :$verbosity);
 
 done-testing;
