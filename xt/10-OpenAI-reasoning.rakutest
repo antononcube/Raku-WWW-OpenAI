@@ -1,0 +1,19 @@
+use v6.d;
+use Test;
+
+use WWW::OpenAI;
+
+my $reasoning-effort = 'minimal';
+my $verbosity = 'low';
+my $model = 'gpt-5-nano';
+my $base-url = 'https://api.openai.com/v1/responses';
+my $path = 'responses';
+my $max-tokens = 4096;
+
+ok openai-chat-completion('how many people migrate to USA per year?', :$model, :$reasoning-effort, :$path, :$max-tokens);
+
+ok openai-chat-completion('how many people migrate to USA per year?', :$model, :$reasoning-effort);
+
+ok openai-chat-completion('how many people migrate to USA per year?', :$model, :$verbosity);
+
+done-testing;
