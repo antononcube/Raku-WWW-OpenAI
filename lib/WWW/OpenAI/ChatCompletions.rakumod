@@ -36,12 +36,15 @@ our proto OpenAIChatCompletion($prompt is copy,
                                Numeric :$presence-penalty = 0,
                                Numeric :$frequency-penalty = 0,
                                :@images is copy = Empty,
+                               :$reasoning-effort = Whatever,
+                               :$verbosity = Whatever,
                                :@tools = Empty,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
-                               Str :$method = 'tiny',
-                               Str :$base-url = 'https://api.openai.com/v1') is export {*}
+                               Str:D :$method = 'tiny',
+                               Str:D :$base-url = 'https://api.openai.com/v1',
+                               Str:D :$path = 'chat/completions') is export {*}
 
 #| OpenAI completion access.
 multi sub OpenAIChatCompletion(Str $prompt, *%args) {
@@ -61,12 +64,15 @@ multi sub OpenAIChatCompletion(@prompts is copy,
                                Numeric :$presence-penalty = 0,
                                Numeric :$frequency-penalty = 0,
                                :@images is copy = Empty,
+                               :$reasoning-effort = Whatever,
+                               :$verbosity = Whatever,
                                :@tools = Empty,
                                :api-key(:$auth-key) is copy = Whatever,
                                UInt :$timeout= 10,
                                :$format is copy = Whatever,
-                               Str :$method = 'tiny',
-                               Str :$base-url = 'https://api.openai.com/v1') {
+                               Str:D :$method = 'tiny',
+                               Str:D :$base-url = 'https://api.openai.com/v1',
+                               Str:D :$path is copy = 'chat/completions') {
 
     #------------------------------------------------------
     # Process $role
@@ -92,7 +98,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     #------------------------------------------------------
     # Process $max-tokens
     #------------------------------------------------------
-    if $max-tokens.isa(Whatever) { $max-tokens = 16; }
+    if $max-tokens.isa(Whatever) { $max-tokens = 4096; }
     die "The argument \$max-tokens is expected to be Whatever or a positive integer."
     unless $max-tokens ~~ Int && 0 < $max-tokens;
 
@@ -202,7 +208,18 @@ multi sub OpenAIChatCompletion(@prompts is copy,
         %body<max_completion_tokens> = $max-tokens;
     }
 
-    my $url = $base-url ~ '/chat/completions';
+    if ($path ~~ / ^ 'responses' /) ||
+            $model.starts-with('gpt-5') && ($reasoning-effort ~~ Str:D || $verbosity ~~ Str:D) {
+        %body = %();
+        %body<model> = $model;
+        %body<input> = @messages.map(*<content>).join("\n");
+        if $reasoning-effort ~~ Str:D { %body<reasoning> = { effort => $reasoning-effort } }
+        if $verbosity ~~ Str:D { %body<text> = { :$verbosity } }
+        #%body<max_output_tokens> = $max-tokens;
+        $path = 'responses';
+    }
+
+    my $url = $base-url ~ "/" ~ $path;
 
     #------------------------------------------------------
     # Delegate
