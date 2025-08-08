@@ -1,5 +1,8 @@
 Revision history for "WWW::OpenAI"
 
+0.3.9 2025-08-07
+    - Added "gpt-5*" models.
+
 0.3.8 2025-05-18
     - Added a new formats to &Request : <choices message messages>
         - It is more general _and_ needed in order to facilitate function calling.
