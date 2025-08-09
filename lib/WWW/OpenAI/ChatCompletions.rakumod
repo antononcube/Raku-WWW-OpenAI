@@ -225,5 +225,11 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     # Delegate
     #------------------------------------------------------
 
-    return openai-request(:$url, body => to-json(%body), :$auth-key, :$timeout, :$format, :$method);
+    if $path eq 'responses' && $format eq 'values' {
+        my $res = openai-request(:$url, body => to-json(%body), :$auth-key, :$timeout, format => 'hash', :$method);
+        my @ans = $res<output>.grep(*<content>).map({ $_.<content>.grep(*<type> eq 'output_text').map(*<text>) }).flat.List;
+        return @ans.elems == 1 ?? @ans.head !! @ans;
+    } else {
+        return openai-request(:$url, body => to-json(%body), :$auth-key, :$timeout, :$format, :$method);
+    }
 }
