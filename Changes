@@ -1,5 +1,8 @@
 Revision history for "WWW::OpenAI"
 
+0.3.10 2025-10-16
+    - Added "gpt-5.1*" models.
+
 0.3.9 2025-08-07
     - Added "gpt-5*" models.
     - Automatic handling of peculiar reasoning API settings for "gpt-5*" models.
