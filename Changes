@@ -1,5 +1,8 @@
 Revision history for "WWW::OpenAI"
 
+0.3.11 2025-10-16
+    - Added the models "gpt-5.1-codex" and "gpt-5.1-codex-mini".
+
 0.3.10 2025-10-16
     - Added "gpt-5.1*" models.
 
