@@ -1,5 +1,8 @@
 Revision history for "WWW::OpenAI"
 
+0.3.14 2026-03-20
+    - Added new gpt-5.4* models and "missing" gpt-5.3* and gpt-5.2* models.
+
 0.3.13 2026-03-08
     - Added the model "gpt-5.4" (pointing to "gpt-5.4-2026-03-05".)
 
