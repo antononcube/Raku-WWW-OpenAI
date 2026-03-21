@@ -149,8 +149,12 @@ multi sub OpenAICreateImage($prompt,
 
     my %body = :$model, :$prompt, :$size, :$n;
 
+    if $model eq 'dall-e-3' {
+        %body = %body , {:$style}
+    }
+
     if $model ne 'dall-e-2' {
-        %body = %body , {:$style, :$quality}
+        %body = %body , {:$quality}
     }
 
     if $model ∈ <dall-e-2 dall-e-3> {
