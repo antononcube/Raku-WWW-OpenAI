@@ -122,8 +122,8 @@ multi sub OpenAICreateImage($prompt,
     #------------------------------------------------------
     # Process $quality
     #------------------------------------------------------
-    if $quality.isa(Whatever) { $quality = $model.starts-with('dall-e') ?? 'standard' !! 'medium'; }
-    die "The argument \$quality is expected to be Whatever or one of 'hd' or 'standard' for 'dall-e-3' and 'high', 'medium', or 'low' for 'gpt-image-1'."
+    if $quality.isa(Whatever) { $quality = $model.starts-with('dall-e') ?? 'standard' !! 'medium' }
+    die "The argument \$quality is expected to be Whatever or one of 'hd' or 'standard' for 'dall-e-3' and 'high', 'medium', or 'low' for \"gpt-image-1*\" models."
     unless $quality ~~ Str && $quality.lc ∈ <hd standard high medium low>;
 
     #------------------------------------------------------
