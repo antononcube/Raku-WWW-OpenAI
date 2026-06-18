@@ -1,5 +1,11 @@
 Revision history for "WWW::OpenAI"
 
+0.3.18 2026-06-18
+    - Using env variables to obtain default models.
+        - OPENAI_DEFAULT_MODEL
+        - OPENAI_DEFAULT_IMAGE_GENERATION_MODEL
+        - OPENAI_DEFAULT_EMBEDDING_MODEL
+
 0.3.17 2026-03-25
     - Added the model "gpt-5.5" (pointing to "gpt-5.4-2026-04-23".)
 
