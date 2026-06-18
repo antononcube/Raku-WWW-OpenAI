@@ -81,7 +81,7 @@ multi sub openai-completion($prompt,
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
-    if $model.isa(Whatever) { $model = $type eq 'text' ?? 'gpt-3.5-turbo-instruct' !! 'gpt-3.5-turbo'; }
+    if $model.isa(Whatever) { $model = $type eq 'text' ?? 'gpt-3.5-turbo-instruct' !! WWW::OpenAI::Models::GetDefaultModel(); }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-known-models.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ openai-known-models;
 

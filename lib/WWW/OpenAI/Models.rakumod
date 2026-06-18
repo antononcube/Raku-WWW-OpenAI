@@ -186,3 +186,19 @@ our sub OpenAIModels(:api-key(:$auth-key) is copy = Whatever,
 
     return $res<data>.map(*<id>).sort;
 }
+
+#============================================================
+# Default model
+#============================================================
+our sub GetDefaultModel(
+        Bool:D :$image-generation = False,
+        Bool:D :$embedding = False
+                        ) is export {
+    return do if $embedding {
+        %*ENV<OPENAI_DEFAULT_EMBEDDING_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_EMBEDDING_MODEL> !! 'text-embedding-3-small'
+    } elsif $image-generation {
+        %*ENV<OPENAI_DEFAULT_IMAGE_GENERATION_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_IMAGE_GENERATION_MODEL> !! 'gpt-image-1'
+    } else {
+        %*ENV<OPENAI_DEFAULT_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_MODEL> !! 'gpt-5'
+    }
+}

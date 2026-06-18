@@ -35,7 +35,7 @@ multi sub OpenAIEmbeddings($prompt,
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
-    if $model.isa(Whatever) { $model = 'text-embedding-ada-002'; }
+    if $model.isa(Whatever) { $model = WWW::OpenAI::Models::GetDefaultModel(:embedding); }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-known-models.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ openai-known-models;
 

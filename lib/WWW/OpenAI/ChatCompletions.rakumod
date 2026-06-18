@@ -84,7 +84,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
-    if $model.isa(Whatever) { $model = @images ?? 'gpt-4-vision-preview' !! 'gpt-3.5-turbo'; }
+    if $model.isa(Whatever) { $model = WWW::OpenAI::Models::GetDefaultModel(image-generation => (so @images)) }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-known-models.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ openai-known-models;
 
