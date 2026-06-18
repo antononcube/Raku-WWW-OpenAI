@@ -460,6 +460,16 @@ a first line followed by the answers. In that situation the answers are not pars
 
 -------
 
+## Default models
+
+Default models can be specified with the operating system environmental variables:
+
+- `OPENAI_DEFAULT_MODEL`
+- `OPENAI_DEFAULT_IMAGE_GENERATION_MODEL`
+- `OPENAI_DEFAULT_EMBEDDING_MODEL`
+
+-------
+
 ## Command Line Interface
 
 ### Playground access
