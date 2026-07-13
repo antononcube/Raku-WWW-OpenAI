@@ -1,5 +1,8 @@
 Revision history for "WWW::OpenAI"
 
+0.3.19 2026-07-13
+    - Added the models 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.5-pro', and 'gpt-5.4-pro'.
+
 0.3.18 2026-06-18
     - Using env variables to obtain default models.
         - OPENAI_DEFAULT_MODEL
