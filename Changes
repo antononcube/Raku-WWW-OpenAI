@@ -1,5 +1,8 @@
 Revision history for "WWW::OpenAI"
 
+0.3.28 2026-07-13
+    - Fix: better handling of parameters for the "gpt-image-*" models.
+
 0.3.19 2026-07-13
     - Added the models 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.5-pro', and 'gpt-5.4-pro'.
 
