@@ -68,8 +68,13 @@ multi sub OpenAICreateImage($prompt,
     my %sizeMap3 = square => '1024x1024', landscape => '1792x1024', 'portrait' => '1024x1792';
     %sizeMap3 = %sizeMap3, %sizeMap3.values.map({ $_ => $_ }).Hash;
 
-    die "The argument \$size is expected to be Whatever or one of '{ [|%sizeMap2.keys, |%sizeMap3.keys].sort.join(', ') }'."
-    unless $size.isa(Whatever) || (%sizeMap2{$size}:exists) || (%sizeMap3{$size}:exists);
+    my %sizeMapGPT = :default("auto"),
+                     :square("1024x1024"), :landscape("1536x1024"), :portrait("1024x1536"),
+                     "2K landscape" => "2048x1152", "4K portrait" => "2160x3840",
+                     "4K landscape" => "3840x2160",  "2K square" => "2048x2048";
+
+    die "The argument \$size is expected to be Whatever or one of '{ [|%sizeMap2.keys, |%sizeMap3.keys, |%sizeMapGPT.keys].sort.join(', ') }'."
+    unless $size.isa(Whatever) || (%sizeMap2{$size}:exists) || (%sizeMap3{$size}:exists) || (%sizeMapGPT{$size});
 
     #------------------------------------------------------
     # Process $model
@@ -108,9 +113,11 @@ multi sub OpenAICreateImage($prompt,
         $size = %sizeMap3<square>;
     } elsif $model eq 'dall-e-3' && !(%sizeMap3{$size}:exists) {
         die "When the model is $model then \$size is expected to be Whatever or one of '{ %sizeMap3.keys.sort.join(', ') }'.";
+    } elsif $model.starts-with('gpt-image') {
+        $size = $size.isa(Whatever) ?? 'auto' !! %sizeMapGPT{$size} // $size;
+    } else {
+        $size = %sizeMap3{$size} // %sizeMap2{$size} // %sizeMapGPT{$size} // $size;
     }
-
-    $size = %sizeMap3{$size} // %sizeMap2{$size} // $size;
 
     #------------------------------------------------------
     # Process $style
