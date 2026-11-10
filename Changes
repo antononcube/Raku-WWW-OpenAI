@@ -1,6 +1,13 @@
 Revision history for "WWW::OpenAI"
 
-0.3.28 2026-07-13
+0.3.21 2026-11-09
+    - Add GPT-6 text, GPT Image 2.6, and GPT Transcribe model support.
+    - Use Responses for GPT-6 requests and preserve message roles, image input,
+      and tools in Responses payloads.
+    - Update text, image, and transcription defaults while keeping explicit
+      legacy model selections available where supported by OpenAI.
+
+0.3.18 2026-07-13
     - Fix: better handling of parameters for the "gpt-image-*" models.
 
 0.3.19 2026-07-13
