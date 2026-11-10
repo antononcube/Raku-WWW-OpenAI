@@ -3,15 +3,22 @@
 The examples below document the earlier DALL·E models. For new requests, the
 package defaults to `gpt-image-2.6-flare`. For example:
 
-```raku
+```raku, results=asis
+use WWW::OpenAI;
 my @images = openai-create-image(
     'A raccoon reading a Raku book',
     size => 'square',
     format => 'values');  # Base64 image data
+
+@images.map({ '![](data:image/png;base64,' ~ $_ ~ ')' }).join("\n\n") 
 ```
+
+<hr style="width: 60%; height: 6px; margin: 1rem auto; border: 0; background-color: currentColor;">
 
 The DALL·E examples below are historical: OpenAI has shut down `dall-e-2` and
 `dall-e-3`. See [OpenAI deprecations](https://developers.openai.com/api/docs/deprecations).
+
+<hr style="width: 60%; height: 6px; margin: 1rem auto; border: 0; background-color: currentColor;">
 
 This Markdown file can be "evaluated" with the Raku package "Text::CodeProcessing", [AAp2]. 
 Here is a shell command:
@@ -27,7 +34,7 @@ file-code-chunks-eval Image-generation.md
 
 Here we load the Raku package "WWW::OpenAI", [AAp1]:
 
-```perl6
+```raku
 use WWW::OpenAI;
 ```
 
@@ -36,7 +43,7 @@ Images can be generated with the function `openai-create-image` -- see the secti
 
 Here is an example that returns "whole images" in [Base64 format](https://en.wikipedia.org/wiki/Base64):
 
-```perl6, results=asis
+```raku, results=asis
 my @imgResB64 = |openai-create-image(
         "raccoon with a sliced onion in the style of Raphael",
         model => 'dall-e-3',
@@ -68,7 +75,7 @@ Here are the descriptions of the named arguments (options):
 
 Here we generate a few images, get their URLs, and place (embed) the image links using a table:
 
-```perl6, results=asis
+```raku, results=asis
 my @imgRes = |openai-create-image(
         "painting of a racoon and onion in the style of Rene Magritte",
         response-format => 'url',
