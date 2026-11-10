@@ -25,6 +25,7 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "curie-similarity", "cushman:2020-05-03",
                            "dall-e-2", "dall-e-3",
                            "gpt-image-1", "gpt-image-1-mini", "gpt-image-1.5",
+                           "gpt-image-2.6-sunburst", "gpt-image-2.6-flare",
                            "chatgpt-image-latest",
                            "davinci",
                            "davinci:2020-05-03", "davinci-if:3.0.0", "davinci-instruct-beta",
@@ -35,6 +36,7 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "o3-mini", "o3-mini-2025-01-31",
                            "o1-preview", "o1-preview-2024-09-12", "o1-mini", "o1-mini-2024-09-12",
                            "chatgpt-4o-latest",
+                           'gpt-6-astra', 'gpt-6.1-sol', 'gpt-6.1-terra', 'gpt-6-luna',
                            'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra',
                            'gpt-5.5-pro', 'gpt-5.5-pro-2026-04-23',
                            "gpt-5.5", "gpt-5.5-2026-04-23",
@@ -81,7 +83,7 @@ my $knownModels = Set.new(["ada", "ada:2020-05-03", "ada-code-search-code",
                            "text-search-davinci-query-001", "text-similarity-ada-001",
                            "text-similarity-babbage-001", "text-similarity-curie-001",
                            "text-similarity-davinci-001",
-                           "whisper-1",
+                           "whisper-1", "gpt-transcribe", "gpt-live-transcribe",
                            "tts-1", "tts-1-hd"]);
 
 
@@ -98,12 +100,12 @@ our sub openai-known-models() is export {
 
 my %endPointToModels =
         '/v1/assistants' => [|openai-known-models.grep(* ~~ / ^ ['gpt-' ['4' | '5'] | 'o' \d '-'] / ).Hash.keys, |<gpt-3.5-turbo gpt-3.5-turbo-1106>],
-        '/v1/responses' => [|openai-known-models.grep(* ~~ / ^ 'gpt-5' . ** 1..3 'codex'  / ).Hash.keys ],
+        '/v1/responses' => [|openai-known-models.grep(* ~~ / ^ 'gpt-' ['5' | '6'] / ).Hash.keys ],
         '/v1/chat/completions' => [|openai-known-models.grep(* ~~ / ^ ['gpt-' ['4' | '5'] | 'o' \d '-'] / ).Hash.keys, |<chatgpt-4o-latest gpt-3.5-turbo gpt-3.5-turbo-0301 gpt-3.5-turbo-1106>],
         '/v1/completions' => <gpt-3.5-turbo gpt-3.5-turbo-instruct text-davinci-003 text-davinci-002 text-curie-001 text-babbage-001 text-ada-001>,
         '/v1/edits' => <text-davinci-edit-001 code-davinci-edit-001>,
         '/v1/audio/speech' => <tts-1 tts-1-hd>,
-        '/v1/audio/transcriptions' => <whisper-1>,
+        '/v1/audio/transcriptions' => <whisper-1 gpt-transcribe>,
         '/v1/audio/translations' => <whisper-1>,
         '/v1/images/generations' => [|<dall-e-2 dall-e-3>, |openai-known-models.grep(* ~~ / ^ ['gpt-image-' | 'chatgpt-image-']  / ).Hash.keys ],
         '/v1/fine-tunes' => <davinci curie babbage ada>,
@@ -200,8 +202,8 @@ our sub GetDefaultModel(
     return do if $embedding {
         %*ENV<OPENAI_DEFAULT_EMBEDDING_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_EMBEDDING_MODEL> !! 'text-embedding-3-small'
     } elsif $image-generation {
-        %*ENV<OPENAI_DEFAULT_IMAGE_GENERATION_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_IMAGE_GENERATION_MODEL> !! 'gpt-image-1'
+        %*ENV<OPENAI_DEFAULT_IMAGE_GENERATION_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_IMAGE_GENERATION_MODEL> !! 'gpt-image-2.6-flare'
     } else {
-        %*ENV<OPENAI_DEFAULT_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_MODEL> !! 'gpt-5'
+        %*ENV<OPENAI_DEFAULT_MODEL>:exists ?? %*ENV<OPENAI_DEFAULT_MODEL> !! 'gpt-6.1-sol'
     }
 }

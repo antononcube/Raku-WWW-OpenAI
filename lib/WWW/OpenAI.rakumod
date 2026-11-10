@@ -57,7 +57,6 @@ multi sub openai-completion($prompt,
     if $type.isa(Whatever) {
         $type = do given $model {
             when $_.isa(Whatever) && (so %args<images>) {
-                $model = 'gpt-4-turbo';
                 'chat'
             }
             when Whatever { 'chat' }
@@ -137,7 +136,7 @@ multi sub openai-embeddings(**@args, *%args) {
 #| C<:$model> -- model;
 #| C<:$n> -- number of generated images;
 #| C<:$response-format> -- image result format, one of <url b64_json>;
-#| C<:$quality> -- quality of the image, one of <hd standard>, applies only for the model "dall-e-3";
+#| C<:$quality> -- model-specific image quality;
 #| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024 square landscape portrait 1792x1024 1024x1792>;
 #| C<:$style> -- style of the image, one of <vivid natural>, applies only for the model "dall-e-3";
 #| C<:api-key($auth-key)> -- authorization key (API key);
@@ -154,8 +153,10 @@ multi sub openai-create-image(**@args, *%args) {
 #| OpenAI image variation access.
 #| C<$file> -- PNG image file to make edit(s) of;
 #| C<$prompt> -- prompt to generate the edit with;
+#| C<:$model> -- image model, defaulting to C<gpt-image-2.6-flare>;
 #| C<:$mask-file> -- PNG image file to mask the image given with C<$file>;
 #| C<:$n> -- number of generated images;
+#| C<:$quality> -- model-specific image quality;
 #| C<:$size> -- size of the image, cat take one of <small medium large 256x256 512x512 1024x1024>;
 #| C<:$response-format> -- image result format, one of <url b64_json>;
 #| C<:api-key($auth-key)> -- authorization key (API key);
@@ -244,7 +245,7 @@ multi sub openai-text-completion(**@args, *%args) {
 #| C<:$base-url> -- base URL of the WWW API;
 #| C<*%args> -- additional arguments, see C<openai-chat-completion> and C<openai-text-completion>.
 our proto openai-playground($text is copy = '',
-                            Str :$path = 'completions',
+                            Str :$path = 'responses',
                             :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
@@ -265,7 +266,7 @@ multi sub openai-playground(@texts, *%args) {
 
 #| OpenAI playground access.
 multi sub openai-playground($text is copy,
-                            Str :$path = 'completions',
+                            Str :$path = 'responses',
                             :api-key(:$auth-key) is copy = Whatever,
                             UInt :$timeout= 10,
                             :$format is copy = Whatever,
@@ -291,12 +292,14 @@ multi sub openai-playground($text is copy,
                     type => Whatever,
                     model => %args<model> // Whatever,
                     |%args.grep({ $_.key ∈ <n role max-tokens temperature images> }).Hash,
+                    path => $path eq 'responses' ?? 'responses' !! 'chat/completions',
                     :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
-        when $_ ∈ <chat chat/completions> {
+        when $_ ∈ <chat chat/completions responses> {
             # my $url = 'https://api.openai.com/v1/chat/completions';
             return openai-completion($text, type => 'chat',
-                    |%args.grep({ $_.key ∈ <n model role max-tokens temperature images> }).Hash,
+                    |%args.grep({ $_.key ∈ <n model role max-tokens temperature images reasoning-effort verbosity tools> }).Hash,
+                    path => $path eq 'responses' ?? 'responses' !! 'chat/completions',
                     :$auth-key, :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <completion completions text/completions> {
@@ -308,12 +311,12 @@ multi sub openai-playground($text is copy,
         }
         when $_ ∈ <create-image image-generation image-generations images-generations images/generations> {
             # my $url = 'https://api.openai.com/v1/images/generations';
-            return openai-create-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
+            return openai-create-image($text, |%args.grep({ $_.key ∈ <n model response-format size quality style> }).Hash, :$auth-key,
                     :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <edit-image image-edit image-edits images-edits images/edits> {
             # my $url = 'https://api.openai.com/v1/images/edits';
-            return openai-edit-image($text, |%args.grep({ $_.key ∈ <n response-format size> }).Hash, :$auth-key,
+            return openai-edit-image($text, |%args.grep({ $_.key ∈ <n model response-format size quality> }).Hash, :$auth-key,
                     :$timeout, :$format, :$method, :$base-url);
         }
         when $_ ∈ <variate-image image-variation image-variations images-variations images/variations> {

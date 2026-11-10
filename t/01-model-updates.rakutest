@@ -1,0 +1,140 @@
+use v6.d;
+use Test;
+use JSON::Fast;
+use WWW::OpenAI;
+use WWW::OpenAI::Models;
+
+sub capture-request(&invoke) {
+    my $server = IO::Socket::INET.new(:localhost('127.0.0.1'), :localport(0), :listen);
+    my $base-url = "http://127.0.0.1:{$server.localport}/v1";
+    my $worker = start {
+        my $client = $server.accept;
+        my $request-line = $client.get;
+        my %headers;
+        loop {
+            my $line = $client.get;
+            last if !$line.defined || $line eq '';
+            my ($name, $value) = $line.split(': ', 2);
+            %headers{$name.lc} = $value;
+        }
+        my $body = $client.read(%headers<content-length>.Int);
+        my $path = $request-line.split(' ')[1];
+        my $reply = $path eq '/v1/responses'
+                ?? '{"output":[{"content":[{"type":"output_text","text":"ok"}]}]}'
+                !! $path.starts-with('/v1/images/')
+                ?? '{"data":[{"b64_json":"aGVsbG8="}]}'
+                !! $path eq '/v1/audio/transcriptions'
+                ?? '{"text":"hello"}'
+                !! '{"choices":[{"message":{"content":"ok"}}]}';
+        $client.print("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {$reply.encode.bytes}\r\nConnection: close\r\n\r\n$reply");
+        $client.close;
+        %( :$path, :$body );
+    };
+    my $result = invoke($base-url);
+    my %request = $worker.result;
+    $server.close;
+    ($result, %request);
+}
+
+for <gpt-6-astra gpt-6.1-sol gpt-6.1-terra gpt-6-luna
+     gpt-image-2.6-sunburst gpt-image-2.6-flare gpt-transcribe> -> $model {
+    ok $model ∈ openai-known-models, "$model is registered";
+}
+ok 'gpt-5' ∈ openai-known-models, 'deprecated model remains selectable';
+
+my ($text, %text-request) = capture-request(-> $base-url {
+    openai-chat-completion([system => 'rules', user => 'hello'],
+            model => 'gpt-6.1-sol', max-tokens => 128,
+            :$base-url, auth-key => 'test', format => 'values')
+});
+is $text, 'ok', 'Responses text is extracted';
+is %text-request<path>, '/v1/responses', 'GPT-6 uses Responses';
+my %text-body = from-json(%text-request<body>.decode);
+is %text-body<input>[0]<role>, 'system', 'system role is preserved';
+is %text-body<input>[1]<role>, 'user', 'user role is preserved';
+is %text-body<max_output_tokens>, 128, 'explicit output limit is sent';
+
+my ($playground-text, %playground-request) = capture-request(-> $base-url {
+    openai-playground('hello', :$base-url, auth-key => 'test', format => 'values')
+});
+is %playground-request<path>, '/v1/responses', 'playground defaults to Responses';
+is $playground-text, 'ok', 'playground returns Responses text';
+
+my ($deprecated-text, %deprecated-request) = capture-request(-> $base-url {
+    openai-chat-completion('hello', model => 'gpt-5',
+            :$base-url, auth-key => 'test', format => 'values')
+});
+is %deprecated-request<path>, '/v1/chat/completions', 'explicit legacy model keeps its endpoint';
+my %deprecated-body = from-json(%deprecated-request<body>.decode);
+is %deprecated-body<model>, 'gpt-5', 'explicit deprecated model is sent unchanged';
+
+my ($vision, %vision-request) = capture-request(-> $base-url {
+    openai-chat-completion('look', model => 'gpt-6.1-terra',
+            images => ['https://example.org/a.png'], :$base-url,
+            auth-key => 'test', format => 'values')
+});
+is $vision, 'ok', 'vision response is extracted';
+my %vision-body = from-json(%vision-request<body>.decode);
+is %vision-body<input>[0]<content>[0]<type>, 'input_text', 'text input uses Responses schema';
+is %vision-body<input>[0]<content>[1]<type>, 'input_image', 'image input uses Responses schema';
+is %vision-body<input>[0]<content>[1]<image_url>, 'https://example.org/a.png', 'image URL is preserved';
+
+my ($tool-result, %tool-request) = capture-request(-> $base-url {
+    openai-chat-completion('weather', model => 'gpt-6.1-sol',
+            tools => [{type => 'function', name => 'weather', parameters => {type => 'object'}},],
+            :$base-url, auth-key => 'test', format => 'values')
+});
+my %tool-body = from-json(%tool-request<body>.decode);
+is %tool-body<tools>[0]<name>, 'weather', 'Responses tool descriptions are preserved';
+
+my ($old-tool-result, %old-tool-request) = capture-request(-> $base-url {
+    openai-chat-completion('weather', model => 'gpt-6.1-sol',
+            tools => [{type => 'function', function => {name => 'weather', parameters => {type => 'object'}}},],
+            :$base-url, auth-key => 'test', format => 'values')
+});
+my %old-tool-body = from-json(%old-tool-request<body>.decode);
+is %old-tool-body<tools>[0]<name>, 'weather', 'legacy chat function schema converts to Responses';
+ok !(%old-tool-body<tools>[0]<function>:exists), 'nested function key is removed';
+dies-ok { openai-chat-completion('x', model => 'gpt-6.1-sol', reasoning-effort => 'none') },
+        'Sol rejects unsupported none reasoning effort before sending';
+
+my ($image, %image-request) = capture-request(-> $base-url {
+    openai-create-image('cat', :$base-url, auth-key => 'test', format => 'values')
+});
+is %image-request<path>, '/v1/images/generations', 'image generation uses Images API';
+my %image-body = from-json(%image-request<body>.decode);
+is %image-body<model>, 'gpt-image-2.6-flare', 'new image default is used';
+is %image-body<size>, 'auto', 'new image default size is used';
+is %image-body<quality>, 'auto', 'new image default quality is used';
+ok !(%image-body<response_format>:exists), 'GPT Image omits legacy response_format';
+
+my ($edit, %edit-request) = capture-request(-> $base-url {
+    openai-edit-image('resources/RandomMandala.png', 'change color',
+            :$base-url, auth-key => 'test', format => 'values')
+});
+is %edit-request<path>, '/v1/images/edits', 'image edit endpoint is used';
+my $edit-body = %edit-request<body>.decode('latin-1');
+ok $edit-body.contains('gpt-image-2.6-flare') && $edit-body.contains('name="quality"'),
+        'image edits use the new model and quality field';
+ok !$edit-body.contains('name="response_format"'), 'GPT Image edits omit legacy response_format';
+
+my ($transcript, %audio-request) = capture-request(-> $base-url {
+    openai-audio('resources/HelloRaccoonsEN.mp3', type => 'transcriptions', language => 'en',
+            :$base-url, auth-key => 'test', format => 'json')
+});
+is %audio-request<path>, '/v1/audio/transcriptions', 'transcription endpoint is used';
+my $audio-body = %audio-request<body>.decode('latin-1');
+ok $audio-body.contains('name="model"') && $audio-body.contains('gpt-transcribe'),
+        'transcription defaults to gpt-transcribe';
+ok $audio-body.contains('name="languages[]"'), 'GPT Transcribe uses languages hint';
+
+my ($legacy, %legacy-request) = capture-request(-> $base-url {
+    openai-audio('resources/HelloRaccoonsEN.mp3', type => 'transcriptions',
+            model => 'whisper-1', language => 'en',
+            :$base-url, auth-key => 'test', format => 'json')
+});
+my $legacy-body = %legacy-request<body>.decode('latin-1');
+ok $legacy-body.contains('whisper-1') && $legacy-body.contains('name="language"'),
+        'explicit deprecated Whisper model retains its language field';
+
+done-testing;

@@ -84,9 +84,16 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     #------------------------------------------------------
     # Process $model
     #------------------------------------------------------
-    if $model.isa(Whatever) { $model = WWW::OpenAI::Models::GetDefaultModel(image-generation => (so @images)) }
+    if $model.isa(Whatever) { $model = WWW::OpenAI::Models::GetDefaultModel() }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-known-models.keys.sort.join('", "') ~ '"' }."
     unless $model ∈ openai-known-models;
+    if $model.starts-with('gpt-6') && $reasoning-effort ~~ Str:D {
+        my @efforts = $model ∈ <gpt-6-astra gpt-6.1-sol>
+                ?? <low medium high xhigh max>
+                !! <none low medium high xhigh max>;
+        die "The reasoning effort '$reasoning-effort' is not supported by model '$model'."
+        unless $reasoning-effort ∈ @efforts;
+    }
 
     #------------------------------------------------------
     # Process $temperature
@@ -98,6 +105,7 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     #------------------------------------------------------
     # Process $max-tokens
     #------------------------------------------------------
+    my Bool $explicit-max-tokens = !$max-tokens.isa(Whatever);
     if $max-tokens.isa(Whatever) { $max-tokens = 4096; }
     die "The argument \$max-tokens is expected to be Whatever or a positive integer."
     unless $max-tokens ~~ Int && 0 < $max-tokens;
@@ -198,24 +206,53 @@ multi sub OpenAIChatCompletion(@prompts is copy,
 
     # Add tools with caution
     if @tools {
+        die "The argument \@tools is expected to contain tool description maps."
+        unless @tools.all ~~ Map;
         %body = %body , {:@tools};
     }
 
     # Initially was: $model.starts-with('o1-')
-    if $model ~~ / ^ 'o' \d [ $ | '-' ] | ^ 'gpt-5' / {
+    if $model ~~ / ^ 'o' \d [ $ | '-' ] | ^ 'gpt-' ['5' | '6'] / {
         %body<temperature>:delete;
         %body<max_tokens>:delete;
         %body<max_completion_tokens> = $max-tokens;
     }
 
-    if ($path ~~ / ^ 'responses' /) ||
+    if ($path ~~ / ^ 'responses' /) || $model.starts-with('gpt-6') ||
             $model.starts-with('gpt-5') && ($reasoning-effort ~~ Str:D || $verbosity ~~ Str:D) {
         %body = %();
         %body<model> = $model;
-        %body<input> = @messages.map(*<content>).join("\n");
+        %body<input> = @messages.map(-> $message {
+            my %item = $message.Hash;
+            if %item<content> ~~ Positional {
+                %item<content> = %item<content>.map(-> $part {
+                    my %content = $part.Hash;
+                    if %content<type> eq 'text' {
+                        %content<type> = 'input_text';
+                    } elsif %content<type> eq 'image_url' {
+                        %content<type> = 'input_image';
+                        %content<image_url> = %content<image_url><url>;
+                    }
+                    %content
+                }).Array;
+            }
+            %item
+        }).Array;
         if $reasoning-effort ~~ Str:D { %body<reasoning> = { effort => $reasoning-effort } }
         if $verbosity ~~ Str:D { %body<text> = { :$verbosity } }
-        #%body<max_output_tokens> = $max-tokens;
+        if $explicit-max-tokens { %body<max_output_tokens> = $max-tokens; }
+        if @tools {
+            %body<tools> = @tools.map(-> $tool {
+                my %item = $tool.Hash;
+                if %item<type> eq 'function' && %item<function> ~~ Map {
+                    my %function = %item<function>.Hash;
+                    %item<function>:delete;
+                    %item = %item, %function;
+                }
+                %item
+            }).Array;
+        }
+        if $stream { %body<stream> = True; }
         $path = 'responses';
     }
 

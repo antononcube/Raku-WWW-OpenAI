@@ -82,28 +82,14 @@ multi sub OpenAICreateImage($prompt,
     if $model ~~ Str && $model.lc ∈ <dalle2 dall-e2 dall-e-2> { $model = 'dall-e-2'; }
     if $model ~~ Str && $model.lc ∈ <dalle3 dall-e3 dall-e-3> { $model = 'dall-e-3'; }
     if $model ~~ Str && $model.lc ~~ / ^ ['gpt-image-' | 'chatgpt-image-'] / { $model .= lc  }
+    if $model.isa(Whatever) { $model = WWW::OpenAI::Models::GetDefaultModel(:image-generation); }
     die "The argument \$model is expected to be Whatever or one of the strings: { '"' ~ openai-end-point-to-models('/v1/images/generations').join('", "') ~ '"' }."
     unless $model.isa(Whatever) || $model ∈ openai-end-point-to-models('/v1/images/generations');
 
     #------------------------------------------------------
     # Assign and check appropriate $model and $size values
     #------------------------------------------------------
-    if $model.isa(Whatever) && $size.isa(Whatever) {
-        if $n > 1 {
-            $model = 'dall-e-2'; $size = 'small';
-        } else {
-            $model = 'dall-e-3'; $size = 'square';
-        }
-    } elsif $model.isa(Whatever) && (%sizeMap2{$size}:exists) {
-        $model = 'dall-e-2';
-    } elsif $model.isa(Whatever) && (%sizeMap3{$size}:exists) {
-        if $n == 1 {
-            $model = 'dall-e-3';
-        } else {
-            die "The image size value $size implies the use of the model \"dall-e-3\"," ~
-                    "and that model can generate one image only. (Not $n.)";
-        }
-    } elsif $model eq 'dall-e-2' && $size.isa(Whatever) {
+    if $model eq 'dall-e-2' && $size.isa(Whatever) {
         $size = %sizeMap2<small>;
     } elsif $model eq 'dall-e-2' && !(%sizeMap2{$size}:exists) {
         die "When the model is $model then \$size is expected to be Whatever or one of '{ %sizeMap2.keys.sort.join(', ') }'.";
@@ -114,6 +100,8 @@ multi sub OpenAICreateImage($prompt,
     } elsif $model eq 'dall-e-3' && !(%sizeMap3{$size}:exists) {
         die "When the model is $model then \$size is expected to be Whatever or one of '{ %sizeMap3.keys.sort.join(', ') }'.";
     } elsif $model.starts-with('gpt-image') {
+        die "When the model is $model then \$size must be a GPT Image size or Whatever."
+        unless $size.isa(Whatever) || (%sizeMapGPT{$size}:exists) || $size eq 'auto';
         $size = $size.isa(Whatever) ?? 'auto' !! %sizeMapGPT{$size} // $size;
     } else {
         $size = %sizeMap3{$size} // %sizeMap2{$size} // %sizeMapGPT{$size} // $size;
@@ -129,9 +117,14 @@ multi sub OpenAICreateImage($prompt,
     #------------------------------------------------------
     # Process $quality
     #------------------------------------------------------
-    if $quality.isa(Whatever) { $quality = $model.starts-with('dall-e') ?? 'standard' !! 'medium' }
-    die "The argument \$quality is expected to be Whatever or one of 'hd' or 'standard' for 'dall-e-3' and 'high', 'medium', or 'low' for \"gpt-image-1*\" models."
-    unless $quality ~~ Str && $quality.lc ∈ <hd standard high medium low>;
+    if $quality.isa(Whatever) {
+        $quality = $model.starts-with('dall-e') ?? 'standard' !!
+                $model.starts-with('gpt-image-2.6-') ?? 'auto' !! 'medium';
+    }
+    my @expectedQuality = $model.starts-with('dall-e') ?? <hd standard> !!
+            $model.starts-with('gpt-image-2.6-') ?? <auto low medium high xhigh max> !! <auto low medium high>;
+    die "The quality '$quality' is not supported by model '$model'."
+    unless $quality ~~ Str && $quality.lc ∈ @expectedQuality;
 
     #------------------------------------------------------
     # Process $format

@@ -113,9 +113,10 @@ multi sub OpenAIAudio($file,
     #------------------------------------------------------
     if $type ∈ <transcriptions translations> {
 
-        # The API documentation states that only 'whisper-1' is available. (2023-03-29)
-        if $model.isa(Whatever) { $model = 'whisper-1'; }
-        my @expectedModels = <whisper-1>;
+        if $model.isa(Whatever) {
+            $model = $type eq 'transcriptions' ?? 'gpt-transcribe' !! 'whisper-1';
+        }
+        my @expectedModels = $type eq 'transcriptions' ?? <whisper-1 gpt-transcribe> !! <whisper-1>;
         die "For transcriptions and translations the value of the argument \$model is expected to be one of { @expectedModels.join(', ') }."
         unless $model ~~ Str && $model.lc ∈ @expectedModels;
 
@@ -141,7 +142,10 @@ multi sub OpenAIAudio($file,
 
         if $method eq 'curl' {
             # Some sort of no-good shortcut -- see curl-post
-            my %body = %(:$file, :$model, :$prompt, :$language, :$temperature, response_format => $format);
+            my %body = %(:$file, :$model, :$prompt, :$temperature, response_format => $format);
+            if $language {
+                %body{$model eq 'gpt-transcribe' ?? 'languages[]' !! 'language'} = $language;
+            }
 
             return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method);
 
@@ -151,7 +155,9 @@ multi sub OpenAIAudio($file,
 
             if $prompt { %body<prompt> = $prompt; }
 
-            if $language { %body<language> = $language; }
+            if $language {
+                %body{$model eq 'gpt-transcribe' ?? 'languages[]' !! 'language'} = $language;
+            }
 
             %body<file> = $file.IO;
 

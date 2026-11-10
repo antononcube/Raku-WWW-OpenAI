@@ -1,6 +1,7 @@
 use v6.d;
 
 use WWW::OpenAI::Request;
+use WWW::OpenAI::Models;
 use JSON::Fast;
 
 unit module WWW::OpenAI::ImageEdits;
@@ -23,8 +24,10 @@ END
 #| OpenAI image generation access.
 our proto OpenAIEditImage($imageFile,
                           Str $prompt,
+                          :$model is copy = Whatever,
                           :$mask-file = Whatever,
                           UInt :$n = 1,
+                          :$quality is copy = Whatever,
                           :$size is copy = Whatever,
                           :$response-format is copy = Whatever,
                           :api-key(:$auth-key) is copy = Whatever,
@@ -42,8 +45,10 @@ multi sub OpenAIEditImage(@fileNames, Str $prompt, *%args) {
 #| OpenAI image generation access.
 multi sub OpenAIEditImage($file,
                           Str $prompt,
+                          :$model is copy = Whatever,
                           :$mask-file is copy = Whatever,
                           UInt :$n = 1,
+                          :$quality is copy = Whatever,
                           :$size is copy = Whatever,
                           :$response-format is copy = Whatever,
                           :api-key(:$auth-key) is copy = Whatever,
@@ -74,13 +79,30 @@ multi sub OpenAIEditImage($file,
     #------------------------------------------------------
     # Process $size
     #------------------------------------------------------
-    if $size.isa(Whatever) { $size = '256x256'; }
+    if $model.isa(Whatever) { $model = WWW::OpenAI::Models::GetDefaultModel(:image-generation); }
+    die "The model '$model' is not supported for image edits."
+    unless $model eq 'dall-e-2' ||
+            ($model ∈ openai-known-models) && ($model.starts-with('gpt-image-') || $model.starts-with('chatgpt-image-'));
+
+    if $size.isa(Whatever) { $size = $model eq 'dall-e-2' ?? '256x256' !! 'auto'; }
     my %sizeMap = small => '256x256', medium => '512x512', 'large' => '1024x1024';
     %sizeMap = %sizeMap, %sizeMap.values.map({ $_ => $_ }).Hash;
 
-    die "The argument \$size is expected to be Whatever or one of '{ %sizeMap.keys.sort.join(', ') }'."
-    unless %sizeMap{$size}:exists;
-    $size = %sizeMap{$size};
+    if $model eq 'dall-e-2' {
+        die "The argument \$size is expected to be one of '{ %sizeMap.keys.sort.join(', ') }'."
+        unless %sizeMap{$size}:exists;
+        $size = %sizeMap{$size};
+    } else {
+        my %gptSizes = square => '1024x1024', landscape => '1536x1024', portrait => '1024x1536';
+        die "The argument \$size is expected to be 'auto', 'square', 'landscape', 'portrait', or an image size."
+        unless ($size ∈ <auto 1024x1024 1536x1024 1024x1536>) || (%gptSizes{$size}:exists);
+        $size = %gptSizes{$size} // $size;
+    }
+
+    if $quality.isa(Whatever) { $quality = 'auto'; }
+    die "The quality '$quality' is not supported by model '$model'."
+    unless $model eq 'dall-e-2' ||
+            $quality ∈ ($model.starts-with('gpt-image-2.6-') ?? <auto low medium high xhigh max> !! <auto low medium high>);
 
     #------------------------------------------------------
     # Process $response_format
@@ -100,13 +122,18 @@ multi sub OpenAIEditImage($file,
     #------------------------------------------------------
     if $method eq 'curl' {
         # Some sort of no-good shortcut -- see curl-post
-        my %body = image => $file, mask => $mask-file, :$prompt, :$size, :$n, response_format => $response-format;
+        my %body = image => $file, :$model, :$prompt, :$size, :$n;
+        if $mask-file { %body<mask> = $mask-file; }
+        if $model eq 'dall-e-2' { %body<response_format> = $response-format; }
+        else { %body<quality> = $quality; }
 
         return openai-request(:$url, :%body, :$auth-key, :$timeout, :$format, :$method);
 
     } elsif $method eq 'tiny' {
 
-        my %body = :$prompt, :$size, :$n, response_format => $response-format;
+        my %body = :$model, :$prompt, :$size, :$n;
+        if $model eq 'dall-e-2' { %body<response_format> = $response-format; }
+        else { %body<quality> = $quality; }
 
         %body<image> = $file.IO;
         if $mask-file {
