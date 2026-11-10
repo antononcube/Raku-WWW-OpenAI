@@ -46,59 +46,65 @@ then the functions `openai-*` attempt to use the env variable `OPENAI_API_KEY`.
 The package has an universal "front-end" function `openai-playground` for the 
 [different functionalities provided by OpenAI](https://platform.openai.com/docs/api-reference/introduction).
 
-Here is a simple call for a "chat completion":
+Here is a simple text-generation call. The default model is `gpt-6.1-sol` and
+the default path is the Responses API:
 
-```perl6
+```raku
 use WWW::OpenAI;
-openai-playground('Where is Roger Rabbit?', max-tokens => 64);
+openai-playground('Where is Roger Rabbit?', max-tokens => 128, format => 'values');
 ```
 
 Another one using Bulgarian:
 
-```perl6
-openai-playground('Колко групи могат да се намерят в този облак от точки.', max-tokens => 64);
+```raku
+openai-playground('Колко групи могат да се намерят в този облак от точки.', max-tokens => 128, format => 'values');
 ```
 
-**Remark:** The function `openai-completion` can be used instead in the examples above. 
-See the section 
-["Create chat completion"](https://platform.openai.com/docs/api-reference/chat/create) of [OAI2]
-for more details.
+The function `openai-completion` can also be used for text generation.
+Use `openai-chat-completion` with `path => 'chat/completions'` when explicitly
+calling the Chat Completions endpoint with a compatible model.
 
 ### Models
 
 The current OpenAI models can be found with the function `openai-models`:
 
-```perl6
+```raku
 openai-models
 ```
 
+The returned list reflects the models available to your API account. The
+package's built-in model list includes current and legacy IDs. Deprecated IDs
+remain selectable while OpenAI still serves them; retirement dates are listed
+in [OpenAI's deprecations page](https://developers.openai.com/api/docs/deprecations).
+For example, `gpt-5` and `whisper-1` can be selected explicitly during their
+deprecation periods. An ID remaining in the package cannot restore access after
+OpenAI shuts it down.
+
 ### Code generation
 
-There are two types of completions : text and chat. Let us illustrate the differences
-of their usage by Raku code generation. Here is a text completion:
+For new text-generation code, use the Responses path:
 
-```perl6
+```raku
 openai-completion(
         'generate Raku code for making a loop over a list',
-        type => 'text',
+        model => 'gpt-6.1-sol',
         max-tokens => 120,
         format => 'values');
 ```
 
-Here is a chat completion:
 
-```perl6
-openai-completion(
-        'generate Raku code for making a loop over a list',
-        type => 'chat',
-        max-tokens => 120,
+You can preserve separate system and user messages with `openai-chat-completion`:
+
+```raku
+openai-chat-completion(
+        [system => 'Answer with Raku code only.',
+         user => 'Write a loop over a list.'],
+        model => 'gpt-6.1-sol',
         format => 'values');
 ```
 
-**Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
-For example: 
-- `model => 'text-davinci-003'` implies `type => 'text'`
-- `model => 'gpt-3.5-turbo'` implies `type => 'chat'`
+
+Legacy text-completion models require `type => 'text'` and an active model ID.
 
 
 ### Image generation
@@ -111,11 +117,10 @@ Images can be generated with the function `openai-create-image` -- see the secti
 
 Here is an example:
 
-```perl6, eval=FALSE
+```raku, eval=FALSE
 my $imgB64 = openai-create-image(
         "racoon with a sliced onion in the style of Raphael",
-        response-format => 'b64_json',
-        model = 'dalle-e-3',
+        model => 'gpt-image-2.6-flare',
         n => 1,
         size => '1024x1024',
         format => 'values',
@@ -124,30 +129,33 @@ my $imgB64 = openai-create-image(
 
 Here are the options descriptions:
 
-- `response-format` takes the values "url" and "b64_json"
+- GPT Image models return Base64 image data; `response-format` applies to older DALL·E models
 - `n` takes a positive integer, for the number of images to be generated
-- `size` takes the values '1024x1024', '512x512', '256x256', 'large', 'medium', 'small'. 
+- `size` accepts `auto`, `square`, `landscape`, or `portrait` for the current GPT Image models
 
-Here we generate an image, get its URL, and place (embed) a link to it via the output of the code cell:
+Here we embed a generated image using the returned Base64 data:
 
-```perl6, results='asis', eval=FALSE
+```raku, results='asis', eval=FALSE
 my @imgRes = |openai-create-image(
         "racoon and onion in the style of Roy Lichtenstein",
-        response-format => 'url',
         n => 1,
-        size => 'small',
+        size => 'square',
+        format => 'values',
         method => 'tiny');
 
-'![](' ~ @imgRes.head<url> ~ ')';
+'![](data:image/png;base64,' ~ @imgRes.head ~ ')';
 ```
 
-**Remark:** The argument "model" can be `Whatever` of one of "dall-e-2" or "dall-e-3". 
-Not all parameters that are valid for one of the models are valid or respected by the other --
-see the subsection ["Create image"](https://platform.openai.com/docs/api-reference/images/create) of 
-[OpenAI's documentation](https://platform.openai.com/docs/api-reference).
+The default image model is `gpt-image-2.6-flare`. Older DALL·E model names
+remain in the package for historical compatibility; OpenAI has shut down
+`dall-e-2` and `dall-e-3`.
 
 
 ### Image variation
+
+The image variations endpoint used by the examples below relied on `dall-e-2`,
+which OpenAI has shut down. For current image-to-image work, use
+`openai-edit-image` with a GPT Image model.
 
 **Remark:** See the files ["Image-variation*"](./docs/Image-variation-and-edition.md) for more details.
 
@@ -157,7 +165,7 @@ Images variations over image files can be generated with the function `openai-va
 
 Here is an example:
 
-```perl6, eval=FALSE
+```raku, eval=FALSE
 my $imgB64 = openai-variate-image(
         $*CWD ~ '/resources/RandomMandala.png',
         response-format => 'b64_json',
@@ -177,7 +185,7 @@ Here are the options descriptions:
 
 Here we generate an image, get its URL, and place (embed) a link to it via the output of the code cell:
 
-```perl6, results='asis', eval=FALSE
+```raku, results='asis', eval=FALSE
 my @imgRes = |openai-variate-image(
         $*CWD ~ '/resources/RandomMandala.png',
         response-format => 'url',
@@ -215,7 +223,7 @@ Here is a random mandala color (RGBA) image:
 Here we generate a few editions of the colored mandala image above, get their URLs,
 and place (embed) the image links using a table:
 
-```perl6, results=asis, eval=FALSE
+```raku, results=asis, eval=FALSE
 my @imgRes = |openai-edit-image(
         $*CWD ~ '/../resources/RandomMandala2.png',
         'add cosmic background',
@@ -239,7 +247,7 @@ The argument "images" is a list of image URLs, image file names, or image Base64
 
 Here is an example with three images:
 
-```perl6
+```raku
 my $url1 = 'https://i.imgur.com/LEGfCeq.jpg';
 my $url2 = 'https://i.imgur.com/UcRYl9Y.jpg';
 my $fname3 = $*CWD ~ '/resources/ThreeHunters.jpg';
@@ -250,7 +258,7 @@ say openai-completion("Give concise descriptions of the images.", :@images, max-
 The function `encode-image` from the namespace `WWW::OpenAI::ChatCompletions` can be used
 to get Base64 image strings corresponding to image files. For example:
 
-```perl6, results=asis, eval=FALSE
+```raku, results=asis, eval=FALSE
 my $img3 = WWW::OpenAI::ChatCompletions::encode-image($fname3);
 say "![]($img3)"  
 ```
@@ -263,7 +271,7 @@ When a file name is given to the argument "images" of `openai-completion` then t
 Here is an example of using 
 [OpenAI's moderation](https://platform.openai.com/docs/api-reference/moderations):
 
-```perl6
+```raku
 my @modRes = |openai-moderation(
 "I want to kill them!",
 format => "values",
@@ -277,7 +285,7 @@ for @modRes -> $m { .say for $m.pairs.sort(*.value).reverse; }
 Here is an example of using
 [OpenAI's audio transcription](https://platform.openai.com/docs/api-reference/audio):
 
-```perl6
+```raku
 my $fileName = $*CWD ~ '/resources/HelloRaccoonsEN.mp3';
 say openai-audio(
         $fileName,
@@ -285,9 +293,12 @@ say openai-audio(
         method => 'tiny');
 ```
 
-To do translations use the named argument `type`:
 
-```perl6
+Transcription defaults to `gpt-transcribe`. You can still select
+`model => 'whisper-1'` while that model remains available. Translation uses
+`whisper-1`; specify `type => 'translations'`:
+
+```raku
 my $fileName = $*CWD ~ '/resources/HowAreYouRU.mp3';
 say openai-audio(
         $fileName,
@@ -300,7 +311,7 @@ say openai-audio(
 
 Here is an example of text-to-speech generation - `type`, `prompt`, have to be specified:
 
-```perl6
+```raku
 my $fileName = $*CWD ~ '/resources/EveryDay.mp3';
 my $res = openai-audio(
         $fileName, 
@@ -319,7 +330,7 @@ my $res = openai-audio(
 can be obtained with the function `openai-embeddings`. Here is an example of finding the embedding vectors
 for each of the elements of an array of strings:
 
-```perl6
+```raku
 my @queries = [
     'make a classifier with the method RandomForeset over the data dfTitanic',
     'show precision and accuracy',
@@ -335,7 +346,7 @@ Here we show:
 - That the result is an array of four vectors each with length 1536
 - The distributions of the values of each vector
 
-```perl6
+```raku
 use Data::Reshapers;
 use Data::Summarizers;
 
@@ -346,13 +357,13 @@ records-summary($embs.kv.Hash.&transpose);
 
 Here we find the corresponding dot products and (cross-)tabulate them:
 
-```perl6
+```raku
 use Data::Reshapers;
 use Data::Summarizers;
 my @ct = (^$embs.elems X ^$embs.elems).map({ %( i => $_[0], j => $_[1], dot => sum($embs[$_[0]] >>*<< $embs[$_[1]])) }).Array;
 
 say to-pretty-table(cross-tabulate(@ct, 'i', 'j', 'dot'), field-names => (^$embs.elems)>>.Str);
-````
+```
 
 **Remark:** Note that the fourth element (the cooking recipe request) is an outlier.
 (Judging by the table with dot products.)
@@ -364,7 +375,7 @@ Here is a prompt for "emojification" (see the
 entry
 ["Emojify"](https://resources.wolframcloud.com/PromptRepository/resources/Emojify/)):
 
-```perl6
+```raku
 my $preEmojify = q:to/END/;
 Rewrite the following text and convert some of it into emojis.
 The emojis are all related to whatever is in the text.
@@ -377,7 +388,7 @@ END
 
 Here is an example of chat completion with emojification:
 
-```perl6
+```raku
 openai-chat-completion([ system => $preEmojify, user => 'Python sucks, Raku rocks, and Perl is annoying'], max-tokens => 200, format => 'values')
 ```
 
@@ -393,7 +404,7 @@ using the parameter specs `llm => 'chatgpt'` or `llm => 'openai'`.
 
 Here is an example of finding textual answers:
 
-```perl6
+```raku
 use ML::FindTextualAnswer;
 my $text = "Lake Titicaca is a large, deep lake in the Andes 
 on the border of Bolivia and Peru. By volume of water and by surface 
@@ -418,7 +429,7 @@ area, it is the largest lake in South America"
 
 Here we get a longer answer by changing the value of "request":
 
-```perl6
+```raku
 find-textual-answer($text, "Where is Titicaca?", llm => 'chatgpt', request => "answer the question:")
 ```
 
@@ -433,7 +444,7 @@ then all questions are spliced with the given text into one query (that is sent 
 
 For example, consider the following text and questions:
 
-```perl6
+```raku
 my $query = 'Make a classifier with the method RandomForest over the data dfTitanic; show precision and accuracy.';
 
 my @questions =
@@ -467,6 +478,10 @@ Default models can be specified with the operating system environmental variable
 - `OPENAI_DEFAULT_MODEL`
 - `OPENAI_DEFAULT_IMAGE_GENERATION_MODEL`
 - `OPENAI_DEFAULT_EMBEDDING_MODEL`
+
+The built-in defaults are `gpt-6.1-sol` for text, `gpt-image-2.6-flare` for
+image generation and editing, and `text-embedding-3-small` for embeddings.
+Transcription defaults to `gpt-transcribe`.
 
 -------
 
@@ -619,7 +634,7 @@ Related is a (current) deficiency of the package "WWW::OpenAI" -- the known mode
 
 - [X] DONE Implement vision (over images)
 
-- [X] DONE Implement handling of tools (function calling)
+- [X] DONE Implement handling of tools
 
 --------
 
