@@ -1,5 +1,9 @@
 # Image variation and edition
 
+The image variation examples below use the retired `dall-e-2` model. For new
+image-to-image work, use `openai-edit-image` with the default
+`gpt-image-2.6-flare` model. See [OpenAI deprecations](https://developers.openai.com/api/docs/deprecations).
+
 This Markdown file can be "evaluated" with the Raku package "Text::CodeProcessing", [AAp2]. 
 Here is a shell command:
 

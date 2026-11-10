@@ -46,33 +46,29 @@ then the functions `openai-*` attempt to use the env variable `OPENAI_API_KEY`.
 The package has an universal "front-end" function `openai-playground` for the 
 [different functionalities provided by OpenAI](https://platform.openai.com/docs/api-reference/introduction).
 
-Here is a simple call for a "chat completion":
+Here is a simple text-generation call. The default model is `gpt-6.1-sol` and
+the default path is the Responses API:
 
 ```perl6
 use WWW::OpenAI;
-openai-playground('Where is Roger Rabbit?', max-tokens => 64);
+openai-playground('Where is Roger Rabbit?', max-tokens => 128, format => 'values');
 ```
 ```
-# [{finish_reason => stop, index => 0, logprobs => (Any), text => 
-# 
-# Roger Rabbit is a fictional character from the movie "Who Framed Roger Rabbit" and he does not exist in real life. He can only be found in the movie and its related merchandise.}]
+# Roger Rabbit is a fictional character.
 ```
 
 Another one using Bulgarian:
 
 ```perl6
-openai-playground('Колко групи могат да се намерят в този облак от точки.', max-tokens => 64);
+openai-playground('Колко групи могат да се намерят в този облак от точки.', max-tokens => 128, format => 'values');
 ```
 ```
-# [{finish_reason => length, index => 0, logprobs => (Any), text => 
-# 
-# Не може да се даде точен отговор на този въпрос без да се предостави допълнителна информация за облака от точки. Броят на групите може да зав}]
+# The answer depends on the input data.
 ```
 
-**Remark:** The function `openai-completion` can be used instead in the examples above. 
-See the section 
-["Create chat completion"](https://platform.openai.com/docs/api-reference/chat/create) of [OAI2]
-for more details.
+The function `openai-completion` can also be used for text generation.
+Use `openai-chat-completion` with `path => 'chat/completions'` when explicitly
+calling the Chat Completions endpoint with a compatible model.
 
 ### Models
 
@@ -81,72 +77,45 @@ The current OpenAI models can be found with the function `openai-models`:
 ```perl6
 openai-models
 ```
-```
-# (babbage-002 dall-e-2 dall-e-3 davinci-002 gpt-3.5-turbo gpt-3.5-turbo-0125 gpt-3.5-turbo-0301 gpt-3.5-turbo-0613 gpt-3.5-turbo-1106 gpt-3.5-turbo-16k gpt-3.5-turbo-16k-0613 gpt-3.5-turbo-instruct gpt-3.5-turbo-instruct-0914 gpt-4 gpt-4-0125-preview gpt-4-0613 gpt-4-1106-preview gpt-4-turbo-preview gpt-4-vision-preview text-embedding-3-large text-embedding-3-small text-embedding-ada-002 tts-1 tts-1-1106 tts-1-hd tts-1-hd-1106 whisper-1)
-```
+The returned list reflects the models available to your API account. The
+package's built-in model list includes current and legacy IDs. Deprecated IDs
+remain selectable while OpenAI still serves them; retirement dates are listed
+in [OpenAI's deprecations page](https://developers.openai.com/api/docs/deprecations).
+For example, `gpt-5` and `whisper-1` can be selected explicitly during their
+deprecation periods. An ID remaining in the package cannot restore access after
+OpenAI shuts it down.
 
 ### Code generation
 
-There are two types of completions : text and chat. Let us illustrate the differences
-of their usage by Raku code generation. Here is a text completion:
+For new text-generation code, use the Responses path:
 
 ```perl6
 openai-completion(
         'generate Raku code for making a loop over a list',
-        type => 'text',
+        model => 'gpt-6.1-sol',
         max-tokens => 120,
         format => 'values');
 ```
 ```
-# my @list = (1, 2, 3, 4, 5, 6); # example list
-# 
-# for @list -> $item { # loop over the list using the for loop
-#     say $item; # print each item in the list
-# }
-# 
-# # Output:
-# # 1
-# # 2
-# # 3
-# # 4
-# # 5
-# # 6
-```
-
-Here is a chat completion:
-
-```perl6
-openai-completion(
-        'generate Raku code for making a loop over a list',
-        type => 'chat',
-        max-tokens => 120,
-        format => 'values');
-```
-```
-# Here is an example of Raku code that loops over a list and prints each element:
-# 
-# ```raku
 # my @list = 1, 2, 3, 4, 5;
-# 
-# for @list -> $element {
-#     say $element;
-# }
-# ```
-# 
-# This code will output:
-# ```
-# 1
-# 2
-# 3
-# 4
-# 5
-# ```
+# for @list -> $item { say $item }
 ```
 
-**Remark:** The argument "type" and the argument "model" have to "agree." (I.e. be found agreeable by OpenAI.)
-For example: 
-- `model => 'text-davinci-003'` implies `type => 'text'`
-- `model => 'gpt-3.5-turbo'` implies `type => 'chat'`
+You can preserve separate system and user messages with `openai-chat-completion`:
+
+```perl6
+openai-chat-completion(
+        [system => 'Answer with Raku code only.',
+         user => 'Write a loop over a list.'],
+        model => 'gpt-6.1-sol',
+        format => 'values');
+```
+```
+# my @list = 1, 2, 3, 4, 5;
+# for @list -> $item { say $item }
+```
+
+Legacy text-completion models require `type => 'text'` and an active model ID.
 
 
 ### Image generation
@@ -162,8 +131,7 @@ Here is an example:
 ```perl6, eval=FALSE
 my $imgB64 = openai-create-image(
         "racoon with a sliced onion in the style of Raphael",
-        response-format => 'b64_json',
-        model = 'dalle-e-3',
+        model => 'gpt-image-2.6-flare',
         n => 1,
         size => '1024x1024',
         format => 'values',
@@ -172,30 +140,33 @@ my $imgB64 = openai-create-image(
 
 Here are the options descriptions:
 
-- `response-format` takes the values "url" and "b64_json"
+- GPT Image models return Base64 image data; `response-format` applies to older DALL·E models
 - `n` takes a positive integer, for the number of images to be generated
-- `size` takes the values '1024x1024', '512x512', '256x256', 'large', 'medium', 'small'. 
+- `size` accepts `auto`, `square`, `landscape`, or `portrait` for the current GPT Image models
 
-Here we generate an image, get its URL, and place (embed) a link to it via the output of the code cell:
+Here we embed a generated image using the returned Base64 data:
 
 ```perl6, results='asis', eval=FALSE
 my @imgRes = |openai-create-image(
         "racoon and onion in the style of Roy Lichtenstein",
-        response-format => 'url',
         n => 1,
-        size => 'small',
+        size => 'square',
+        format => 'values',
         method => 'tiny');
 
-'![](' ~ @imgRes.head<url> ~ ')';
+'![](data:image/png;base64,' ~ @imgRes.head ~ ')';
 ```
 
-**Remark:** The argument "model" can be `Whatever` of one of "dall-e-2" or "dall-e-3". 
-Not all parameters that are valid for one of the models are valid or respected by the other --
-see the subsection ["Create image"](https://platform.openai.com/docs/api-reference/images/create) of 
-[OpenAI's documentation](https://platform.openai.com/docs/api-reference).
+The default image model is `gpt-image-2.6-flare`. Older DALL·E model names
+remain in the package for historical compatibility; OpenAI has shut down
+`dall-e-2` and `dall-e-3`.
 
 
 ### Image variation
+
+The image variations endpoint used by the examples below relied on `dall-e-2`,
+which OpenAI has shut down. For current image-to-image work, use
+`openai-edit-image` with a GPT Image model.
 
 **Remark:** See the files ["Image-variation*"](./docs/Image-variation-and-edition.md) for more details.
 
@@ -354,11 +325,14 @@ say openai-audio(
 ```
 ```
 # {
-#   "text": "Raku practitioners around the world, eat more onions!"
+#   "text": "Raku practitioners around the world, eat more onions!",
+#   "languages": [{ "code": "en" }]
 # }
 ```
 
-To do translations use the named argument `type`:
+Transcription defaults to `gpt-transcribe`. You can still select
+`model => 'whisper-1'` while that model remains available. Translation uses
+`whisper-1`; specify `type => 'translations'`:
 
 ```perl6
 my $fileName = $*CWD ~ '/resources/HowAreYouRU.mp3';
@@ -596,6 +570,10 @@ Default models can be specified with the operating system environmental variable
 - `OPENAI_DEFAULT_IMAGE_GENERATION_MODEL`
 - `OPENAI_DEFAULT_EMBEDDING_MODEL`
 
+The built-in defaults are `gpt-6.1-sol` for text, `gpt-image-2.6-flare` for
+image generation and editing, and `text-embedding-3-small` for embeddings.
+Transcription defaults to `gpt-transcribe`.
+
 -------
 
 ## Command Line Interface
@@ -611,9 +589,9 @@ openai-playground --help
 # Usage:
 #   openai-playground [<words> ...] [--path=<Str>] [-n[=UInt]] [--mt|--max-tokens[=UInt]] [-m|--model=<Str>] [-r|--role=<Str>] [-t|--temperature[=Real]] [-i|--images=<Str>] [-l|--language=<Str>] [--response-format=<Str>] [-a|--auth-key=<Str>] [--timeout[=UInt]] [-f|--format=<Str>] [--method=<Str>] [--base-url=<Str>] -- Command given as a sequence of words.
 #   
-#     --path=<Str>                Path, one of 'chat/completions', 'images/generations', 'images/edits', 'images/variations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'chat/completions']
+#     --path=<Str>                Path, one of 'responses', 'chat/completions', 'images/generations', 'images/edits', 'images/variations', 'moderations', 'audio/transcriptions', 'audio/translations', 'embeddings', or 'models'. [default: 'responses']
 #     -n[=UInt]                   Number of completions or generations. [default: 1]
-#     --mt|--max-tokens[=UInt]    The maximum number of tokens to generate in the completion. [default: 100]
+#     --mt|--max-tokens[=UInt]    The maximum number of tokens to generate in the completion. [default: 4096]
 #     -m|--model=<Str>            Model. [default: 'Whatever']
 #     -r|--role=<Str>             Role. [default: 'user']
 #     -t|--temperature[=Real]     Temperature. [default: 0.7]

@@ -1,5 +1,18 @@
 # Image generation
 
+The examples below document the earlier DALL·E models. For new requests, the
+package defaults to `gpt-image-2.6-flare`. For example:
+
+```raku
+my @images = openai-create-image(
+    'A raccoon reading a Raku book',
+    size => 'square',
+    format => 'values');  # Base64 image data
+```
+
+The DALL·E examples below are historical: OpenAI has shut down `dall-e-2` and
+`dall-e-3`. See [OpenAI deprecations](https://developers.openai.com/api/docs/deprecations).
+
 This Markdown file can be "evaluated" with the Raku package "Text::CodeProcessing", [AAp2]. 
 Here is a shell command:
 
