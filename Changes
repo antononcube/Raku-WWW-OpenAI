@@ -1,5 +1,8 @@
 Revision history for "WWW::OpenAI"
 
+0.3.21 2026-11-15
+    - Proper handling of the "reasoning_effort" for different models of different generations.
+
 0.3.21 2026-11-09
     - Add GPT-6 text, GPT Image 2.6, and GPT Transcribe model support.
     - Use Responses for GPT-6 requests and preserve message roles, image input,
