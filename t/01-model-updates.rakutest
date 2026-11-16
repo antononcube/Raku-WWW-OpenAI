@@ -68,6 +68,17 @@ is %deprecated-request<path>, '/v1/chat/completions', 'explicit legacy model kee
 my %deprecated-body = from-json(%deprecated-request<body>.decode);
 is %deprecated-body<model>, 'gpt-5', 'explicit deprecated model is sent unchanged';
 
+my ($luna-text, %luna-request) = capture-request(-> $base-url {
+    openai-chat-completion('weather', model => 'gpt-5.6-luna',
+            reasoning-effort => 'none',
+            tools => [{type => 'function', function => {name => 'weather', parameters => {type => 'object'}}},],
+            :$base-url, auth-key => 'test', format => 'values')
+});
+is %luna-request<path>, '/v1/chat/completions', 'Luna with none effort keeps Chat Completions';
+my %luna-body = from-json(%luna-request<body>.decode);
+is %luna-body<reasoning_effort>, 'none', 'Chat request sends reasoning_effort none';
+is %luna-body<tools>[0]<function><name>, 'weather', 'Chat tool schema is preserved';
+
 my ($vision, %vision-request) = capture-request(-> $base-url {
     openai-chat-completion('look', model => 'gpt-6.1-terra',
             images => ['https://example.org/a.png'], :$base-url,

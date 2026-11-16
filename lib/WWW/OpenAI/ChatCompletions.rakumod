@@ -219,7 +219,8 @@ multi sub OpenAIChatCompletion(@prompts is copy,
     }
 
     if ($path ~~ / ^ 'responses' /) || $model.starts-with('gpt-6') ||
-            $model.starts-with('gpt-5') && ($reasoning-effort ~~ Str:D || $verbosity ~~ Str:D) {
+            $model.starts-with('gpt-5') &&
+            (($reasoning-effort ~~ Str:D && $reasoning-effort ne 'none') || $verbosity ~~ Str:D) {
         %body = %();
         %body<model> = $model;
         %body<input> = @messages.map(-> $message {
@@ -254,6 +255,8 @@ multi sub OpenAIChatCompletion(@prompts is copy,
         }
         if $stream { %body<stream> = True; }
         $path = 'responses';
+    } elsif $reasoning-effort ~~ Str:D {
+        %body<reasoning_effort> = $reasoning-effort;
     }
 
     my $url = $base-url ~ "/" ~ $path;
